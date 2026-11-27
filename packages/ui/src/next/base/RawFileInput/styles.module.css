@@ -1,0 +1,21 @@
+.raw-file-input {
+    display: contents;
+
+    /* NOTE: visually hidden but focusable, so the picker opens from the keyboard */
+    .input {
+        position: absolute;
+        margin: -1px;
+        border: 0;
+        padding: 0;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+    }
+
+    &:has(.input:focus-visible) > :not(.input) {
+        outline: var(--go-ui-width-separator-md) solid var(--go-ui-color-primary-blue);
+        outline-offset: var(--go-ui-width-separator-sm);
+    }
+}
