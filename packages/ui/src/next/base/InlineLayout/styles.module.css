@@ -1,0 +1,128 @@
+.inline-layout {
+    display: grid;
+    align-items: center;
+
+    &.start-aligned-content {
+        align-items: start;
+    }
+
+    &.end-aligned-content {
+        align-items: end;
+    }
+
+    .after-content,
+    .before-content {
+        svg {
+            display: flex;
+        }
+    }
+
+    .before-content:empty {
+        display: none;
+    }
+
+    .after-content:empty {
+        display: none;
+    }
+
+    &:has(> .after-content:not(:empty)):not(:has(> .before-content)) {
+        grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    &:has(> .before-content:not(:empty)):not(:has(> .after-content)) {
+        grid-template-columns: auto minmax(0, 1fr);
+    }
+
+    &:has(> .before-content:not(:empty)):has(> .after-content:not(:empty)) {
+        grid-template-columns: auto 1fr auto;
+    }
+
+    &:has(> .before-content:empty):has(> .after-content:empty) {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    &:has(> .after-content:not(:empty)):has(> .before-content:empty) {
+        grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    &:has(> .before-content:not(:empty)):has(> .after-content:empty) {
+        grid-template-columns: auto minmax(0, 1fr);
+    }
+
+    .children {
+        min-width: 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+
+        &.ellipsized {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    }
+
+    &.with-inline-display {
+        display: inline-grid;
+
+        .children {
+            &:not(.ellipsized) {
+                display: inline-flex;
+            }
+        }
+    }
+
+}
+
+/* Adaptive row: below the breakpoint, `after` moves to its own line under the content */
+.wrap-container {
+    container-type: inline-size;
+
+    @container (max-width: 18rem) {
+        &.with-sm-wrap-breakpoint > .inline-layout {
+            &:has(> .before-content) {
+                grid-template-columns: auto minmax(0, 1fr);
+            }
+
+            &:not(:has(> .before-content)) {
+                grid-template-columns: minmax(0, 1fr);
+            }
+
+            > .after-content {
+                grid-column: 1 / -1;
+            }
+        }
+    }
+
+    @container (max-width: 24rem) {
+        &.with-md-wrap-breakpoint > .inline-layout {
+            &:has(> .before-content) {
+                grid-template-columns: auto minmax(0, 1fr);
+            }
+
+            &:not(:has(> .before-content)) {
+                grid-template-columns: minmax(0, 1fr);
+            }
+
+            > .after-content {
+                grid-column: 1 / -1;
+            }
+        }
+    }
+
+    @container (max-width: 32rem) {
+        &.with-lg-wrap-breakpoint > .inline-layout {
+            &:has(> .before-content) {
+                grid-template-columns: auto minmax(0, 1fr);
+            }
+
+            &:not(:has(> .before-content)) {
+                grid-template-columns: minmax(0, 1fr);
+            }
+
+            > .after-content {
+                grid-column: 1 / -1;
+            }
+        }
+    }
+}

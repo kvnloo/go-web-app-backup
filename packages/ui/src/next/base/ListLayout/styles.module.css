@@ -1,0 +1,163 @@
+.list-layout {
+    --border-radius: initial;
+    border-radius: var(--border-radius);
+
+    &.with-overflow {
+        overflow: auto;
+    }
+
+    &.with-grow {
+        flex-grow: 1;
+    }
+
+    &.grid-layout {
+        container-type: inline-size;
+        /* stylelint-disable-next-line csstools/value-no-unknown-custom-properties */
+        --num-columns: var(--num-preferred-columns);
+        /* stylelint-disable-next-line csstools/value-no-unknown-custom-properties */
+        --min-item-size: var(--min-column-size);
+
+        .grid-content {
+            display: grid;
+            --sidebar-size: 0;
+
+            &:not(.grid-content-with-sidebar) {
+                /* stylelint-disable csstools/value-no-unknown-custom-properties */
+                grid-template-columns: repeat(
+                    auto-fill,
+                    minmax(
+                        max(
+                            var(--min-item-size),
+                            calc((100cqi - var(--reserved-space)) / var(--num-columns))
+                        ),
+                        1fr
+                    )
+                );
+                /* stylelint-enable csstools/value-no-unknown-custom-properties */
+            }
+
+            &.xs-sidebar {
+                --sidebar-size: calc(6rem + 10 * var(--go-ui-page-size-unit));
+            }
+
+            &.sm-sidebar {
+                --sidebar-size: calc(8rem + 15 * var(--go-ui-page-size-unit));
+            }
+
+            &.md-sidebar {
+                --sidebar-size: calc(10rem + 23 * var(--go-ui-page-size-unit));
+            }
+
+            &.lg-sidebar {
+                --sidebar-size: calc(14rem + 30 * var(--go-ui-page-size-unit));
+            }
+
+            &.grid-content-with-sidebar {
+                grid-template-columns: 1fr var(--sidebar-size);
+
+                &.sidebar-position-start {
+                    grid-template-columns: var(--sidebar-size) 1fr;
+                }
+            }
+        }
+
+        &.with-overflow {
+            .grid-content {
+                overflow: auto;
+            }
+        }
+    }
+
+    &.with-sidebar {
+        display: flex;
+        flex-direction: column;
+    }
+
+    &.inline-layout {
+        display: flex;
+        align-items: center;
+        flex-direction: row;
+
+        &.with-wrap {
+            align-content: start;
+            flex-wrap: wrap;
+        }
+
+        &.with-space-between-contents {
+            justify-content: space-between;
+        }
+
+        &.with-centered-contents {
+            justify-content: center;
+        }
+
+        &.with-start-alignment {
+            align-items: start;
+        }
+    }
+
+    &.block-layout {
+        display: flex;
+        flex-direction: column;
+
+        &.with-centered-contents {
+           align-items: center;
+        }
+    }
+
+    &.with-full-width {
+        width: 100%;
+    }
+
+    /* background-color itself comes from the spec utility class */
+    &.with-background-color {
+        --border-radius: var(--go-ui-border-radius-md);
+    }
+
+    &:empty {
+        display: none;
+    }
+
+    @container (max-width: 40rem) {
+        overflow: unset;
+
+        &.grid-layout {
+            overflow: unset;
+
+            >.grid-content {
+                overflow: unset;
+
+                &.grid-content-with-sidebar {
+                    grid-template-columns: 1fr;
+                    overflow: unset;
+
+                    &.sidebar-position-start {
+                        grid-template-columns: 1fr;
+                    }
+                }
+            }
+        }
+    }
+
+    @container (max-width: 18rem) {
+        overflow: unset;
+
+        &.grid-layout {
+            overflow: unset;
+
+            >.grid-content {
+                overflow: unset;
+                grid-template-columns: 1fr;
+
+                &.grid-content-with-sidebar {
+                    grid-template-columns: 1fr;
+                    overflow: unset;
+                }
+
+                &.sidebar-position-start {
+                    grid-template-columns: 1fr;
+                }
+            }
+        }
+    }
+}
