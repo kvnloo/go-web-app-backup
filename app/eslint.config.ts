@@ -5,6 +5,7 @@ import tseslint from "typescript-eslint";
 import process from 'process';
 import { Linter } from 'eslint';
 
+import goUiNext from './scripts/eslint/go-ui-next';
 import i18nUsage from './scripts/eslint/i18n-usage';
 
 const dirname = process.cwd();
@@ -162,6 +163,27 @@ const jsonConfig: Linter.Config = {
     },
 };
 
+// NOTE: guards for @ifrc-go/ui/next (decisions 5, 16 and 28 in the GO UI plan)
+const viewsConfig: Linter.Config = {
+    files: ['src/views/**/*.tsx', 'src/views/**/*.ts'],
+    rules: {
+        'no-restricted-imports': ['error', {
+            paths: [
+                {
+                    name: '@ifrc-go/ui/next/base',
+                    message: 'Building blocks are for app/src/components only; views use @ifrc-go/ui/next.',
+                },
+                {
+                    name: '@ifrc-go/ui/next',
+                    importNames: ['Link', 'MenuItem', 'Page'],
+                    message: 'Use the app wrapper from #components, which maps route keys and app concerns.',
+                },
+            ],
+        }],
+        'go-ui-next/no-styling-props': 'warn',
+    },
+};
+
 // const i18nJsonConfig = {
 //     files: ['**/i18n.json'],
 //     language: 'json/json',
@@ -174,12 +196,14 @@ const config = tseslint.config(
     {
         plugins: {
             json,
+            'go-ui-next': goUiNext,
             'i18n-usage': i18nUsage,
         },
     },
     ...appConfigs,
     otherConfig,
     jsonConfig,
+    viewsConfig,
     // i18nJsonConfig,
     ...tseslint.configs.recommended
 );
