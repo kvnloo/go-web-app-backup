@@ -1,0 +1,167 @@
+{
+    "parent": "000106-1795264409258.json",
+    "actions": [
+        {
+            "action": "update",
+            "key": "threeWViewAllActivityLabel",
+            "namespace": "accountMyFormsThreeW",
+            "newValue": "View All Activities"
+        },
+        {
+            "action": "update",
+            "key": "operationMapViewAll",
+            "namespace": "activeOperationMap",
+            "newValue": "View All Operations"
+        },
+        {
+            "action": "update",
+            "key": "operationMapViewAllInCountry",
+            "namespace": "activeOperationMap",
+            "newValue": "View All Operations in this Country"
+        },
+        {
+            "action": "update",
+            "key": "operationMapViewAllInRegion",
+            "namespace": "activeOperationMap",
+            "newValue": "View All Operations in this Region"
+        },
+        {
+            "action": "update",
+            "key": "operationMapViewAll",
+            "namespace": "countryOngoingActivitiesEmergencies",
+            "newValue": "View All Operations"
+        },
+        {
+            "action": "update",
+            "key": "operationMapViewAllInCountry",
+            "namespace": "countryOngoingActivitiesEmergencies",
+            "newValue": "View All Operations in this Country"
+        },
+        {
+            "action": "update",
+            "key": "drefFormProposedActionBudgetLabel",
+            "namespace": "drefApplicationForm",
+            "newValue": "Budget (CHF)"
+        },
+        {
+            "action": "update",
+            "key": "drefFormProposedActionBudgetLabel",
+            "namespace": "drefFinalReportForm",
+            "newValue": "Budget (CHF)"
+        },
+        {
+            "action": "update",
+            "key": "approachBudget",
+            "namespace": "eapFullForm",
+            "newValue": "Budget (CHF)"
+        },
+        {
+            "action": "update",
+            "key": "financeEarlyActionBudgetLabel",
+            "namespace": "eapFullForm",
+            "newValue": "Early Actions Budget (CHF)"
+        },
+        {
+            "action": "update",
+            "key": "financePrePositioningBudgetLabel",
+            "namespace": "eapFullForm",
+            "newValue": "Pre-Positioning Budget (CHF)"
+        },
+        {
+            "action": "update",
+            "key": "financeReadinessBudgetLabel",
+            "namespace": "eapFullForm",
+            "newValue": "Readiness Budget (CHF)"
+        },
+        {
+            "action": "update",
+            "key": "financeTotalBudgetLabel",
+            "namespace": "eapFullForm",
+            "newValue": "Total Budget (CHF)"
+        },
+        {
+            "action": "update",
+            "key": "selectionActionsPlannedOperationBudget",
+            "namespace": "eapFullForm",
+            "newValue": "Budget (CHF)"
+        },
+        {
+            "action": "update",
+            "key": "approachBudget",
+            "namespace": "eapSimplifiedForm",
+            "newValue": "Budget (CHF)"
+        },
+        {
+            "action": "update",
+            "key": "operationBudget",
+            "namespace": "eapSimplifiedForm",
+            "newValue": "Budget (CHF)"
+        },
+        {
+            "action": "update",
+            "key": "timeframeDescription",
+            "namespace": "eapSimplifiedForm",
+            "newValue": "A simplified EAP has a timeframe of two years (unless the early actions are activated)"
+        },
+        {
+            "action": "update",
+            "key": "plannedOperationBudgetLabel",
+            "namespace": "emergencyOperationStrategy",
+            "newValue": "Budget (CHF)"
+        },
+        {
+            "action": "update",
+            "key": "surgeAlertsViewAllForCurrentEmergency",
+            "namespace": "emergencySurge",
+            "newValue": "View All Surge Alerts for this Emergency"
+        },
+        {
+            "action": "update",
+            "key": "submitButtonLabel",
+            "namespace": "form",
+            "newValue": "Submit for Approval"
+        },
+        {
+            "action": "update",
+            "key": "highlightedOperationsViewAll",
+            "namespace": "highlightedOperations",
+            "newValue": "View All Emergencies"
+        },
+        {
+            "action": "update",
+            "key": "highlightedOperationsViewAllInCountry",
+            "namespace": "highlightedOperations",
+            "newValue": "View All Emergencies in this Country"
+        },
+        {
+            "action": "update",
+            "key": "highlightedOperationsViewAllInRegion",
+            "namespace": "highlightedOperations",
+            "newValue": "View All Emergencies in this Region"
+        },
+        {
+            "action": "update",
+            "key": "regionEmergenciesTableViewAll",
+            "namespace": "regionOperations",
+            "newValue": "View All Emergencies in this Region"
+        },
+        {
+            "action": "update",
+            "key": "searchViewAll",
+            "namespace": "search",
+            "newValue": "View All Results for {searchCategory} ({numResults})"
+        },
+        {
+            "action": "update",
+            "key": "standardComponentsDetails",
+            "namespace": "surgeCatalogueCommunicationErtThree",
+            "newValue": "Each team member is self-equipped with a laptop, smart phone with relevant suite of communications and editing apps, video/still camera, tripod(s) and microphone(s) or suitable sound recording device, a drone/ 360 camera (if legally permissible)."
+        },
+        {
+            "action": "update",
+            "key": "standardComponentsDetails",
+            "namespace": "surgeCatalogueCommunicationErtTwo",
+            "newValue": "Each team member is self-equipped with a laptop, smart phone with relevant suite of communications and editing apps, video/still camera, tripod(s) and microphone(s) or suitable sound recording device, a drone/ 360 camera (if legally permissible)."
+        }
+    ]
+}

@@ -2,9 +2,9 @@
     "namespace": "activeOperationMap",
     "strings": {
         "activeOperationsTitle": "Active Operations Map ({numAppeals})",
-        "operationMapViewAll": "View all Operations",
-        "operationMapViewAllInRegion": "View all Operations in this Region",
-        "operationMapViewAllInCountry": "View all Operations in this Country",
+        "operationMapViewAll": "View All Operations",
+        "operationMapViewAllInRegion": "View All Operations in this Region",
+        "operationMapViewAllInCountry": "View All Operations in this Country",
         "operationType": "Type of Appeal",
         "operationFilterTypePlaceholder": "All Appeal Types",
         "operationDisasterType": "Disaster Type",

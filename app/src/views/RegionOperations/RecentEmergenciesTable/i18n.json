@@ -8,7 +8,7 @@
         "regionEmergenciesTableGlide":"Glide",
         "regionEmergenciesTableRequestedAmt":"Requested Amount",
         "regionEmergenciesTableCountry":"Countries",
-        "regionEmergenciesTableViewAll":"View all Emergencies in this Region",
+        "regionEmergenciesTableViewAll":"View All Emergencies in this Region",
         "regionEmergenciesTableNumberAffected":"# Affected"
     }
 }
