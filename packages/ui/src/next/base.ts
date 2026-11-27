@@ -9,6 +9,12 @@ export type {
     Tone,
 } from './base/ButtonLayout';
 export { default as ButtonLayout } from './base/ButtonLayout';
+export type { Props as ChartAxesProps } from './base/ChartAxes';
+export { default as ChartAxes } from './base/ChartAxes';
+export type { Props as ChartContainerProps, ChartSize } from './base/ChartContainer';
+export { default as ChartContainer } from './base/ChartContainer';
+export type { Props as ChartPointProps } from './base/ChartPoint';
+export { default as ChartPoint } from './base/ChartPoint';
 export type { Props as ChipLayoutProps } from './base/ChipLayout';
 export { default as ChipLayout } from './base/ChipLayout';
 export type { Props as ContainerLayoutProps } from './base/ContainerLayout';

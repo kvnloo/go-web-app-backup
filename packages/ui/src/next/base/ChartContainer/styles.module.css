@@ -1,0 +1,24 @@
+.chart-container {
+    width: 100%;
+
+    &.size-sm {
+        height: var(--go-ui-height-chart-sm);
+    }
+
+    &.size-md {
+        height: var(--go-ui-height-chart-md);
+    }
+
+    &.size-lg {
+        height: var(--go-ui-height-chart-lg);
+    }
+
+    &.size-xl {
+        height: var(--go-ui-height-chart-xl);
+    }
+
+    .svg {
+        width: 100%;
+        height: 100%;
+    }
+}
