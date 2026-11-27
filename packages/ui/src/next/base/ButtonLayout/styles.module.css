@@ -1,0 +1,145 @@
+.button-layout {
+    --tone-color: var(--go-ui-color-text-black);
+    --border-color: transparent;
+    --background-color: transparent;
+    --text-color: var(--tone-color);
+
+    position: relative;
+    border: var(--go-ui-width-separator-thin) solid var(--border-color);
+    border-radius: var(--go-ui-border-radius-full);
+    background-color: var(--background-color);
+    width: fit-content;
+    text-align: start;
+    line-height: var(--go-ui-line-height-sm);
+    color: var(--text-color);
+    font-size: inherit;
+    font-weight: var(--go-ui-font-weight-medium);
+    user-select: none;
+
+    .before,
+    .after {
+        line-height: 0;
+
+        /* NOTE: icons in the slots scale with the text, as in IconButton */
+        svg {
+            font-size: var(--go-ui-height-icon-multiplier);
+        }
+    }
+
+    &.tone-primary {
+        --tone-color: var(--go-ui-color-primary-red);
+    }
+
+    &.tone-secondary {
+        --tone-color: var(--go-ui-color-primary-blue);
+    }
+
+    &.tone-neutral {
+        --tone-color: var(--go-ui-color-text-black);
+    }
+
+    &.tone-positive {
+        --tone-color: var(--go-ui-color-positive);
+    }
+
+    &.tone-information {
+        --tone-color: var(--go-ui-color-information);
+    }
+
+    &.tone-warning {
+        --tone-color: var(--go-ui-color-warning);
+    }
+
+    &.tone-negative {
+        --tone-color: var(--go-ui-color-negative);
+    }
+
+    &.fill-solid {
+        --background-color: var(--tone-color);
+        --text-color: var(--go-ui-color-text-on-dark);
+    }
+
+    &.fill-soft {
+        --background-color: color-mix(in srgb, var(--tone-color) 6%, transparent);
+    }
+
+    &.with-border {
+        --border-color: var(--tone-color);
+
+        /* NOTE: bordered buttons sit on a white plate so they read on gray surfaces too */
+        &.fill-none {
+            --background-color: var(--go-ui-color-foreground);
+        }
+    }
+
+    &.shape-inline {
+        --border-color: transparent;
+        --background-color: transparent;
+        padding: 0;
+    }
+
+    &.with-underline {
+        text-decoration: underline;
+    }
+
+    /* On a dark surface every tone uses the on-dark colour */
+    &.on-dark {
+        --tone-color: var(--go-ui-color-text-on-dark);
+
+        &.fill-solid {
+            --text-color: var(--go-ui-color-primary-blue);
+        }
+
+        &.with-border.fill-none {
+            --background-color: transparent;
+        }
+    }
+
+    &.with-full-width {
+        width: 100%;
+    }
+
+    &.disabled {
+        opacity: var(--go-ui-opacity-disabled-element);
+    }
+
+    .visual-feedback {
+        --visual-feedback-offset: 0.25rem;
+        --du: var(--go-ui-duration-transition-medium);
+        --de: calc(var(--du) / 4);
+        position: absolute;
+        top: 0;
+        left: 0;
+        transition: var(--du) var(--de) background-color ease-in-out,
+            var(--du) var(--de) box-shadow ease-in-out;
+        border-radius: var(--go-ui-border-radius-md);
+        background-color: transparent;
+        width: 100%;
+        height: 100%;
+        user-select: none;
+        pointer-events: none;
+    }
+
+    &:not(.disabled):not(.read-only) {
+        cursor: pointer;
+
+        &:hover {
+            .visual-feedback {
+                --visual-feedback-color: color-mix(in srgb, var(--tone-color) 5%, transparent);
+                transition: var(--du) background-color ease-in-out,
+                    var(--du) var(--de) box-shadow ease-in-out;
+                box-shadow: 0 0 0 var(--visual-feedback-offset) var(--visual-feedback-color);
+                background-color: var(--visual-feedback-color);
+            }
+
+            &.with-border.fill-none.tone-primary:not(.on-dark) {
+                --background-color: var(--go-ui-color-primary-red);
+                --text-color: var(--go-ui-color-text-on-dark);
+            }
+
+            &.fill-none.tone-neutral:not(.with-border):not(.on-dark) {
+                --tone-color: var(--go-ui-color-primary-red);
+            }
+        }
+    }
+}

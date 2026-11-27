@@ -1,0 +1,90 @@
+.chip-layout {
+    --tone-color: var(--go-ui-color-dark-blue-40);
+    --border-color: transparent;
+    --background-color: transparent;
+    --text-color: var(--tone-color);
+    --padding: var(--go-ui-spacing-4xs) var(--go-ui-spacing-sm);
+
+    display: inline-flex;
+    align-items: center;
+    border: var(--go-ui-width-separator-sm) solid var(--border-color);
+    border-radius: var(--go-ui-border-radius-full);
+    background-color: var(--background-color);
+    padding: var(--padding);
+    list-style: none;
+    color: var(--text-color);
+    gap: var(--go-ui-spacing-3xs);
+
+    &.tone-primary {
+        --tone-color: var(--go-ui-color-primary-red);
+    }
+
+    &.tone-secondary {
+        --tone-color: var(--go-ui-color-primary-blue);
+    }
+
+    &.tone-neutral {
+        --tone-color: var(--go-ui-color-dark-blue-40);
+    }
+
+    &.tone-positive {
+        --tone-color: var(--go-ui-color-positive);
+    }
+
+    &.tone-information {
+        --tone-color: var(--go-ui-color-information);
+    }
+
+    &.tone-warning {
+        --tone-color: var(--go-ui-color-warning);
+    }
+
+    &.tone-negative {
+        --tone-color: var(--go-ui-color-negative);
+    }
+
+    &.fill-soft {
+        --background-color: color-mix(in srgb, var(--tone-color) 12%, transparent);
+    }
+
+    &.tone-neutral.fill-soft:not(.on-dark) {
+        --background-color: var(--go-ui-color-gray-20);
+    }
+
+    &.fill-solid {
+        --background-color: var(--tone-color);
+        --text-color: var(--go-ui-color-text-on-dark);
+    }
+
+    &.with-border {
+        --border-color: var(--tone-color);
+    }
+
+    &.on-dark {
+        --tone-color: var(--go-ui-color-text-on-dark);
+
+        &.fill-soft {
+            --background-color: color-mix(in srgb, var(--tone-color) 18%, transparent);
+        }
+
+        &.fill-solid {
+            --text-color: var(--go-ui-color-primary-blue);
+        }
+    }
+
+    /* NOTE: a trailing action sits closer to the edge */
+    &.with-trailing {
+        --padding: var(--go-ui-spacing-4xs) var(--go-ui-spacing-4xs) var(--go-ui-spacing-4xs) var(--go-ui-spacing-sm);
+    }
+
+    .leading {
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .trailing {
+        display: inline-flex;
+        align-items: center;
+        font-size: var(--go-ui-font-size-sm);
+    }
+}
