@@ -135,7 +135,7 @@
 
 .ratingStatusBadge {
   border-radius: var(--go-ui-border-radius-full);
-  background-color: #dc3545;
+  background-color: var(--go-ui-color-negative);
   padding: 0 var(--go-ui-spacing-xs);
   color: var(--go-ui-color-white);
   font-size: var(--go-ui-font-size-sm);
@@ -177,24 +177,24 @@
 }
 
 .upIcon {
-  color: #28a745;
+  color: var(--go-ui-color-positive);
 }
 
 .downIcon {
-  color: #dc3545;
+  color: var(--go-ui-color-negative);
 }
 
 .ratingChange.positive {
-  color: #28a745;
+  color: var(--go-ui-color-positive);
 }
 
 .ratingChange.negative {
-  color: #dc3545;
+  color: var(--go-ui-color-negative);
 }
 
 .sortButton {
   margin-left: var(--go-ui-spacing-xs);
-  border: 1px solid #007bff;
+  border: 1px solid var(--go-ui-color-information);
   border-radius: var(--go-ui-border-radius-md);
   background: none;
   cursor: pointer;
@@ -208,9 +208,9 @@
 }
 
 .sortButton.active {
-  border-color: #007bff;
-  background-color: #e6f0ff;
-  color: #007bff;
+  border-color: var(--go-ui-color-information);
+  background-color: color-mix(in srgb, var(--go-ui-color-information) 10%, transparent);
+  color: var(--go-ui-color-information);
 }
 
 .ratingScaleWrapper {

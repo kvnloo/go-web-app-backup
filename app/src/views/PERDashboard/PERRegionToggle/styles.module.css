@@ -48,9 +48,9 @@
     background: linear-gradient(
         90deg,
         transparent,
-        rgba(var(--go-ui-color-primary-red), 0.03),
-        rgba(var(--go-ui-color-primary-red), 0.05),
-        rgba(var(--go-ui-color-primary-red), 0.03),
+        color-mix(in srgb, var(--go-ui-color-primary-red) 3%, transparent),
+        color-mix(in srgb, var(--go-ui-color-primary-red) 5%, transparent),
+        color-mix(in srgb, var(--go-ui-color-primary-red) 3%, transparent),
         transparent
     );
     width: 100%;
@@ -142,7 +142,7 @@
     top: 0;
     right: 0;
     left: 0;
-    background: rgba(var(--go-ui-color-primary-red), 0.1);
+    background: color-mix(in srgb, var(--go-ui-color-primary-red) 10%, transparent);
     height: 100%;
     content: '';
 }
