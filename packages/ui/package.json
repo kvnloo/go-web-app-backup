@@ -22,7 +22,8 @@
         "lint:js": "eslint src",
         "lint:css": "stylelint \"./src/**/*.css\"",
         "lint": "pnpm lint:js && pnpm lint:css",
-        "lint:fix": "pnpm lint:js --fix && pnpm lint:css --fix"
+        "lint:fix": "pnpm lint:js --fix && pnpm lint:css --fix",
+        "codemod:move-component": "tsx codemods/move-component.ts"
     },
     "files": [
         "dist/*"
@@ -109,6 +110,8 @@
         "stylelint-config-recommended": "^18.0.0",
         "stylelint-no-unsupported-browser-features": "8.1.2",
         "stylelint-value-no-unknown-custom-properties": "^6.1.1",
+        "ts-morph": "28.0.0",
+        "tsx": "^4.21.0",
         "typescript": "^5.9.3",
         "typescript-eslint": "^8.58.0",
         "vite": "^6.0.0",
