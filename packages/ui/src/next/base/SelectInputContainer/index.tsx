@@ -1,0 +1,421 @@
+import React, {
+    useId,
+    useRef,
+} from 'react';
+import {
+    ArrowDownSmallFillIcon,
+    ArrowUpSmallFillIcon,
+    CheckDoubleFillIcon,
+    CloseLineIcon,
+} from '@ifrc-go/icons';
+import {
+    _cs,
+    isDefined,
+    isTruthyString,
+} from '@togglecorp/fujs';
+
+// NOTE: shares the v2 strings (same "common" namespace keys); the file moves
+// here when v2 is removed
+import i18n from '#components/SelectInputContainer/i18n.json';
+import useBlurEffect from '#hooks/useBlurEffect';
+import useKeyboard from '#hooks/useKeyboard';
+import useTranslation from '#hooks/useTranslation';
+import { extractInputContainerProps } from '#next/utils/inputs';
+
+import ButtonLayout from '../ButtonLayout';
+import InputContainer, { type Props as InputContainerProps } from '../InputContainer';
+import ListLayout from '../ListLayout';
+import Popover from '../Popover';
+import RawButton, { type Props as RawButtonProps } from '../RawButton';
+import RawInput from '../RawInput';
+import RawList from '../RawList';
+import StateMessage from '../StateMessage';
+import GenericOption, {
+    ContentBaseProps,
+    OptionKey,
+    Props as GenericOptionProps,
+} from './GenericOption';
+
+import styles from './styles.module.css';
+
+interface SelectInputContainerProps<
+    OPTION_KEY extends OptionKey,
+    NAME,
+    OPTION,
+    RENDER_PROPS extends ContentBaseProps,
+> {
+    name: NAME,
+    onOptionClick: (optionKey: OPTION_KEY, option: OPTION, name: NAME) => void;
+    dropdownShown: boolean;
+    onDropdownShownChange: (value: boolean) => void;
+
+    focused: boolean;
+    onFocusedChange: (value: boolean) => void;
+    focusedKey: { key: OPTION_KEY, mouse?: boolean } | undefined;
+    onFocusedKeyChange: (value: { key: OPTION_KEY, mouse?: boolean } | undefined) => void;
+
+    searchText: string | undefined | null;
+    onSearchTextChange: (search: string | undefined) => void;
+
+    optionKeySelector: (datum: OPTION, index: number) => OPTION_KEY;
+    optionContainerClassName?: string;
+    optionRenderer: (
+        props: Pick<RENDER_PROPS, Exclude<keyof RENDER_PROPS, keyof ContentBaseProps>>,
+    ) => React.ReactNode;
+    optionRendererParams: (optionKey: OPTION_KEY, option: OPTION) => RENDER_PROPS;
+    totalOptionsCount?: number;
+    options: OPTION[] | undefined | null;
+    optionsPending?: boolean;
+    optionsFiltered?: boolean;
+    optionsErrored?: boolean;
+    optionsPopupClassName?: string;
+    persistentOptionPopup?: boolean;
+    placeholder?: string;
+    valueDisplay: string;
+    autoFocus?: boolean;
+    hasValue: boolean;
+    nonClearable?: boolean;
+    onClearButtonClick: () => void;
+    onSelectAllButtonClick?: () => void;
+    onEnterWithoutOption?: () => void;
+    dropdownHidden?: boolean;
+    withoutDropdownIcon?: boolean;
+    /** Predicate for whether an option is currently chosen (drives aria-selected). */
+    optionSelector?: (optionKey: OPTION_KEY, option: OPTION) => boolean;
+    /** True for multi-select variants; sets aria-multiselectable on the listbox. */
+    multiSelect?: boolean;
+}
+
+export type Props<
+    OPTION_KEY extends OptionKey,
+    NAME,
+    OPTION,
+    RENDER_PROPS extends ContentBaseProps,
+> = SelectInputContainerProps<OPTION_KEY, NAME, OPTION, RENDER_PROPS> & Omit<InputContainerProps, 'input' | 'inputSectionRef' | 'elementRef'>
+
+const emptyList: unknown[] = [];
+
+/**
+ * Shared shell for the select inputs: search input, clear/select-all/
+ * dropdown actions and the options popup (generic layer).
+ *
+ * Implements the WAI-ARIA combobox pattern: role="combobox" on the search input
+ * (aria-expanded/-controls/-haspopup/-autocomplete + aria-activedescendant
+ * tracking the keyboard-focused option), role="listbox" on the options popup,
+ * and role="option" + aria-selected on each option (see GenericOption). The
+ * label/hint/error contract is wired through InputContainer via inputId.
+ */
+function SelectInputContainer<
+    OPTION_KEY extends OptionKey,
+    const NAME,
+    OPTION extends object,
+    RENDER_PROPS extends ContentBaseProps
+>(
+    props: Props<OPTION_KEY, NAME, OPTION, RENDER_PROPS>,
+) {
+    const {
+        actions,
+        disabled,
+        readOnly,
+        required,
+        ...otherProps
+    } = props;
+
+    const [inputContainerProps, selectInputContainerProps] = extractInputContainerProps(
+        otherProps,
+    );
+
+    const {
+        name,
+        onOptionClick,
+        searchText,
+        onSearchTextChange,
+        optionContainerClassName,
+        optionKeySelector,
+        optionRenderer,
+        optionRendererParams,
+        options: optionsFromProps,
+        optionsPopupClassName,
+        persistentOptionPopup,
+        placeholder,
+        valueDisplay = '',
+        nonClearable,
+        onClearButtonClick,
+        onSelectAllButtonClick,
+        optionsPending = false,
+        optionsFiltered = false,
+        optionsErrored = false,
+        focused,
+        focusedKey,
+        onFocusedKeyChange,
+        onFocusedChange,
+        dropdownShown,
+        onDropdownShownChange,
+        totalOptionsCount = 0,
+        hasValue,
+        autoFocus,
+        onEnterWithoutOption,
+        dropdownHidden,
+        withoutDropdownIcon,
+        optionSelector,
+        multiSelect,
+    } = selectInputContainerProps;
+
+    const options = optionsFromProps ?? (emptyList as OPTION[]);
+    const strings = useTranslation(i18n);
+
+    const containerRef = useRef<HTMLDivElement>(null);
+    const inputSectionRef = useRef<HTMLDivElement>(null);
+    const inputElementRef = useRef<HTMLInputElement>(null);
+    const popupRef = useRef<HTMLDivElement>(null);
+
+    const generatedId = useId();
+    const inputId = generatedId;
+    const listboxId = `${generatedId}-listbox`;
+    const getOptionNodeId = (key: OPTION_KEY) => `${generatedId}-option-${key}`;
+    const hasError = isDefined(inputContainerProps.error);
+    const hasHint = isDefined(inputContainerProps.hint);
+    const errorId = hasError ? `${generatedId}-error` : undefined;
+    const hintId = hasHint ? `${generatedId}-hint` : undefined;
+    const describedBy = [hintId, errorId].filter(isDefined).join(' ') || undefined;
+
+    // FIXME(frozenhelium): useCallback removed for React Compiler compatibility
+    const handleSearchInputChange = (value: string | undefined) => {
+        if (!dropdownShown) {
+            onDropdownShownChange(true);
+        }
+        onSearchTextChange(value);
+    };
+
+    // FIXME(frozenhelium): useCallback removed for React Compiler compatibility
+    const handleToggleDropdown: NonNullable<RawButtonProps<undefined>['onClick']> = (_, e) => {
+        e.stopPropagation();
+        onDropdownShownChange(!dropdownShown);
+    };
+
+    // FIXME(frozenhelium): useCallback removed for React Compiler compatibility
+    const handleShowDropdown = () => {
+        // FIXME: this is not atomic. Call only once
+        if (!dropdownShown) {
+            onDropdownShownChange(true);
+        }
+    };
+
+    // FIXME(frozenhelium): useCallback removed for React Compiler compatibility
+    const handleHideDropdown = () => {
+        onDropdownShownChange(false);
+    };
+
+    // FIXME(frozenhelium): useCallback removed for React Compiler compatibility
+    const handleSearchInputClick = () => {
+        if (readOnly) {
+            return;
+        }
+        handleShowDropdown();
+    };
+
+    // FIXME(frozenhelium): useCallback removed for React Compiler compatibility
+    const handlePopupBlur = (clickedInside: boolean, clickedInParent: boolean) => {
+        const isClickedWithin = clickedInside || clickedInParent;
+        if (!isClickedWithin) {
+            handleHideDropdown();
+        } else if (persistentOptionPopup && inputElementRef.current) {
+            inputElementRef.current.focus();
+        }
+    };
+
+    // FIXME(frozenhelium): useCallback removed for React Compiler compatibility
+    const handleOptionClick = (valueKey: OPTION_KEY, value: OPTION) => {
+        onOptionClick(valueKey, value, name);
+        if (!persistentOptionPopup) {
+            handleHideDropdown();
+        }
+    };
+
+    // FIXME(frozenhelium): useCallback removed for React Compiler compatibility
+    const optionListRendererParams = (key: OPTION_KEY, option: OPTION) => ({
+        contentRendererParam: optionRendererParams,
+        option,
+        optionKey: key,
+        focusedKey,
+        contentRenderer: optionRenderer,
+        onClick: handleOptionClick,
+        onFocus: onFocusedKeyChange,
+        optionContainerClassName: _cs(optionContainerClassName, styles.listItem),
+        optionNodeId: getOptionNodeId(key),
+        isSelected: optionSelector ? optionSelector(key, option) : false,
+    });
+
+    useBlurEffect(
+        dropdownShown,
+        handlePopupBlur,
+        popupRef,
+        containerRef,
+    );
+
+    const handleKeyDown = useKeyboard(
+        focusedKey,
+        optionKeySelector,
+        options,
+        dropdownShown,
+
+        onFocusedKeyChange,
+        handleHideDropdown,
+        handleShowDropdown,
+        handleOptionClick,
+        onEnterWithoutOption,
+    );
+
+    const optionsCount = options.length;
+
+    const infoMessage = totalOptionsCount - optionsCount > 0
+        ? `${strings.infoMessageAnd} ${totalOptionsCount - optionsCount} ${strings.infoMessageMore}`
+        : undefined;
+
+    const dropdownShownActual = dropdownShown && !dropdownHidden;
+
+    return (
+        <>
+            <InputContainer
+                // eslint-disable-next-line react/jsx-props-no-spreading
+                {...inputContainerProps}
+                elementRef={containerRef}
+                inputSectionRef={inputSectionRef}
+                inputId={inputId}
+                hintId={hintId}
+                errorId={errorId}
+                disabled={disabled}
+                readOnly={readOnly}
+                required={required}
+                actions={(
+                    <>
+                        {actions}
+                        {!readOnly && onSelectAllButtonClick && (
+                            <RawButton
+                                name={undefined}
+                                onClick={onSelectAllButtonClick}
+                                disabled={disabled}
+                                title={strings.buttonTitleSelect}
+                                aria-label={strings.buttonTitleSelect}
+                            >
+                                <ButtonLayout shape="inline" disabled={disabled}>
+                                    <CheckDoubleFillIcon className={styles.icon} />
+                                </ButtonLayout>
+                            </RawButton>
+                        )}
+                        {!readOnly && !nonClearable && hasValue && (
+                            <RawButton
+                                name={undefined}
+                                onClick={onClearButtonClick}
+                                disabled={disabled}
+                                title={strings.buttonTitleClear}
+                                aria-label={strings.buttonTitleClear}
+                            >
+                                <ButtonLayout shape="inline" disabled={disabled}>
+                                    <CloseLineIcon className={styles.icon} />
+                                </ButtonLayout>
+                            </RawButton>
+                        )}
+                        {!readOnly && !withoutDropdownIcon && (
+                            <RawButton
+                                name={undefined}
+                                onClick={handleToggleDropdown}
+                                disabled={disabled}
+                                title={dropdownShownActual
+                                    ? strings.buttonTitleClose
+                                    : strings.buttonTitleOpen}
+                                aria-label={dropdownShownActual
+                                    ? strings.buttonTitleClose
+                                    : strings.buttonTitleOpen}
+                            >
+                                <ButtonLayout shape="inline" disabled={disabled}>
+                                    {dropdownShownActual
+                                        ? <ArrowUpSmallFillIcon className={styles.icon} />
+                                        : <ArrowDownSmallFillIcon className={styles.icon} />}
+                                </ButtonLayout>
+                            </RawButton>
+                        )}
+                    </>
+                )}
+                input={(
+                    <RawInput
+                        name={name}
+                        id={inputId}
+                        role="combobox"
+                        aria-expanded={dropdownShownActual}
+                        aria-controls={dropdownShownActual ? listboxId : undefined}
+                        aria-haspopup="listbox"
+                        aria-autocomplete="list"
+                        aria-activedescendant={
+                            dropdownShownActual && focusedKey
+                                ? getOptionNodeId(focusedKey.key)
+                                : undefined
+                        }
+                        aria-invalid={hasError}
+                        aria-required={required}
+                        aria-describedby={describedBy}
+                        elementRef={inputElementRef}
+                        readOnly={readOnly}
+                        disabled={disabled}
+                        value={(dropdownShown || focused) ? searchText : valueDisplay}
+                        onChange={handleSearchInputChange}
+                        onClick={handleSearchInputClick}
+                        onFocus={() => onFocusedChange(true)}
+                        onBlur={() => onFocusedChange(false)}
+                        placeholder={isTruthyString(valueDisplay) ? valueDisplay : placeholder}
+                        autoComplete="off"
+                        onKeyDown={handleKeyDown}
+                        autoFocus={autoFocus}
+                    />
+                )}
+            />
+            {dropdownShownActual && (
+                <Popover
+                    elementRef={popupRef}
+                    parentRef={inputSectionRef}
+                    className={_cs(optionsPopupClassName, styles.popup)}
+                >
+                    <ListLayout
+                        className={styles.list}
+                        layout="block"
+                        spacing="none"
+                        role="listbox"
+                        id={listboxId}
+                        aria-multiselectable={multiSelect ? true : undefined}
+                    >
+                        <RawList<
+                            OPTION,
+                            OPTION_KEY,
+                            GenericOptionProps<RENDER_PROPS, OPTION_KEY, OPTION>
+                        >
+                            data={options}
+                            keySelector={optionKeySelector}
+                            renderer={GenericOption}
+                            rendererParams={optionListRendererParams}
+                        />
+                        <StateMessage
+                            pending={optionsPending}
+                            filtered={optionsFiltered}
+                            errored={optionsErrored}
+                            empty={options.length === 0}
+                            messages={{
+                                pending: strings.selectInputPendingMessage,
+                                empty: strings.selectInputEmptyMessage,
+                                filtered: strings.selectInputFilteredMessage,
+                                errored: strings.selectInputErrorMessage,
+                            }}
+                            compact
+                        />
+                    </ListLayout>
+                    {!optionsPending && !optionsErrored && !!infoMessage && (
+                        <div className={styles.infoMessage}>
+                            {infoMessage}
+                        </div>
+                    )}
+                </Popover>
+            )}
+        </>
+    );
+}
+
+export default SelectInputContainer;

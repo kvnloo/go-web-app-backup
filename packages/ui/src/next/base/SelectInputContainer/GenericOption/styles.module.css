@@ -1,0 +1,13 @@
+.generic-option {
+    display: flex;
+    gap: var(--go-ui-spacing-sm);
+
+    /* Airy rows with a larger inline-start inset (design dropdown spec). */
+    padding-block: var(--go-ui-spacing-sm);
+    padding-inline: var(--go-ui-spacing-md) var(--go-ui-spacing-sm);
+    text-align: left;
+
+    &:hover {
+        background-color: color-mix(in srgb, var(--go-ui-color-text-black) 5%, transparent);
+    }
+}
