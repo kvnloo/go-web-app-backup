@@ -71,6 +71,20 @@ export type { Props as StateMessageProps } from './base/StateMessage';
 export { default as StateMessage } from './base/StateMessage';
 export type { Props as TabLayoutProps } from './base/TabLayout';
 export { default as TabLayout } from './base/TabLayout';
+export type { TableProps as TableLayoutProps } from './base/TableLayout';
+export { default as TableLayout } from './base/TableLayout';
+export type { HeaderCellProps } from './base/TableLayout/HeaderCell';
+export { default as TableHeaderCell } from './base/TableLayout/HeaderCell';
+export type { Sorting } from './base/TableLayout/sorting';
+export type { Props as TableBodyContentProps } from './base/TableLayout/TableBodyContent';
+export { default as TableBodyContent } from './base/TableLayout/TableBodyContent';
+export type {
+    BaseCell,
+    BaseHeader,
+    Column,
+    RowOptions,
+    SortDirection,
+} from './base/TableLayout/types';
 export type { Props as TabListLayoutProps } from './base/TabListLayout';
 export { default as TabListLayout } from './base/TabListLayout';
 export type { Props as TextLayoutProps } from './base/TextLayout';
