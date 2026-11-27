@@ -184,6 +184,14 @@
     --go-ui-color-text: rgb(0 0 0 / 0.8);
     --go-ui-color-text-light: rgb(0 0 0 / 0.5);
     --go-ui-color-text-on-dark: rgb(255 255 255 / 1);
+    --go-ui-color-text-on-dark-light: rgb(255 255 255 / 0.7);
+
+    /* NOTE: surface-aware text colours for next; light-surface values here,
+       overridden by the dark surface class (utils/specs.module.css) */
+    --go-ui-surface-color-text: var(--go-ui-color-text);
+    --go-ui-surface-color-text-light: var(--go-ui-color-text-light);
+    --go-ui-surface-color-text-strong: var(--go-ui-color-text-black);
+    --go-ui-surface-color-text-brand: var(--go-ui-color-primary-red);
 
     --go-ui-color-positive: var(--go-ui-color-green);
     --go-ui-color-information: var(--go-ui-color-blue);
