@@ -4,6 +4,9 @@
     --go-ui-font-family-mono: SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
     --go-ui-optical-correction-factor: 1.5;
+    /* Additive term for vertical spacing (padding-block, row-gap) that compensates
+       for the extra whitespace text line-height adds */
+    --go-ui-spacing-optical-correction: calc(1rem / var(--go-ui-optical-correction-factor) - 1rem);
     --base-font-size: 0.875rem;
     --go-ui-font-size-export: 0.6875rem;
 
@@ -19,24 +22,39 @@
 
     --go-ui-height-icon-multiplier: 1.33em;
 
+    --go-ui-height-icon-sm: 1rem;
+    --go-ui-height-icon-md: 1.5rem;
+    --go-ui-height-icon-lg: 2rem;
+    --go-ui-height-icon-xl: 2.5rem;
+    --go-ui-height-icon-2xl: 3rem;
+
+    /* NOTE: named icon sizes kept for v2 until 3.0; next uses the scale above */
     --go-ui-height-brand-icon: 2.25rem;
-    --go-ui-height-social-icon: 2.5rem;
-    --go-ui-height-key-figure-icon: 3rem;
+    --go-ui-height-social-icon: var(--go-ui-height-icon-xl);
+    --go-ui-height-key-figure-icon: var(--go-ui-height-icon-lg);
     --go-ui-height-status-icon: 2.536rem;
-    --go-ui-height-compact-status-icon: 2rem;
+    --go-ui-height-compact-status-icon: var(--go-ui-height-icon-lg);
 
     --go-ui-line-height-none: 1;
     --go-ui-line-height-xs: 1.125;
     --go-ui-line-height-sm: 1.25;
     --go-ui-line-height-md: 1.5;
 
+    --go-ui-height-map-sm: min(28rem, 60vh);
     --go-ui-height-map-md: min(40rem, 70vh);
+    --go-ui-height-map-lg: min(56rem, 80vh);
+
+    --go-ui-height-chart-sm: 10rem;
+    --go-ui-height-chart-md: 16rem;
+    --go-ui-height-chart-lg: 20rem;
+    --go-ui-height-chart-xl: 24rem;
 
     --go-ui-font-weight-light: 300;
     --go-ui-font-weight-normal: 400;
     --go-ui-font-weight-medium: 500;
     --go-ui-font-weight-semibold: 600;
-    --go-ui-font-weight-bold: 700;
+    /* NOTE: the design has no 700; bold is the semibold weight */
+    --go-ui-font-weight-bold: 600;
 
     --go-ui-width-screen-sm: 640px;
     --go-ui-width-screen-md: 768px;
@@ -69,11 +87,12 @@
     --go-ui-width-separator-lg: 4pt;
     --go-ui-width-separator-xl: 8pt;
 
-    --go-ui-width-separator-thin: 1pt;
-    --go-ui-width-separator-small: 2pt;
-    --go-ui-width-separator-thick: 4pt;
+    /* NOTE: second naming scheme kept for v2 until 3.0; next uses sm to xl above */
+    --go-ui-width-separator-thin: var(--go-ui-width-separator-sm);
+    --go-ui-width-separator-small: var(--go-ui-width-separator-md);
+    --go-ui-width-separator-thick: var(--go-ui-width-separator-lg);
     --go-ui-width-separator-medium: 6pt;
-    --go-ui-width-separator-large: 8pt;
+    --go-ui-width-separator-large: var(--go-ui-width-separator-xl);
     --go-ui-width-separator-dense: 12pt;
     --go-ui-width-separator-extra-dense: 14pt;
 
@@ -153,11 +172,13 @@
 
     --go-ui-color-red-hover: #DE2934;
 
-    --go-ui-color-purple-per: #8648B3;
-    --go-ui-color-orange-per: #FF8654;
-    --go-ui-color-blue-per: #418FDE;
-    --go-ui-color-teal-per: #00B2A2;
-    --go-ui-color-red-per: #DA283D;
+    /* NOTE: desaturated to the design's PER category swatches
+       (Guidelines "Colours PER"); the vivid values were chart-only */
+    --go-ui-color-purple-per: #806792;
+    --go-ui-color-orange-per: #FFA17A;
+    --go-ui-color-blue-per: #778BAD;
+    --go-ui-color-teal-per: #429089;
+    --go-ui-color-red-per: #C4515F;
 
     --go-ui-color-text-black: rgb(0 0 0 / 1);
     --go-ui-color-text: rgb(0 0 0 / 0.8);
@@ -167,7 +188,7 @@
     --go-ui-color-positive: var(--go-ui-color-green);
     --go-ui-color-information: var(--go-ui-color-blue);
     --go-ui-color-warning: var(--go-ui-color-yellow);
-    --go-ui-color-negative: var(--go-ui-color-red);
+    --go-ui-color-negative: var(--go-ui-color-primary-red);
 
     --go-ui-color-separator: rgb(0 0 0 / 0.1);
     --go-ui-color-separator-light: rgb(0 0 0 / 0.05);
@@ -209,14 +230,29 @@
     --go-ui-saturate-150: 1.5;
     --go-ui-saturate-200: 2;
 
+    /* NOTE: categorical hazard palette; cyclone, drought, flood and fi follow the
+       design export, storm and wildfire the app's previous values */
+    --go-ui-color-hazard-cyclone: #a4bede;
+    --go-ui-color-hazard-drought: #b68fba;
+    --go-ui-color-hazard-earthquake: #eca48c;
+    --go-ui-color-hazard-flood: #5a80b0;
     --go-ui-color-hazard-fi: #b7c992;
+    --go-ui-color-hazard-storm: #97b8c2;
+    --go-ui-color-hazard-wildfire: #ff5014;
 
     --go-ui-color-map-dot-appeals: #f5333f;
     --go-ui-color-map-dot-dref: #ff9e00;
     --go-ui-color-map-dot-fba: #ff6b00;
     --go-ui-color-map-dot-multiple-types: #4c5d9b;
 
+    --go-ui-width-content-narrow: 40rem;
     --go-ui-width-content-max: 56rem;
+
+    --go-ui-width-column-xs: 6rem;
+    --go-ui-width-column-sm: 10rem;
+    --go-ui-width-column-md: 16rem;
+    --go-ui-width-column-lg: 20rem;
+    --go-ui-width-column-xl: 30rem;
     --go-ui-page-header-description-width-max: var(--go-ui-width-content-max);
     /* 1280px + 1.5rem padding on both sides */
     --go-ui-page-width-max: 83rem;
