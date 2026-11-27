@@ -1,0 +1,74 @@
+.container-layout {
+    &.with-centered-content {
+        margin: 0 auto;
+        width: 100%;
+        max-width: var(--go-ui-width-content-max);
+    }
+
+    &.with-fixed-height {
+        /* FIXME: use variable */
+        max-height: 18rem;
+    }
+
+    /*
+     * background-color, border-radius and box-shadow come from the
+     * spec utility classes (see #utils/style)
+     */
+    &.with-border {
+        border: var(--go-ui-width-separator-thin) solid var(--go-ui-color-separator);
+    }
+
+    &.with-header-well {
+        >.before-container {
+            border-bottom: var(--go-ui-width-separator-thin) solid var(--go-ui-color-separator);
+        }
+    }
+
+    .content {
+        display: flex;
+        flex-direction: column;
+
+        &:empty {
+            display: none;
+        }
+
+        &.pending-overlaid {
+            isolation: isolate;
+            position: relative;
+            min-height: var(--go-ui-content-min-height);
+
+            .message {
+                z-index: 1;
+            }
+        }
+
+        &.with-overflow {
+            &.without-padding-overflow {
+                overflow-block: auto;
+            }
+
+            &.with-padding-overflow {
+                display: contents;
+
+                .overflow-container {
+                    flex-grow: 1;
+                    overflow-block: auto;
+                }
+            }
+        }
+
+        .filters {
+            align-items: end;
+        }
+    }
+
+    &.with-content-well {
+        isolation: isolate;
+
+        >.content {
+            z-index: 1;
+            border-radius: var(--go-ui-border-radius-md);
+            background-color: var(--go-ui-color-background);
+        }
+    }
+}

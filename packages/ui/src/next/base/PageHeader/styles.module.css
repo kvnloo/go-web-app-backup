@@ -1,0 +1,20 @@
+.page-header {
+    .heading-group {
+        margin: 0;
+    }
+
+    .overline {
+        letter-spacing: var(--go-ui-spacing-5xs);
+    }
+
+    /* NOTE: the page title look (the design's largest heading) */
+    .heading {
+        line-height: var(--go-ui-line-height-xs);
+        letter-spacing: 0.1rem;
+        font-size: 2.5rem;
+    }
+
+    .description {
+        max-width: var(--go-ui-page-header-description-width-max);
+    }
+}
