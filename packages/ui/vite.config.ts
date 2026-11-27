@@ -6,6 +6,7 @@ import { globSync } from 'glob';
 import dts from 'vite-plugin-dts';
 import { libInjectCss } from 'vite-plugin-lib-inject-css';
 import reactSwc from '@vitejs/plugin-react-swc';
+import browserslistToEsbuild from 'browserslist-to-esbuild';
 import { peerDependencies } from './package.json';
 
 export default defineConfig(({ mode }) => {
@@ -25,6 +26,8 @@ export default defineConfig(({ mode }) => {
             },
         },
         build: {
+            // NOTE: follows the root browserslist (Baseline widely available)
+            target: browserslistToEsbuild(),
             lib: {
                 entry: './src/index.tsx',
                 name: '@ifrc-go/ui',

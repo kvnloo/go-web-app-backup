@@ -10,6 +10,7 @@ import checker from 'vite-plugin-checker';
 import { compression } from 'vite-plugin-compression2';
 import { VitePluginRadar } from 'vite-plugin-radar';
 import svgr from 'vite-plugin-svgr';
+import browserslistToEsbuild from 'browserslist-to-esbuild';
 import pkg from './package.json';
 
 import envConfig from './env';
@@ -81,6 +82,8 @@ export default defineConfig(({ mode }) => {
             },
         },
         build: {
+            // NOTE: follows the root browserslist (Baseline widely available)
+            target: browserslistToEsbuild(),
             outDir: '../build',
             sourcemap: isProd,
             emptyOutDir: true,

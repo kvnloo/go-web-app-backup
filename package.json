@@ -26,6 +26,9 @@
         "build-storybook": "pnpm -F go-ui-storybook build-storybook",
         "chromatic": "pnpm -F go-ui-storybook chromatic"
     },
+    "browserslist": [
+        "baseline widely available"
+    ],
     "engines": {
         "node": "22",
         "pnpm": "10.6.1"

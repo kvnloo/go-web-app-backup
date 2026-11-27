@@ -4,6 +4,7 @@ import json from "@eslint/json";
 import tseslint  from 'typescript-eslint';
 import process from 'process';
 import { Linter } from 'eslint';
+import compatPlugin from 'eslint-plugin-compat';
 
 const dirname = process.cwd();
 
@@ -133,6 +134,12 @@ const otherConfig = {
     ...js.configs.recommended,
 };
 
+// NOTE: browser APIs are checked against the root browserslist (Baseline widely available)
+const compatConfig: Linter.Config = {
+    ...compatPlugin.configs['flat/recommended'],
+    files: ['src/**/*.tsx', 'src/**/*.ts'],
+};
+
 const jsonConfig: Linter.Config = {
     files: ['**/*.json'],
     language: 'json/json',
@@ -152,6 +159,7 @@ const config = tseslint.config(
     ...appConfigs,
     otherConfig,
     jsonConfig,
+    compatConfig,
 );
 
 export default config;
