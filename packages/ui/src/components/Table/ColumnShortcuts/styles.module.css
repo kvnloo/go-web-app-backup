@@ -2,6 +2,19 @@
     color: inherit;
 }
 
+.number-cell {
+    font-variant-numeric: tabular-nums;
+}
+
+.number-cell-container {
+    text-align: end;
+}
+
+.number-cell-header {
+    justify-content: flex-end;
+    text-align: end;
+}
+
 .actions-cell {
     width: max-content;
 }

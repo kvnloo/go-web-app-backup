@@ -23,6 +23,7 @@ import { type Props as InputContainerProps } from '#components/InputContainer';
 import { type Language } from '#contexts/language';
 
 import {
+    DEFAULT_CURRENCY,
     DEFAULT_DATE_FORMAT,
     KEY_DATE_FORMAT,
 } from './constants';
@@ -355,7 +356,8 @@ function getMaximumFractionDigits(value: number) {
 }
 
 interface FormatNumberOptions {
-    currency?: boolean;
+    /** `true` formats as CHF (the currency GO reports in); a string is an ISO 4217 code */
+    currency?: boolean | string;
     unit?: Intl.NumberFormatOptions['unit'];
     maximumFractionDigits?: Intl.NumberFormatOptions['maximumFractionDigits'];
     compact?: boolean;
@@ -399,13 +401,18 @@ export function formatNumber(
         language,
     } = options;
 
-    if (isTruthyString(unit)) {
+    // NOTE: Intl ignores `unit` without `style: 'unit'` and throws for
+    // `style: 'currency'` without a currency code
+    if (currency) {
+        formattingOptions.style = 'currency';
+        formattingOptions.currency = typeof currency === 'string' ? currency : DEFAULT_CURRENCY;
+        formattingOptions.currencyDisplay = 'narrowSymbol';
+        // NOTE: the currency style forces its own minimum fraction digits (".00")
+        formattingOptions.minimumFractionDigits = 0;
+    } else if (isTruthyString(unit)) {
+        formattingOptions.style = 'unit';
         formattingOptions.unit = unit;
         formattingOptions.unitDisplay = 'short';
-    }
-    if (currency) {
-        formattingOptions.currencyDisplay = 'narrowSymbol';
-        formattingOptions.style = 'currency';
     }
     if (compact) {
         formattingOptions.notation = 'compact';

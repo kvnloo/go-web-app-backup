@@ -3,6 +3,7 @@ import {
     isDefined,
 } from '@togglecorp/fujs';
 
+import ListView from '#components/ListView';
 import NumberOutput from '#components/NumberOutput';
 
 import styles from './styles.module.css';
@@ -79,15 +80,20 @@ function ProgressBar(props: Props) {
             )}
         >
             {(title || showPercentageInTitle) && (
-                <div className={styles.title}>
+                <ListView
+                    className={styles.title}
+                    spacing="xs"
+                    withSpaceBetweenContents
+                >
                     {title}
                     {showPercentageInTitle && (
                         <NumberOutput
                             value={percentage}
                             suffix="%"
+                            maximumFractionDigits={0}
                         />
                     )}
-                </div>
+                </ListView>
             )}
             <div className={styles.total}>
                 <div

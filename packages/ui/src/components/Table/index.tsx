@@ -197,10 +197,19 @@ function Table<D, K extends string | number, C extends Column<D, K, any, any>>(
                                 const {
                                     id,
                                     columnClassName,
+                                    columnStyle,
+                                    columnWidth: preferredColumnWidth,
                                 } = column;
 
-                                const columnWidth = columnWidths[id];
-                                const style = fixedColumnWidth ? { width: `${columnWidth}px` } : undefined;
+                                // NOTE: in auto layout only an explicitly set columnWidth applies;
+                                // the computed widths are for fixedColumnWidth tables
+                                const colWidth = fixedColumnWidth
+                                    ? columnWidths[id]
+                                    : preferredColumnWidth;
+                                const style = {
+                                    ...columnStyle,
+                                    ...(isDefined(colWidth) ? { width: `${colWidth}px` } : undefined),
+                                };
 
                                 return (
                                     <col

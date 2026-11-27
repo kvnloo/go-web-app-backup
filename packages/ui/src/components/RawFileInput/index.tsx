@@ -2,7 +2,10 @@ import {
     useCallback,
     useState,
 } from 'react';
-import { randomString } from '@togglecorp/fujs';
+import {
+    _cs,
+    randomString,
+} from '@togglecorp/fujs';
 
 import type { Props as ButtonLayoutProps } from '#components/ButtonLayout';
 import ButtonLayout from '#components/ButtonLayout';
@@ -70,6 +73,7 @@ function RawFileInput<NAME>(props: Props<NAME>) {
             <ButtonLayout
                 // eslint-disable-next-line react/jsx-props-no-spreading
                 {...buttonLayoutProps}
+                className={_cs(styles.buttonLayout, buttonLayoutProps.className)}
                 spacingOffset={spacingOffset}
                 disabled={disabled}
                 readOnly={readOnly}

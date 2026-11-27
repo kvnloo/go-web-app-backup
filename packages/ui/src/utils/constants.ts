@@ -3,6 +3,7 @@ export const DEFAULT_PRINT_DATE_FORMAT = 'dd-MM-yyyy';
 export const KEY_DATE_FORMAT = 'yyyy-MM';
 
 export const DEFAULT_INVALID_TEXT = '-';
+export const DEFAULT_CURRENCY = 'CHF';
 
 // Alert
 export const DURATION_DEFAULT_ALERT_DISMISS = 4500;

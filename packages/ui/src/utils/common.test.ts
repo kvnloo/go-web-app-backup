@@ -6,6 +6,7 @@ import {
 
 import {
     denormalizeList,
+    formatNumber,
     getWordCount,
     splitList,
     trimToWordLimit,
@@ -211,4 +212,19 @@ test('Trim to word limit', () => {
     expect(trimToWordLimit('  one   two   three  ', 2)).toBe('  one   two');
     expect(trimToWordLimit('one two three', 0)).toBe(undefined);
     expect(trimToWordLimit('one\ntwo\nthree', 2)).toBe('one\ntwo');
+});
+
+test('Format number as currency', () => {
+    // previously threw: style 'currency' without a currency code
+    expect(() => formatNumber(2400000, { currency: true, language: 'en' })).not.toThrow();
+    expect(formatNumber(2400000, { currency: true, language: 'en' })).toContain('2,400,000');
+    expect(formatNumber(2400000, { currency: true, language: 'en' })).toContain('CHF');
+    expect(formatNumber(1500, { currency: 'USD', language: 'en' })).toBe('$1,500');
+    expect(formatNumber(2400000, { currency: true, compact: true, language: 'en' })).toContain('2.4M');
+});
+
+test('Format number with unit', () => {
+    // previously ignored: unit without style 'unit'
+    expect(formatNumber(12, { unit: 'kilometer', language: 'en' })).toBe('12 km');
+    expect(formatNumber(64, { unit: 'percent', language: 'en' })).toBe('64%');
 });

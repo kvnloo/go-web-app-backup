@@ -210,7 +210,10 @@ export function createNumberColumn<D, K extends string | number>(
             styles.numberCell,
             options?.cellRendererClassName,
         ),
-        cellContainerClassName: options?.cellContainerClassName,
+        cellContainerClassName: _cs(
+            styles.numberCellContainer,
+            options?.cellContainerClassName,
+        ),
         cellRenderer: NumberOutput,
         cellRendererParams: (_: K, datum: D): NumberOutputProps => ({
             value: accessor(datum),

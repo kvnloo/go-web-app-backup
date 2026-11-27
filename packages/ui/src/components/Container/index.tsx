@@ -283,7 +283,15 @@ function Container(props: Props) {
                     spacingOffset={spacingOffset}
                     withoutSpacingOpticalCorrection={withoutSpacingOpticalCorrection}
                     before={footerIcons}
-                    after={footerActions}
+                    after={footerActions && (
+                        <ListView
+                            spacing={spacing}
+                            spacingOffset={spacingOffset - 1}
+                            withSpacingOpticalCorrection={!withoutSpacingOpticalCorrection}
+                        >
+                            {footerActions}
+                        </ListView>
+                    )}
                     wrapBreakpoint={withoutWrapInFooter ? 'none' : 'lg'}
                 >
                     {footer}

@@ -43,7 +43,7 @@ function useSanitizedHtml(rawHtml: string | null | undefined) {
                     iframe: ['style', 'src', 'width', 'height', 'frameborder'],
                     a: ['style', 'href', 'target', 'rel'],
                 },
-                allowedSchemes: ['http', 'https', 'data'],
+                allowedSchemes: ['http', 'https', 'data', 'mailto', 'tel'],
                 allowedStyles: {
                     '*': {
                         'padding-left': [/^\d+px$/],
