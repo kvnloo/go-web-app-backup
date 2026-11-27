@@ -4,6 +4,7 @@
           "#components/*": ["./src/components/*"],
           "#contexts/*": ["./src/contexts/*"],
           "#hooks/*": ["./src/hooks/*"],
+          "#next/*": ["./src/next/*"],
           "#utils/*": ["./src/utils/*"]
       },
     "target": "ESNext",

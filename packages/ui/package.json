@@ -51,6 +51,14 @@
         "./printable": {
             "import": "./dist/components/printable/index.js",
             "types": "./dist/components/printable/index.d.ts"
+        },
+        "./next": {
+            "import": "./dist/next/index.js",
+            "types": "./dist/next/index.d.ts"
+        },
+        "./next/base": {
+            "import": "./dist/next/base.js",
+            "types": "./dist/next/base.d.ts"
         }
     },
     "dependencies": {
