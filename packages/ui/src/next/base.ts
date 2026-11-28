@@ -73,6 +73,8 @@ export type { Props as RawTextAreaProps } from './base/RawTextArea';
 export { default as RawTextArea } from './base/RawTextArea';
 export type { Props as SelectInputContainerProps } from './base/SelectInputContainer';
 export { default as SelectInputContainer } from './base/SelectInputContainer';
+export type { Props as SelectLayoutProps } from './base/SelectLayout';
+export { default as SelectLayout } from './base/SelectLayout';
 export type { Props as SpinnerProps } from './base/Spinner';
 export { default as Spinner } from './base/Spinner';
 export type { Props as StateMessageProps } from './base/StateMessage';

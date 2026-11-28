@@ -354,6 +354,7 @@ function SelectInputContainer<
                         aria-invalid={hasError}
                         aria-required={required}
                         aria-describedby={describedBy}
+                        aria-label={inputContainerProps.ariaLabel}
                         elementRef={inputElementRef}
                         readOnly={readOnly}
                         disabled={disabled}
