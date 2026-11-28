@@ -23,11 +23,11 @@ import {
     getErrorString,
 } from '@togglecorp/toggle-form';
 
-import ImageWithCaptionInput from '#components/domain/ImageWithCaptionInput';
 import ContactFieldGroup from '#components/next/domain/ContactFieldGroup';
 import CountrySelectInput from '#components/next/domain/CountrySelectInput';
 import DisasterTypeSelectInput from '#components/next/domain/DisasterTypeSelectInput';
 import EapMonthYearInput from '#components/next/domain/EapMonthYearInput';
+import ImageWithCaptionInput from '#components/next/domain/ImageWithCaptionInput';
 import NationalSocietySelectInput from '#components/next/domain/NationalSocietySelectInput';
 import TabPage from '#components/TabPage';
 import {
@@ -106,9 +106,6 @@ function Overview(props: Props) {
                 />
             )}
         >
-            {/* FIXME: ImageWithCaptionInput is still v2 and ignores the form
-            state of next form sections; drop its disabled and readOnly once it
-            moves */}
             <FormSection
                 heading={strings.overviewHeading}
                 disabled={disabled}
@@ -179,8 +176,6 @@ function Overview(props: Props) {
                         fileIdToUrlMap={fileIdToUrlMap}
                         setFileIdToUrlMap={setFileIdToUrlMap}
                         label={strings.formUploadAnImageLabel}
-                        readOnly={readOnly}
-                        disabled={disabled}
                     />
                 </FieldGroup>
                 <FieldGroup
