@@ -1,4 +1,7 @@
-import { useContext } from 'react';
+import {
+    useCallback,
+    useContext,
+} from 'react';
 import { isDefined } from '@togglecorp/fujs';
 
 import RouteContext from '#contexts/route';
@@ -26,10 +29,15 @@ function getRouteHref(routes: WrappedRoutes, target: RouteTarget) {
     return `${resolvedPath}${search}${hash}`;
 }
 
-/** Resolves route keys into hrefs, for cells and other places outside a Link */
+/**
+ * Resolves route keys into hrefs, for cells and other places outside a Link.
+ * The resolver keeps its identity, so table columns built with it do too.
+ */
 function useRouteHref() {
     const routes = useContext(RouteContext);
-    return (target: RouteTarget) => getRouteHref(routes, target);
+    return useCallback((target: RouteTarget) => getRouteHref(routes, target), [routes]);
 }
+
+export type RouteHrefResolver = ReturnType<typeof useRouteHref>;
 
 export default useRouteHref;
