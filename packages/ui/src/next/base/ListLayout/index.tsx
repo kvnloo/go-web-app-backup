@@ -45,7 +45,7 @@ export interface BlockLayoutOptions extends CommonLayoutOptions {
 export interface InlineLayoutOptions extends CommonLayoutOptions {
     wrap?: boolean;
     /** Main-axis distribution of the items */
-    align?: 'start' | 'center' | 'between';
+    align?: 'start' | 'center' | 'end' | 'between';
     alignItems?: 'start' | 'center';
     numPreferredColumns?: never;
     minColumnSize?: never;
@@ -186,6 +186,7 @@ function ListLayout(props: Props) {
                 alignItems === 'start' && styles.withStartAlignment,
                 align === 'between' && styles.withSpaceBetweenContents,
                 align === 'center' && styles.withCenteredContents,
+                layout === 'inline' && align === 'end' && styles.withEndContents,
                 withFullWidth && styles.withFullWidth,
                 getBackgroundColorClassName(backgroundColor),
                 isDefined(backgroundColor) && styles.withBackgroundColor,

@@ -91,6 +91,10 @@
             justify-content: center;
         }
 
+        &.with-end-contents {
+            justify-content: flex-end;
+        }
+
         &.with-start-alignment {
             align-items: start;
         }
