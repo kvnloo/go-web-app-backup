@@ -1,0 +1,5 @@
+/* NOTE: auto-sized table columns take the content's narrowest width, which
+would squeeze the controls */
+.table-actions {
+    min-width: max-content;
+}

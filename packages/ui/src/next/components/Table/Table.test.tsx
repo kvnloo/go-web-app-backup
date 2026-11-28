@@ -70,11 +70,9 @@ const columns = [
         (report) => report.status,
         (report) => (report.status === 'Active' ? 'positive' : undefined),
     ),
-    createActionColumn<Report, number>(
-        'actions',
-        () => <MenuItem name="x" onClick={noop}>Export</MenuItem>,
-        { ariaLabel: 'Report actions' },
-    ),
+    createActionColumn<Report, number>('actions', {
+        itemsSelector: () => <MenuItem name="x" onClick={noop}>Export</MenuItem>,
+    }),
 ];
 
 /* eslint-disable max-len */
@@ -88,6 +86,8 @@ function forbiddenCombinations() {
             <Table data={reports} keySelector={keySelector} columns={columns} getSubRows={getSubRows} />
             {/* @ts-expect-error row modifiers stay in the building block */}
             <Table data={reports} keySelector={keySelector} columns={columns} rowModifier={noop} />
+            {/* @ts-expect-error an action column takes MenuItems or a cell component, not both */}
+            {createActionColumn<Report, number>('a', { itemsSelector: () => null, renderer: () => null, rendererParams: () => ({}) })}
             {/* @ts-expect-error column widths are tokens from the column scale */}
             {createStringColumn<Report, number>('t', 'T', (report) => report.title, { width: '12rem' })}
         </>
@@ -108,7 +108,7 @@ test('columns render their kinds; numbers align right and dates get a width', ()
     expect(html).toContain(styles.numberCell);
     expect(html).toContain(styles.numberHeader);
     expect(html).toContain('var(--go-ui-width-column-sm)');
-    expect(html).toContain('aria-label="Report actions"');
+    expect(html).toContain('aria-label="More actions"');
     expect(html).toContain('aria-label="More information"');
     expect(html).toMatch(/<caption[^>]*>Reports<\/caption>/);
     expect(html).toContain('--');

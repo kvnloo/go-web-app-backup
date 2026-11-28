@@ -216,15 +216,44 @@ export function createTagColumn<DATUM, KEY>(
     });
 }
 
+/** A row's MenuItems and in-row controls, or a cell component for rows whose actions keep state */
+export type ActionColumnParams<DATUM, KEY, PROPS> =
+    | {
+        /** MenuItems of the row's "More actions" menu (nothing for a row without them) */
+        itemsSelector: (datum: DATUM) => React.ReactNode;
+        /** Controls shown in the row, before the menu */
+        actionsSelector?: (datum: DATUM) => React.ReactNode;
+        renderer?: never;
+        rendererParams?: never;
+    }
+    | {
+        itemsSelector?: never;
+        actionsSelector?: never;
+        /** Renders TableActions; for actions that open dialogs or run requests */
+        renderer: React.ComponentType<PROPS>;
+        rendererParams: (key: KEY, datum: DATUM) => PROPS;
+    };
+
 /**
- * A "more actions" menu per row; `itemsSelector` returns the row's
- * MenuItems (nothing for a row without actions)
+ * The actions of each row, at the end of the row and as wide as they need:
+ * controls in the row and a "More actions" menu (see TableActions)
  */
-export function createActionColumn<DATUM, KEY>(
+export function createActionColumn<DATUM, KEY, PROPS extends object = object>(
     id: string,
-    itemsSelector: (datum: DATUM) => React.ReactNode,
-    options: { ariaLabel: string },
+    params: ActionColumnParams<DATUM, KEY, PROPS>,
 ) {
+    if (params.renderer) {
+        return createColumn<DATUM, KEY, PROPS>({
+            id,
+            title: '',
+            options: undefined,
+            cellRenderer: params.renderer,
+            cellRendererParams: params.rendererParams,
+            columnClassName: styles.narrowColumn,
+        });
+    }
+
+    const { itemsSelector, actionsSelector } = params;
     return createColumn<DATUM, KEY, React.ComponentProps<typeof ActionCell>>({
         id,
         title: '',
@@ -232,7 +261,7 @@ export function createActionColumn<DATUM, KEY>(
         cellRenderer: ActionCell,
         cellRendererParams: (_, datum) => ({
             items: itemsSelector(datum),
-            ariaLabel: options.ariaLabel,
+            actions: actionsSelector?.(datum),
         }),
         columnClassName: styles.narrowColumn,
     });

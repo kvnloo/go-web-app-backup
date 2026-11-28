@@ -130,7 +130,11 @@ export type { Props as TabProps } from './components/Tab';
 export { default as Tab } from './components/Tab';
 export type { Props as TableProps } from './components/Table';
 export { default as Table } from './components/Table';
-export type { ColumnOptions, TableColumn } from './components/Table/columns';
+export type {
+    ActionColumnParams,
+    ColumnOptions,
+    TableColumn,
+} from './components/Table/columns';
 export {
     createActionColumn,
     createBooleanColumn,
@@ -141,6 +145,8 @@ export {
     createStringColumn,
     createTagColumn,
 } from './components/Table/columns';
+export type { Props as TableActionsProps } from './components/TableActions';
+export { default as TableActions } from './components/TableActions';
 export type { Props as TabListProps } from './components/TabList';
 export { default as TabList } from './components/TabList';
 export type { Props as TabPanelProps } from './components/TabPanel';

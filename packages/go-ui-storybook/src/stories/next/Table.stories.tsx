@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import {
+    Button,
     createActionColumn,
     createDateColumn,
     createLinkColumn,
@@ -58,7 +59,10 @@ const columns = [
     createNumberColumn<Operation, number>('people', 'People affected', (row) => row.people, { sortable: true, info: 'Estimated by the National Society.' }),
     createDateColumn<Operation, number>('date', 'Start date', (row) => row.date),
     createTagColumn<Operation, number>('status', 'Status', (row) => row.status, (row) => (row.status === 'Active' ? 'positive' : undefined)),
-    createActionColumn<Operation, number>('actions', () => <MenuItem name="export" onClick={fn()}>Export</MenuItem>, { ariaLabel: 'Operation actions' }),
+    createActionColumn<Operation, number>('actions', {
+        itemsSelector: () => <MenuItem name="export" onClick={fn()}>Export</MenuItem>,
+        actionsSelector: (row) => (row.status === 'Active' ? <Button name={row.id} onClick={fn()}>Edit</Button> : undefined),
+    }),
 ];
 
 // NOTE: the generic table, fixed to this story's rows

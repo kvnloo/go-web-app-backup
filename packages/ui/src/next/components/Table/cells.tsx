@@ -2,7 +2,6 @@ import { useContext } from 'react';
 import {
     ChevronDownLineIcon,
     ChevronUpLineIcon,
-    MoreFillIcon,
 } from '@ifrc-go/icons';
 import { _cs } from '@togglecorp/fujs';
 
@@ -17,7 +16,7 @@ import type {
 import type { StatusType } from '#utils/style';
 
 import Link from '../Link';
-import Menu from '../Menu';
+import TableActions from '../TableActions';
 import Tag from '../Tag';
 import SubRowContext from './subRows';
 
@@ -91,15 +90,15 @@ export function TagCell(props: CellBase & { label: React.ReactNode; status?: Sta
     return <Tag className={className} label={label} status={status} />;
 }
 
-export function ActionCell(props: CellBase & { items: React.ReactNode; ariaLabel: string }) {
-    const { className, items, ariaLabel } = props;
-    if (!items) {
-        return null;
-    }
+export function ActionCell(props: CellBase & {
+    items: React.ReactNode;
+    actions: React.ReactNode;
+}) {
+    const { className, items, actions } = props;
     return (
-        <Menu className={className} icon={<MoreFillIcon />} ariaLabel={ariaLabel}>
+        <TableActions className={className} actions={actions}>
             {items}
-        </Menu>
+        </TableActions>
     );
 }
 
