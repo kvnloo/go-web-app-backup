@@ -12,23 +12,24 @@ import {
 } from 'react-router-dom';
 import { ShareFillIcon } from '@ifrc-go/icons';
 import {
+    useBooleanState,
+    useTranslation,
+} from '@ifrc-go/ui/hooks';
+import {
     Alert,
     Button,
+    Description,
+    Dialog,
     IconButton,
-    InlineLayout,
+    InlineView,
     ListView,
     Message,
-    Modal,
     Tab,
     TabList,
     TabPanel,
     Tabs,
     TopBanner,
-} from '@ifrc-go/ui';
-import {
-    useBooleanState,
-    useTranslation,
-} from '@ifrc-go/ui/hooks';
+} from '@ifrc-go/ui/next';
 import {
     injectClientId,
     resolveToString,
@@ -48,8 +49,8 @@ import {
 
 import EapObsoleteResolutionModal from '#components/domain/EapObsoleteResolutionModal';
 import EapShareModal from '#components/domain/EapShareModal';
-import Link from '#components/Link';
-import Page from '#components/Page';
+import Link from '#components/next/Link';
+import Page from '#components/next/Page';
 import useAlert from '#hooks/useAlert';
 import useRouting from '#hooks/useRouting';
 import {
@@ -913,7 +914,7 @@ export function Component() {
     );
 
     return (
-        <Tabs value={activeTab} onChange={setActiveTab} styleVariant="step">
+        <Tabs value={activeTab} onChange={setActiveTab} variant="step">
             <Page
                 heading={resolveToString(
                     strings.mainHeading,
@@ -923,9 +924,11 @@ export function Component() {
                     },
                 )}
                 description={strings.mainDescription}
-                withBackgroundColorInMainSection
-                beforeHeaderContent={readOnly && (
-                    <TopBanner variant="warning">
+                variant="form"
+                disabled={disabled}
+                readOnly={readOnly}
+                banner={readOnly && (
+                    <TopBanner status="warning">
                         {strings.readOnlyWarningMessage}
                     </TopBanner>
                 )}
@@ -934,8 +937,7 @@ export function Component() {
                         <>
                             <Link
                                 to="accountMyFormsEap"
-                                styleVariant="outline"
-                                colorVariant="primary"
+                                variant="secondary"
                             >
                                 {strings.cancelButton}
                             </Link>
@@ -950,8 +952,7 @@ export function Component() {
                                     name={undefined}
                                     onClick={setShowShareModalTrue}
                                     disabled={isNotDefined(eapId) || readOnly}
-                                    title={strings.formShareButtonAriaLabel}
-                                    ariaLabel={strings.formShareButtonAriaLabel}
+                                    label={strings.formShareButtonAriaLabel}
                                 >
                                     <ShareFillIcon />
                                 </IconButton>
@@ -960,14 +961,13 @@ export function Component() {
                     ) : (
                         <Link
                             to="accountMyFormsEap"
-                            styleVariant="outline"
-                            colorVariant="primary"
+                            variant="secondary"
                         >
                             {strings.backToAccount}
                         </Link>
                     )
                 }
-                info={fullEapFormAccess && (
+                navigation={fullEapFormAccess && (
                     <TabList elementRef={tabListRef}>
                         <Tab
                             name="overview"
@@ -1030,10 +1030,14 @@ export function Component() {
             >
                 {!fullEapFormAccess ? (
                     <Message
-                        variant="error"
-                        title={strings.formLoadErrorTitle}
-                        description={fullEapResponseError?.value.messageForNotification}
-                        actions={strings.formLoadErrorHelpText}
+                        status="negative"
+                        heading={strings.formLoadErrorTitle}
+                        description={(
+                            <ListView layout="block" spacing="sm">
+                                {fullEapResponseError?.value.messageForNotification}
+                                {strings.formLoadErrorHelpText}
+                            </ListView>
+                        )}
                     />
                 ) : (
                     <>
@@ -1129,15 +1133,14 @@ export function Component() {
                                 isRevision={isRevision}
                             />
                         </TabPanel>
-                        <InlineLayout
-                            after={isEditable && fullEapFormAccess
-                                    && (
-                                        <Button name={undefined} onClick={handleSave}>
-                                            {strings.saveButton}
-                                        </Button>
-                                    )}
+                        <InlineView
+                            after={isEditable && fullEapFormAccess && (
+                                <Button name={undefined} onClick={handleSave}>
+                                    {strings.saveButton}
+                                </Button>
+                            )}
                         >
-                            <ListView withCenteredContents>
+                            <ListView layoutOptions={{ align: 'center' }}>
                                 <Button
                                     name={prevStep ?? activeTab}
                                     onClick={handleTabChange}
@@ -1157,22 +1160,23 @@ export function Component() {
                                         name={undefined}
                                         onClick={handleRequestForApprovalButtonClick}
                                         disabled={readOnly}
-                                        styleVariant="filled"
+                                        variant="primary"
                                     >
                                         {strings.submitButtonLabel}
                                     </Button>
                                 )}
                             </ListView>
-                        </InlineLayout>
+                        </InlineView>
                         {shouldSubmit && (
-                            <Modal
+                            <Dialog
                                 heading={strings.submitConfirmHeading}
                                 onClose={handleRequestForApprovalCancel}
                                 pending={createFullEapPending || updateFullFormPending}
-                                pendingMessage={strings.savingPendingMessage}
+                                messages={{ pending: strings.savingPendingMessage }}
                                 footerActions={(
                                     <Button
                                         name={undefined}
+                                        variant="primary"
                                         disabled={hasFormErrors}
                                         onClick={handleSubmitForApprovalConfirm}
                                     >
@@ -1180,19 +1184,16 @@ export function Component() {
                                     </Button>
                                 )}
                             >
-                                <ListView layout="block" spacing="sm">
-                                    <div>{strings.submitConfirmMessage}</div>
-                                    {hasFormErrors && (
-                                        <Alert
-                                            name="form-error-warning"
-                                            title={strings.submitFormErrorMessage}
-                                            type="warning"
-                                            withLightBackground
-                                            withoutShadow
-                                        />
-                                    )}
-                                </ListView>
-                            </Modal>
+                                <Description>{strings.submitConfirmMessage}</Description>
+                                {hasFormErrors && (
+                                    <Alert
+                                        name="form-error-warning"
+                                        status="warning"
+                                        heading={strings.submitFormErrorMessage}
+                                        withoutCloseButton
+                                    />
+                                )}
+                            </Dialog>
                         )}
                         {showShareModal && isDefined(eapId) && (
                             <EapShareModal

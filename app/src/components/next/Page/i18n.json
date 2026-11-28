@@ -1,0 +1,6 @@
+{
+    "namespace": "common",
+    "strings": {
+        "pageMachineTranslatedContentWarning": "The contents in this page was machine translated from {contentOriginalLanguage}!"
+    }
+}
