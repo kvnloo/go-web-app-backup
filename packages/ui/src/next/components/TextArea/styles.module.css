@@ -1,0 +1,26 @@
+.field {
+    /* NOTE: default for the value the component sets inline */
+    --rows: 5;
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--go-ui-spacing-4xs);
+
+    .text-area {
+        resize: vertical;
+    }
+
+    /* NOTE: grows with the content where supported; rows stays the minimum */
+    @supports (field-sizing: content) {
+        .text-area {
+            field-sizing: content;
+            min-block-size: calc(var(--rows) * 1lh);
+        }
+    }
+
+    .count {
+        align-self: flex-end;
+        color: var(--go-ui-color-text-light);
+        font-size: var(--go-ui-font-size-sm);
+    }
+}
