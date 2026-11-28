@@ -1,32 +1,27 @@
-import { useCallback } from 'react';
-import { AddLineIcon } from '@ifrc-go/icons';
-import {
-    Button,
-    Container,
-    Description,
-    InputSection,
-    Label,
-    ListView,
-    TextArea,
-} from '@ifrc-go/ui';
 import { useTranslation } from '@ifrc-go/ui/hooks';
-import { randomString } from '@togglecorp/fujs';
+import {
+    Description,
+    FieldGroup,
+    FormSection,
+    ListView,
+    RepeatableList,
+    Text,
+    TextArea,
+    useRepeatableList,
+} from '@ifrc-go/ui/next';
 import {
     type EntriesAsList,
     type Error,
     getErrorObject,
     getErrorString,
-    useFormArray,
 } from '@togglecorp/toggle-form';
 
-import GoMultiFileInput from '#components/domain/GoMultiFileInput';
-import ExplanatoryNote from '#components/ExplanatoryNote';
-import NonFieldError from '#components/NonFieldError';
+import GoMultiFileInput from '#components/next/domain/GoMultiFileInput';
 import TabPage from '#components/TabPage';
 import { EAP_ACCEPTED_FILE_FORMATS } from '#utils/constants';
 
 import { wordLimits } from '../common';
-import EAPSourceInformationInput, { type SourceInformationFormFields } from '../EAPSourceInformationInput';
+import EAPSourceInformationInput from '../EAPSourceInformationInput';
 import { type PartialEapFullFormType } from '../schema';
 import SectionQualityCriteria from '../SectionQualityCriteria';
 
@@ -43,6 +38,7 @@ interface Props {
     >;
     readOnly?: boolean;
 }
+
 function NationalSocietyCapacity(props: Props) {
     const {
         value,
@@ -54,30 +50,15 @@ function NationalSocietyCapacity(props: Props) {
         readOnly,
     } = props;
 
-    const error = getErrorObject(formError);
     const strings = useTranslation(i18n);
+    const error = getErrorObject(formError);
 
-    const {
-        setValue: onSourceInformationChange,
-        removeValue: onSourceInformationRemove,
-    } = useFormArray<
+    const sources = useRepeatableList(
         'ns_capacity_source_of_information',
-        SourceInformationFormFields
-    >('ns_capacity_source_of_information', setFieldValue);
-
-    const handleSourcesInformationAdd = useCallback(() => {
-        const newSourceInformationItem: SourceInformationFormFields = {
-            client_id: randomString(),
-        };
-
-        setFieldValue(
-            (oldValue: SourceInformationFormFields[] | undefined) => [
-                ...(oldValue ?? []),
-                newSourceInformationItem,
-            ],
-            'ns_capacity_source_of_information' as const,
-        );
-    }, [setFieldValue]);
+        value.ns_capacity_source_of_information,
+        setFieldValue,
+    );
+    const sourcesError = getErrorObject(error?.ns_capacity_source_of_information);
 
     return (
         <TabPage
@@ -85,205 +66,136 @@ function NationalSocietyCapacity(props: Props) {
                 <SectionQualityCriteria
                     heading={strings.capacitySectionHeading}
                     content={(
-                        <ListView
-                            layout="block"
-                            withSpacingOpticalCorrection
-                        >
-                            <ListView
-                                spacing="xs"
-                                layout="block"
-                                withSpacingOpticalCorrection
-                            >
-                                <Label strong>
+                        <ListView layout="block">
+                            <ListView layout="block" spacing="xs">
+                                <Text variant="strong">
                                     {strings.capacityCriteriaIntroduction11}
-                                </Label>
-                                <Description>
-                                    {strings.capacityCriteriaComment1}
-                                </Description>
-                                <Description>
-                                    {strings.capacityCriteriaComment2}
-                                </Description>
+                                </Text>
+                                <Description>{strings.capacityCriteriaComment1}</Description>
+                                <Description>{strings.capacityCriteriaComment2}</Description>
                             </ListView>
-                            <ListView
-                                spacing="xs"
-                                layout="block"
-                                withSpacingOpticalCorrection
-                            >
-                                <Label strong>
+                            <ListView layout="block" spacing="xs">
+                                <Text variant="strong">
                                     {strings.capacityCriteriaIntroduction12}
-                                </Label>
-                                <Description>
-                                    {strings.capacityCriteriaComment3}
-                                </Description>
+                                </Text>
+                                <Description>{strings.capacityCriteriaComment3}</Description>
                             </ListView>
                         </ListView>
                     )}
                 />
             )}
         >
-            <Container
-                heading={(
-                    <ListView>
-                        {strings.capacityHeading}
-                        <ExplanatoryNote
-                            heading={strings.capacityHeading}
-                            ariaLabel={strings.capacityHeading}
-                            title={strings.capacityHeading}
-                            content={(
-                                <Description>
-                                    {strings.capacityHeadingTooltip}
-                                </Description>
-                            )}
-                        />
-                    </ListView>
-                )}
-                variant="form"
+            <FormSection
+                heading={strings.capacityHeading}
+                info={<Description>{strings.capacityHeadingTooltip}</Description>}
+                disabled={disabled}
+                readOnly={readOnly}
             >
-                <ListView
-                    layout="block"
-                    spacing="sm"
+                <FieldGroup
+                    heading={strings.capacityOperationalTitle}
+                    description={(
+                        <ul>
+                            <li>{strings.capacityOperationalDescription1}</li>
+                            <li>{strings.capacityOperationalDescription2}</li>
+                            <li>{strings.capacityOperationalDescription3}</li>
+                            <li>{strings.capacityOperationalDescription4}</li>
+                        </ul>
+                    )}
+                    required
                 >
-                    <InputSection
-                        title={strings.capacityOperationalTitle}
-                        description={(
-                            <ul>
-                                <li>{strings.capacityOperationalDescription1}</li>
-                                <li>{strings.capacityOperationalDescription2}</li>
-                                <li>{strings.capacityOperationalDescription3}</li>
-                                <li>{strings.capacityOperationalDescription4}</li>
-                            </ul>
-                        )}
-                        withAsteriskOnTitle
+                    <TextArea
+                        name="operational_administrative_capacity"
+                        label={strings.capacityDescriptionLabel}
+                        value={value?.operational_administrative_capacity}
+                        onChange={setFieldValue}
+                        error={getErrorString(error?.operational_administrative_capacity)}
+                        maxWords={wordLimits.operational_administrative_capacity}
+                    />
+                </FieldGroup>
+                <FieldGroup
+                    heading={strings.capacityStrategiesPlansTitle}
+                    description={strings.capacityStrategiesPlansDescription}
+                    required
+                >
+                    <TextArea
+                        name="strategies_and_plans"
+                        label={strings.capacityDescriptionLabel}
+                        value={value?.strategies_and_plans}
+                        onChange={setFieldValue}
+                        error={getErrorString(error?.strategies_and_plans)}
+                        maxWords={wordLimits.strategies_and_plans}
+                    />
+                </FieldGroup>
+                <FieldGroup
+                    heading={strings.capacityFinancialCapacityTitle}
+                    description={strings.capacityFinancialDescription}
+                    info={(
+                        <ListView layout="block">
+                            <ListView layout="block" spacing="xs">
+                                <Text variant="strong">{strings.capacityExplanatoryNoteLabel}</Text>
+                                <Description>{strings.capacityExplanatoryNote}</Description>
+                            </ListView>
+                            <ListView layout="block" spacing="xs">
+                                <Text variant="strong">{strings.capacityRequiredPointsLabel}</Text>
+                                <Description>
+                                    <ul>
+                                        <li>{strings.capacityFinancialDescription}</li>
+                                    </ul>
+                                </Description>
+                            </ListView>
+                        </ListView>
+                    )}
+                    required
+                >
+                    <TextArea
+                        name="advance_financial_capacity"
+                        label={strings.capacityDescriptionLabel}
+                        value={value?.advance_financial_capacity}
+                        onChange={setFieldValue}
+                        error={getErrorString(error?.advance_financial_capacity)}
+                        maxWords={wordLimits.advance_financial_capacity}
+                    />
+                </FieldGroup>
+                <FieldGroup
+                    heading={strings.capacityNationalRelevantFilesTitle}
+                    description={strings.capacityNationalRelevantFilesDescription}
+                >
+                    <GoMultiFileInput
+                        name="capacity_relevant_files"
+                        url="/api/v2/eap-file/multiple/"
+                        accept={EAP_ACCEPTED_FILE_FORMATS}
+                        value={value?.capacity_relevant_files}
+                        onChange={setFieldValue}
+                        error={getErrorString(error?.capacity_relevant_files)}
+                        fileIdToUrlMap={fileIdToUrlMap}
+                        setFileIdToUrlMap={setFileIdToUrlMap}
+                        clearable
+                        useCurrentLanguageForMutation
                     >
-                        <TextArea
-                            label={strings.capacityDescriptionLabel}
-                            name="operational_administrative_capacity"
-                            value={value?.operational_administrative_capacity}
-                            error={error?.operational_administrative_capacity}
-                            onChange={setFieldValue}
-                            disabled={disabled}
-                            readOnly={readOnly}
-                            maxWords={wordLimits.operational_administrative_capacity}
-                        />
-                    </InputSection>
-                    <InputSection
-                        title={strings.capacityStrategiesPlansTitle}
-                        description={strings.capacityStrategiesPlansDescription}
-                        withAsteriskOnTitle
+                        {strings.capacityNationalRelevantFilesUploadLabel}
+                    </GoMultiFileInput>
+                </FieldGroup>
+                <FieldGroup
+                    heading={strings.capacitySourcesInformationTitle}
+                    description={strings.capacitySourcesInformationDescription}
+                >
+                    <RepeatableList
+                        addLabel={strings.addNewCapacitySourceButtonLabel}
+                        onAdd={sources.add}
+                        error={getErrorString(error?.ns_capacity_source_of_information)}
                     >
-                        <TextArea
-                            label={strings.capacityDescriptionLabel}
-                            name="strategies_and_plans"
-                            value={value?.strategies_and_plans}
-                            error={error?.strategies_and_plans}
-                            onChange={setFieldValue}
-                            disabled={disabled}
-                            readOnly={readOnly}
-                            maxWords={wordLimits.strategies_and_plans}
-                        />
-                    </InputSection>
-                    <InputSection
-                        title={strings.capacityFinancialCapacityTitle}
-                        headerActions={(
-                            <ExplanatoryNote
-                                heading={strings.capacityFinancialCapacityTitle}
-                                ariaLabel={strings.capacityFinancialCapacityTitle}
-                                title={strings.capacityFinancialCapacityTitle}
-                                content={(
-                                    <ListView layout="block">
-                                        <ListView spacing="xs" layout="block" withSpacingOpticalCorrection>
-                                            <Label strong>
-                                                {strings.capacityExplanatoryNoteLabel}
-                                            </Label>
-                                            <Description>
-                                                {strings.capacityExplanatoryNote}
-                                            </Description>
-                                        </ListView>
-                                        <ListView spacing="xs" layout="block" withSpacingOpticalCorrection>
-                                            <Label strong>
-                                                {strings.capacityRequiredPointsLabel}
-                                            </Label>
-                                            <Description>
-                                                <ul>
-                                                    <li>{strings.capacityFinancialDescription}</li>
-                                                </ul>
-                                            </Description>
-                                        </ListView>
-                                    </ListView>
-                                )}
+                        {value.ns_capacity_source_of_information?.map((source) => (
+                            <EAPSourceInformationInput
+                                key={source.client_id}
+                                value={source}
+                                onChange={sources.update}
+                                onRemove={sources.remove}
+                                error={getErrorObject(sourcesError?.[source.client_id])}
                             />
-                        )}
-                        description={strings.capacityFinancialDescription}
-                        withAsteriskOnTitle
-                    >
-                        <TextArea
-                            label={strings.capacityDescriptionLabel}
-                            name="advance_financial_capacity"
-                            value={value?.advance_financial_capacity}
-                            error={error?.advance_financial_capacity}
-                            onChange={setFieldValue}
-                            disabled={disabled}
-                            readOnly={readOnly}
-                            maxWords={wordLimits.advance_financial_capacity}
-                        />
-                    </InputSection>
-                    <InputSection
-                        title={strings.capacityNationalRelevantFilesTitle}
-                        description={strings.capacityNationalRelevantFilesDescription}
-                    >
-                        <GoMultiFileInput
-                            name="capacity_relevant_files"
-                            accept={EAP_ACCEPTED_FILE_FORMATS}
-                            fileIdToUrlMap={fileIdToUrlMap}
-                            onChange={setFieldValue}
-                            url="/api/v2/eap-file/multiple/"
-                            value={value?.capacity_relevant_files}
-                            error={getErrorString(error?.capacity_relevant_files)}
-                            setFileIdToUrlMap={setFileIdToUrlMap}
-                            clearable
-                            disabled={disabled}
-                            readOnly={readOnly}
-                            useCurrentLanguageForMutation
-                        >
-                            {strings.capacityNationalRelevantFilesUploadLabel}
-                        </GoMultiFileInput>
-                    </InputSection>
-                    <InputSection
-                        title={strings.capacitySourcesInformationTitle}
-                        description={strings.capacitySourcesInformationDescription}
-                    >
-                        <NonFieldError
-                            error={getErrorObject(
-                                error?.ns_capacity_source_of_information,
-                            )}
-                        />
-                        {value?.ns_capacity_source_of_information?.map(
-                            (source, index) => (
-                                <EAPSourceInformationInput
-                                    key={source.client_id}
-                                    index={index}
-                                    value={source}
-                                    onChange={onSourceInformationChange}
-                                    onRemove={onSourceInformationRemove}
-                                    error={getErrorObject(
-                                        error?.ns_capacity_source_of_information,
-                                    )}
-                                    disabled={disabled}
-                                    readOnly={readOnly}
-                                />
-                            ),
-                        )}
-                        <Button
-                            name={undefined}
-                            onClick={handleSourcesInformationAdd}
-                            disabled={disabled || readOnly}
-                            before={<AddLineIcon />}
-                        >
-                            {strings.addNewCapacitySourceButtonLabel}
-                        </Button>
-                    </InputSection>
-                </ListView>
-            </Container>
+                        ))}
+                    </RepeatableList>
+                </FieldGroup>
+            </FormSection>
         </TabPage>
     );
 }

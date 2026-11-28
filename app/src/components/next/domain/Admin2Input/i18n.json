@@ -1,0 +1,12 @@
+{
+    "namespace": "common",
+    "strings": {
+        "admin2InputSelectButtonLabel": "Select Areas",
+        "admin2InputEmptyMessage": "No areas selected yet.",
+        "admin2InputNotAvailableMessage": "Admin Level 2 data is not available for this country.",
+        "admin2InputRemoveLabel": "Remove Area",
+        "admin2InputRemoveAriaLabel": "Remove {areaName}",
+        "admin2InputDialogHeading": "Select Admin-2",
+        "admin2InputDoneButtonLabel": "Done"
+    }
+}

@@ -10,6 +10,7 @@
         "triggerStatementExplanatoryNote": "The work for the identification of triggers can be very technical and require expert resources. For this process, the National Society can get help from technical experts, Hydro-met services or specialist institutions. The chapter 4.1 Set the Trigger in the Anticipatory Action Manual can be used for guidance.",
         "triggerModelDescriptionLabel": "Description",
         "triggerLeadTimeTitle": "Lead time",
+        "triggerModelLeadTimeUnitLabel": "Lead time unit",
         "sourcesForecastTitle": "Sources of forecast",
         "addNewTriggerButtonLabel": "Add",
         "sourcesForecastDescription": "Add respective source(s) for the forecast and the link to the website, if applicable.",

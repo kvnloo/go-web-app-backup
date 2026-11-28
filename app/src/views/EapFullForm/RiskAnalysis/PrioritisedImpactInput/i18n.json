@@ -1,0 +1,7 @@
+{
+    "namespace": "eapFullForm",
+    "strings": {
+        "riskAnalysisPrioritisedImpactLabel": "Prioritised impact",
+        "riskAnalysisPrioritisedImpactRemoveLabel": "Remove prioritised impact"
+    }
+}

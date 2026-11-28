@@ -1,0 +1,16 @@
+{
+    "namespace": "common",
+    "strings": {
+        "eapOperationActivityInputActivityLabel": "Activity",
+        "eapOperationActivityInputTimeframeLabel": "Timeframe",
+        "eapOperationActivityInputLeadTimeHint": "Taken from the lead time in the {sectionName} section. Change it there to update this.",
+        "eapOperationActivityInputLeadTimeSectionTrigger": "trigger",
+        "eapOperationActivityInputLeadTimeSectionEarlyAction": "early action intervention",
+        "eapOperationActivityInputTimeSpanHint": "Start counting the timeframe after the trigger is reached: day 1 is the day the trigger is met",
+        "eapOperationActivityInputTimeSpanLabel": "Activity Time Span",
+        "eapOperationActivityInputActivationLabel": "Activation",
+        "eapOperationActivityInputActivationOneLabel": "Activation 1",
+        "eapOperationActivityInputActivationTwoLabel": "Activation 2",
+        "eapOperationActivityInputRemoveLabel": "Remove Activity"
+    }
+}

@@ -4,6 +4,7 @@
         "selectionActionsPlannedOperationPeopleTargeted": "People Targeted",
         "selectionActionsPlannedOperationBudget": "Budget(CHF)",
         "selectionActionsPlannedOperationApCode": "AP Code",
-        "selectionActionsPlannedOperationRemoveButton": "Remove"
+        "selectionActionsPlannedOperationRemoveButton": "Remove",
+        "plannedOperationSectorRemoveConfirmation": "Removing this sector will delete all the data entered for it. Do you want to continue?"
     }
 }

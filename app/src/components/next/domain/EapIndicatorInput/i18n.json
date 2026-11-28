@@ -1,0 +1,8 @@
+{
+    "namespace": "common",
+    "strings": {
+        "eapIndicatorInputTitleLabel": "Indicator name",
+        "eapIndicatorInputTargetLabel": "Indicator Target",
+        "eapIndicatorInputRemoveLabel": "Remove Indicator"
+    }
+}

@@ -3,6 +3,7 @@
     "strings": {
         "approachBudget": "Budget(CHF)",
         "approachApCode": "AP Code",
-        "approachRemoveButton": "Remove"
+        "approachRemoveButton": "Remove",
+        "enablingApproachRemoveConfirmation": "Removing this approach will delete all the data entered for it. Do you want to continue?"
     }
 }

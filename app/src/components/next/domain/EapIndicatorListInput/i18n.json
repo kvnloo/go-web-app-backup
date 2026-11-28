@@ -1,0 +1,7 @@
+{
+    "namespace": "common",
+    "strings": {
+        "eapIndicatorListInputHeading": "Indicators",
+        "eapIndicatorListInputAddLabel": "Add Indicator"
+    }
+}

@@ -1,20 +1,17 @@
-import { DeleteBinTwoLineIcon } from '@ifrc-go/icons';
+import { useTranslation } from '@ifrc-go/ui/hooks';
 import {
-    Container,
-    IconButton,
-    InlineLayout,
+    RemovableItem,
     TextInput,
-} from '@ifrc-go/ui';
-import { randomString } from '@togglecorp/fujs';
+} from '@ifrc-go/ui/next';
 import {
-    type ArrayError,
+    type Error,
     getErrorObject,
-    type SetValueArg,
-    useFormObject,
+    getErrorString,
 } from '@togglecorp/toggle-form';
 
-import NonFieldError from '#components/NonFieldError';
 import { type PartialEapFullFormType } from '#views/EapFullForm/schema';
+
+import i18n from './i18n.json';
 
 type PrioritisedImpactFormFields = NonNullable<
     PartialEapFullFormType['prioritized_impacts']
@@ -22,65 +19,42 @@ type PrioritisedImpactFormFields = NonNullable<
 
 interface Props {
     value: PrioritisedImpactFormFields;
-    error: ArrayError<PrioritisedImpactFormFields> | undefined;
-    onChange: (value: SetValueArg<PrioritisedImpactFormFields>, index: number) => void;
-    onRemove: (index: number) => void;
-    index: number;
-    disabled?: boolean;
-    readOnly?: boolean;
+    error: Error<PrioritisedImpactFormFields> | undefined;
+    onChange: (clientId: string, value: PrioritisedImpactFormFields) => void;
+    onRemove: (clientId: string) => void;
 }
 
 function PrioritisedImpactInput(props: Props) {
     const {
-        error: errorFromProps,
-        onChange,
         value,
-        index,
+        onChange,
         onRemove,
-        disabled,
-        readOnly,
+        error: errorFromProps,
     } = props;
 
-    const onFieldChange = useFormObject(index, onChange, () => ({
-        client_id: randomString(),
-    }));
+    const strings = useTranslation(i18n);
+    const error = getErrorObject(errorFromProps);
 
-    const error = value && value.client_id && errorFromProps
-        ? getErrorObject(errorFromProps?.[value.client_id])
-        : undefined;
+    const handleImpactChange = (impact: string | undefined) => {
+        onChange(value.client_id, { ...value, impact });
+    };
 
     return (
-        <Container
-            spacing="sm"
-            headerDescription={error && (
-                <NonFieldError error={error} />
-            )}
+        <RemovableItem
+            name={value.client_id}
+            onRemove={onRemove}
+            removeLabel={strings.riskAnalysisPrioritisedImpactRemoveLabel}
+            error={getErrorString(error)}
         >
-            <InlineLayout
-                after={(
-                    <IconButton
-                        name={index}
-                        onClick={onRemove}
-                        styleVariant="action"
-                        disabled={disabled || readOnly}
-                        // FIXME use translation strings
-                        title="Remove prioritized impact"
-                        ariaLabel="Remove prioritized impact"
-                    >
-                        <DeleteBinTwoLineIcon />
-                    </IconButton>
-                )}
-            >
-                <TextInput
-                    name="impact"
-                    value={value.impact}
-                    onChange={onFieldChange}
-                    readOnly={readOnly}
-                    disabled={disabled}
-                    error={error?.impact}
-                />
-            </InlineLayout>
-        </Container>
+            <TextInput
+                name="impact"
+                ariaLabel={strings.riskAnalysisPrioritisedImpactLabel}
+                value={value.impact}
+                onChange={handleImpactChange}
+                error={getErrorString(error?.impact)}
+                required
+            />
+        </RemovableItem>
     );
 }
 

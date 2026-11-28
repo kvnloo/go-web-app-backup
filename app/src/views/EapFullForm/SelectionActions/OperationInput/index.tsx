@@ -1,22 +1,23 @@
+import { useContext } from 'react';
 import { DeleteBinTwoLineIcon } from '@ifrc-go/icons';
+import { FormStateContext } from '@ifrc-go/ui/contexts';
+import { useTranslation } from '@ifrc-go/ui/hooks';
 import {
     Button,
-    ExpandableContainer,
+    ExpandableSection,
     ListView,
     NumberInput,
     TextInput,
-} from '@ifrc-go/ui';
-import { useTranslation } from '@ifrc-go/ui/hooks';
+} from '@ifrc-go/ui/next';
 import { noOp } from '@togglecorp/fujs';
 import {
-    type ArrayError,
+    type Error,
     getErrorObject,
-    type SetValueArg,
-    useFormObject,
+    getErrorString,
 } from '@togglecorp/toggle-form';
 
-import EapIndicatorListInput from '#components/domain/EapIndicatorListInput';
-import EapOperationActivityListInput from '#components/domain/EapOperationActivityListInput';
+import EapIndicatorListInput from '#components/next/domain/EapIndicatorListInput';
+import EapOperationActivityListInput from '#components/next/domain/EapOperationActivityListInput';
 import { type TimeFrameEnumKey } from '#utils/constants';
 import { type GoApiResponse } from '#utils/restRequest';
 
@@ -30,141 +31,115 @@ type PlannedOperationFormFields = NonNullable<
 
 type EapSectorApCodeOption = NonNullable<GoApiResponse<'/api/v2/eap/options/'>['sector_ap_codes']>;
 
-const defaultOperationValue: PlannedOperationFormFields = {
-    sector: 101,
-};
-
 interface Props {
     value: PlannedOperationFormFields;
-    error: ArrayError<PlannedOperationFormFields> | undefined;
-    onChange: (
-        value: SetValueArg<PlannedOperationFormFields>,
-        index: number
-    ) => void;
+    /** The row's own error (the list error keyed by its sector) */
+    error: Error<PlannedOperationFormFields> | undefined;
+    onChange: (value: PlannedOperationFormFields, index: number) => void;
     onRemove: (index: number) => void;
     index: number;
-    disabled?: boolean;
     operationTitle?: React.ReactNode;
-    readOnly?: boolean;
     sectorApCodeOption?: EapSectorApCodeOption;
     leadTimeframeUnit?: TimeFrameEnumKey;
 }
 
 function OperationsInput(props: Props) {
     const {
+        value,
         error: errorFromProps,
         onChange,
-        value,
-        index,
         onRemove,
-        disabled,
+        index,
         operationTitle,
-        readOnly,
         sectorApCodeOption,
         leadTimeframeUnit,
     } = props;
 
     const strings = useTranslation(i18n);
-    const onFieldChange = useFormObject(index, onChange, defaultOperationValue);
+    const { readOnly } = useContext(FormStateContext);
+    const error = getErrorObject(errorFromProps);
 
     const apCodeValue = sectorApCodeOption?.[value.sector]?.join(', ');
 
-    const error = value && value.sector && errorFromProps
-        ? getErrorObject(errorFromProps?.[value.sector])
-        : undefined;
+    const handleFieldChange = <K extends keyof PlannedOperationFormFields>(
+        fieldValue: PlannedOperationFormFields[K],
+        fieldName: K,
+    ) => {
+        onChange({ ...value, [fieldName]: fieldValue }, index);
+    };
 
     return (
-        <ExpandableContainer
+        <ExpandableSection
             heading={operationTitle ?? '--'}
-            headerActions={(
-                <Button
-                    name={index}
-                    onClick={onRemove}
-                    styleVariant="action"
-                    disabled={disabled || readOnly}
-                    title={strings.selectionActionsPlannedOperationRemoveButton}
-                >
-                    <DeleteBinTwoLineIcon />
-                </Button>
-            )}
-            withPadding
-            withBackground
             initiallyExpanded
-            withHeaderBorder
-            // FIXME: add non field error and error indicator
         >
-            <ListView layout="block">
-                <ListView
-                    layout="grid"
-                    numPreferredGridColumns={3}
-                >
-                    <NumberInput
-                        required
-                        label={strings.selectionActionsPlannedOperationPeopleTargeted}
-                        name="people_targeted"
-                        value={value?.people_targeted}
-                        onChange={onFieldChange}
-                        disabled={disabled}
-                        error={error?.people_targeted}
-                        readOnly={readOnly}
-                    />
-                    <NumberInput
-                        required
-                        label={strings.selectionActionsPlannedOperationBudget}
-                        name="budget_per_sector"
-                        value={value?.budget_per_sector}
-                        onChange={onFieldChange}
-                        disabled={disabled}
-                        error={error?.budget_per_sector}
-                        readOnly={readOnly}
-                    />
-                    <TextInput
-                        name={undefined}
-                        onChange={noOp}
-                        readOnly
-                        label={strings.selectionActionsPlannedOperationApCode}
-                        value={apCodeValue}
-                    />
-                </ListView>
-                <ListView
-                    layout="block"
-                    spacing="2xs"
-                >
-                    <EapIndicatorListInput
-                        name="indicators"
-                        value={value.indicators}
-                        onChange={onFieldChange}
-                        readOnly={readOnly}
-                        error={getErrorObject(error)?.indicators}
-                    />
-                    <EapOperationActivityListInput
-                        name="readiness_activities"
-                        value={value.readiness_activities}
-                        onChange={onFieldChange}
-                        readOnly={readOnly}
-                        error={getErrorObject(error)?.readiness_activities}
-                    />
-                    <EapOperationActivityListInput
-                        name="prepositioning_activities"
-                        value={value.prepositioning_activities}
-                        onChange={onFieldChange}
-                        readOnly={readOnly}
-                        error={getErrorObject(error)?.prepositioning_activities}
-                        withActivationSelection
-                        withoutTimeframeSelection
-                    />
-                    <EapOperationActivityListInput
-                        name="early_action_activities"
-                        value={value.early_action_activities}
-                        onChange={onFieldChange}
-                        readOnly={readOnly}
-                        error={getErrorObject(error)?.early_action_activities}
-                        withActivationSelection
-                        leadTimeframeUnit={leadTimeframeUnit}
-                    />
-                </ListView>
+            <ListView layout="grid" layoutOptions={{ numPreferredColumns: 3 }}>
+                <NumberInput
+                    name="people_targeted"
+                    label={strings.selectionActionsPlannedOperationPeopleTargeted}
+                    value={value.people_targeted}
+                    onChange={handleFieldChange}
+                    error={getErrorString(error?.people_targeted)}
+                    required
+                />
+                <NumberInput
+                    name="budget_per_sector"
+                    label={strings.selectionActionsPlannedOperationBudget}
+                    value={value.budget_per_sector}
+                    onChange={handleFieldChange}
+                    error={getErrorString(error?.budget_per_sector)}
+                    required
+                />
+                <TextInput
+                    name={undefined}
+                    label={strings.selectionActionsPlannedOperationApCode}
+                    value={apCodeValue}
+                    onChange={noOp}
+                    readOnly
+                />
             </ListView>
-        </ExpandableContainer>
+            <EapIndicatorListInput
+                name="indicators"
+                value={value.indicators}
+                onChange={handleFieldChange}
+                error={error?.indicators}
+            />
+            <EapOperationActivityListInput
+                name="readiness_activities"
+                value={value.readiness_activities}
+                onChange={handleFieldChange}
+                error={error?.readiness_activities}
+            />
+            <EapOperationActivityListInput
+                name="prepositioning_activities"
+                value={value.prepositioning_activities}
+                onChange={handleFieldChange}
+                error={error?.prepositioning_activities}
+                withActivationSelection
+                withoutTimeframeSelection
+            />
+            <EapOperationActivityListInput
+                name="early_action_activities"
+                value={value.early_action_activities}
+                onChange={handleFieldChange}
+                error={error?.early_action_activities}
+                withActivationSelection
+                leadTimeframeUnit={leadTimeframeUnit}
+            />
+            {!readOnly && (
+                <ListView layoutOptions={{ align: 'end' }}>
+                    <Button
+                        name={index}
+                        variant="tertiary"
+                        before={<DeleteBinTwoLineIcon />}
+                        onConfirm={onRemove}
+                        confirmMessage={strings.plannedOperationSectorRemoveConfirmation}
+                    >
+                        {strings.selectionActionsPlannedOperationRemoveButton}
+                    </Button>
+                </ListView>
+            )}
+        </ExpandableSection>
     );
 }
 

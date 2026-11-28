@@ -18,15 +18,12 @@
         "selectionActionDescriptionLabel": "Description",
         "selectionActionExplanatoryNoteLabel": "Explanatory Note",
         "selectionActionRequiredPointsLabel": "Required Points",
-        "earlyActionsOutputValue": "Early Actions",
         "earlyActionsAddButtonLabel": "Add",
-        "earlyActionsEmptyMessage": "No actions yet!",
         "selectionActionUploadLabel": "Upload",
         "selectionActionSelectFilesLabel": "Select files",
         "theoryOfChangeTableTitle": "Theory of Change Table",
         "theoryOfChangeTableDescription": "Show how the selected action aims to reduce the expected humanitarian impact, by filling out the Theory of Change (ToC) table",
         "downloadTableLabel": "Download Theory of Change table",
-        "selectionActionUploadTableLabel": "Upload Table",
         "evidenceBaseTitle": "Evidence base",
         "evidenceBaseDescription": "Explain how the selected actions will reduce the expected disaster impacts with a reference to academic research, empirical studies, interviews with key informants/experts, among other sources of evidence.",
         "evidenceBaseExplanatoryNote": "It is important to provide evidence-based information showing that the early action(s) selected are likely to reduce the humanitarian impact of the event.",
@@ -35,11 +32,9 @@
         "plannedOperationTitle": "Planned Operation",
         "plannedOperationDescription": "Select sectors which are used in this Early Action Protocol.",
         "plannedOperationSectorUnselectConfirmation": "Unselecting a sector will delete all the data entered for it. Do you want to continue?",
-        "plannedOperationSectorRemoveConfirmation": "Removing this sector will delete all the data entered for it. Do you want to continue?",
         "enablingApproachesTitle": "Enabling Approaches",
         "enablingApproachesDescription": "Select approaches which are used in this Early Action Protocol.",
         "enablingApproachUnselectConfirmation": "Unselecting an approach will delete all the data entered for it. Do you want to continue?",
-        "enablingApproachRemoveConfirmation": "Removing this approach will delete all the data entered for it. Do you want to continue?",
         "selectionAttachFilesTitle": "Attach relevant files",
         "selectionAttachFilesDescription": "Attach any additional documentation, files, images, etc.",
         "selectionSourceOfInformationTitle": "Sources of information",
@@ -71,6 +66,5 @@
         "actionsSectionCriteriaIntroduction52": "The EAP includes a 4W description indicating who does what, where, and when. This should include also actors outside the structure of the National Society.",
         "actionsSectionCriteriaComment5": "The implementation process described shows that each step of the activation has been thought through and considered and that implementation in the lead time available is possible. The set of tasks described in this section should cover all activities from the moment the trigger is reached (Day 1) to the completion of post-impact surveys (Day X).",
         "actionsSectionCriteriaComment6": "In the case of Population Movement, 4W planning should anticipate fluid and shifting displacement scenarios by outlining contingency arrangements for alternate routes, new host areas, and evolving points of entry/transit. Coordination with external actors, should be clearly defined to ensure operational readiness across potential cross-border or multi-location context"
-
     }
 }

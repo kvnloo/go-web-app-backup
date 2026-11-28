@@ -1,0 +1,7 @@
+{
+    "namespace": "common",
+    "strings": {
+        "admin1MultiSelectWithDescriptionInputSelectLabel": "Select Region/Province",
+        "admin1MultiSelectWithDescriptionInputEmptyMessage": "No areas selected yet."
+    }
+}

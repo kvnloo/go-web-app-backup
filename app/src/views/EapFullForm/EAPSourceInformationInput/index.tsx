@@ -1,24 +1,17 @@
-import { useCallback } from 'react';
-import { DeleteBinTwoLineIcon } from '@ifrc-go/icons';
-import {
-    Container,
-    IconButton,
-    InlineView,
-    ListView,
-    TextInput,
-} from '@ifrc-go/ui';
 import { useTranslation } from '@ifrc-go/ui/hooks';
-import { randomString } from '@togglecorp/fujs';
 import {
-    type ArrayError,
+    ListView,
+    RemovableItem,
+    TextInput,
+} from '@ifrc-go/ui/next';
+import {
+    type Error,
     getErrorObject,
+    getErrorString,
     type PartialForm,
     type PurgeNull,
-    type SetValueArg,
-    useFormObject,
 } from '@togglecorp/toggle-form';
 
-import NonFieldError from '#components/NonFieldError';
 import { type components } from '#generated/types';
 import { formatSourceLink } from '#utils/common';
 
@@ -30,94 +23,64 @@ type EAPSourceInformation = PurgeNull<
     client_id: string;
 };
 
-export type SourceInformationFormFields = PartialForm<
+type SourceInformationFormFields = PartialForm<
     EAPSourceInformation,
     'client_id'
 >;
 
 interface Props {
     value: SourceInformationFormFields;
-    error: ArrayError<SourceInformationFormFields> | undefined;
-    onChange: (
-        value: SetValueArg<SourceInformationFormFields>,
-        index: number
-    ) => void;
-    onRemove: (index: number) => void;
-    index: number;
-    disabled?: boolean;
-    readOnly?: boolean;
+    /** The row's own error (the list error keyed by its client_id) */
+    error: Error<SourceInformationFormFields> | undefined;
+    onChange: (clientId: string, value: SourceInformationFormFields) => void;
+    onRemove: (clientId: string) => void;
 }
 
+/** One source of information of an EAP section, as a row of a RepeatableList */
 function EAPSourceInformationInput(props: Props) {
     const {
+        value,
         error: errorFromProps,
         onChange,
-        value,
-        index,
         onRemove,
-        disabled,
-        readOnly,
     } = props;
 
     const strings = useTranslation(i18n);
+    const error = getErrorObject(errorFromProps);
 
-    const onFieldChange = useFormObject(index, onChange, () => ({
-        client_id: randomString(),
-    }));
-
-    const error = value && value.client_id && errorFromProps
-        ? getErrorObject(errorFromProps?.[value.client_id])
-        : undefined;
-
-    const handleSourceFieldChange = useCallback(
-        (linkValue: string | undefined) => {
-            onFieldChange(formatSourceLink(linkValue), 'source_link');
-        },
-        [onFieldChange],
-    );
+    const handleNameChange = (sourceName: string | undefined) => {
+        onChange(value.client_id, { ...value, source_name: sourceName });
+    };
+    const handleLinkChange = (sourceLink: string | undefined) => {
+        onChange(value.client_id, { ...value, source_link: formatSourceLink(sourceLink) });
+    };
 
     return (
-        <Container
-            headerDescription={<NonFieldError error={error} />}
-            withPadding
-            withBorder
+        <RemovableItem
+            name={value.client_id}
+            onRemove={onRemove}
+            removeLabel={strings.eapSourceInformationDeleteButton}
+            error={getErrorString(errorFromProps)}
         >
-            <InlineView
-                after={(
-                    <IconButton
-                        name={index}
-                        onClick={onRemove}
-                        disabled={disabled || readOnly}
-                        title={strings.eapSourceInformationDeleteButton}
-                        ariaLabel={strings.eapSourceInformationDeleteButton}
-                    >
-                        <DeleteBinTwoLineIcon />
-                    </IconButton>
-                )}
-            >
-                <ListView layout="grid">
-                    <TextInput
-                        required
-                        label={strings.eapSourceInformationNameLabel}
-                        name="source_name"
-                        value={value.source_name}
-                        error={error?.source_name}
-                        onChange={onFieldChange}
-                        readOnly={readOnly}
-                        disabled={disabled}
-                    />
-                    <TextInput
-                        label={strings.eapSourceInformationLinkLabel}
-                        name="source_link"
-                        value={value.source_link}
-                        error={error?.source_link}
-                        onChange={handleSourceFieldChange}
-                        readOnly={readOnly}
-                        disabled={disabled}
-                    />
-                </ListView>
-            </InlineView>
-        </Container>
+            <ListView layout="grid" layoutOptions={{ numPreferredColumns: 2 }}>
+                <TextInput
+                    name="source_name"
+                    label={strings.eapSourceInformationNameLabel}
+                    value={value.source_name}
+                    error={getErrorString(error?.source_name)}
+                    onChange={handleNameChange}
+                    required
+                />
+                <TextInput
+                    name="source_link"
+                    type="url"
+                    label={strings.eapSourceInformationLinkLabel}
+                    value={value.source_link}
+                    error={getErrorString(error?.source_link)}
+                    onChange={handleLinkChange}
+                />
+            </ListView>
+        </RemovableItem>
     );
 }
 

@@ -1,32 +1,27 @@
-import { useCallback } from 'react';
-import { AddLineIcon } from '@ifrc-go/icons';
-import {
-    Button,
-    Container,
-    Description,
-    InputSection,
-    Label,
-    ListView,
-    TextArea,
-} from '@ifrc-go/ui';
 import { useTranslation } from '@ifrc-go/ui/hooks';
-import { randomString } from '@togglecorp/fujs';
+import {
+    Description,
+    FieldGroup,
+    FormSection,
+    ListView,
+    RepeatableList,
+    Text,
+    TextArea,
+    useRepeatableList,
+} from '@ifrc-go/ui/next';
 import {
     type EntriesAsList,
     type Error,
     getErrorObject,
     getErrorString,
-    useFormArray,
 } from '@togglecorp/toggle-form';
 
-import GoMultiFileInput from '#components/domain/GoMultiFileInput';
-import ExplanatoryNote from '#components/ExplanatoryNote';
-import NonFieldError from '#components/NonFieldError';
+import GoMultiFileInput from '#components/next/domain/GoMultiFileInput';
 import TabPage from '#components/TabPage';
 import { EAP_ACCEPTED_FILE_FORMATS } from '#utils/constants';
 
 import { wordLimits } from '../common';
-import EAPSourceInformationInput, { type SourceInformationFormFields } from '../EAPSourceInformationInput';
+import EAPSourceInformationInput from '../EAPSourceInformationInput';
 import { type PartialEapFullFormType } from '../schema';
 import SectionQualityCriteria from '../SectionQualityCriteria';
 
@@ -53,30 +48,15 @@ function Meal(props: Props) {
         readOnly,
     } = props;
 
-    const error = getErrorObject(formError);
     const strings = useTranslation(i18n);
+    const error = getErrorObject(formError);
 
-    const {
-        setValue: onSourceInformationChange,
-        removeValue: onSourceInformationRemove,
-    } = useFormArray<
+    const sourcesOfInformation = useRepeatableList(
         'meal_source_of_information',
-        SourceInformationFormFields
-    >('meal_source_of_information', setFieldValue);
-
-    const handleSourcesInformationAdd = useCallback(() => {
-        const newSourceInformationItem: SourceInformationFormFields = {
-            client_id: randomString(),
-        };
-
-        setFieldValue(
-            (oldValue: SourceInformationFormFields[] | undefined) => [
-                ...(oldValue ?? []),
-                newSourceInformationItem,
-            ],
-            'meal_source_of_information' as const,
-        );
-    }, [setFieldValue]);
+        value.meal_source_of_information,
+        setFieldValue,
+    );
+    const sourcesOfInformationError = getErrorObject(error?.meal_source_of_information);
 
     return (
         <TabPage
@@ -84,11 +64,9 @@ function Meal(props: Props) {
                 <SectionQualityCriteria
                     heading={strings.mealSectionHeading}
                     content={(
-                        <ListView layout="block" withSpacingOpticalCorrection>
-                            <ListView spacing="xs" layout="block" withSpacingOpticalCorrection>
-                                <Label strong>
-                                    {strings.mealCriteriaIntroduction1}
-                                </Label>
+                        <ListView layout="block">
+                            <ListView layout="block" spacing="xs">
+                                <Text variant="strong">{strings.mealCriteriaIntroduction1}</Text>
                                 <Description>
                                     <ol>
                                         <li>{strings.mealCriteriaIntroduction11}</li>
@@ -96,167 +74,132 @@ function Meal(props: Props) {
                                         <li>{strings.mealCriteriaIntroduction13}</li>
                                     </ol>
                                 </Description>
-                                <Description>
-                                    {strings.mealCriteriaComment1}
-                                </Description>
-                                <Description>
-                                    {strings.mealCriteriaComment2}
-                                    <ul>
-                                        <li>{strings.mealCriteriaPdmTheme1}</li>
-                                        <li>{strings.mealCriteriaPdmTheme2}</li>
-                                        <li>{strings.mealCriteriaPdmTheme3}</li>
-                                        <li>{strings.mealCriteriaPdmTheme4}</li>
+                            </ListView>
+                            <Description>{strings.mealCriteriaComment1}</Description>
+                            <Description>
+                                {strings.mealCriteriaComment2}
+                                <ul>
+                                    <li>{strings.mealCriteriaPdmTheme1}</li>
+                                    <li>{strings.mealCriteriaPdmTheme2}</li>
+                                    <li>{strings.mealCriteriaPdmTheme3}</li>
+                                    <li>
+                                        {strings.mealCriteriaPdmTheme4}
                                         <ul>
                                             <li>{strings.mealCriteriaPdmFollowing1}</li>
                                             <li>{strings.mealCriteriaPdmFollowing2}</li>
                                             <li>{strings.mealCriteriaPdmFollowing3}</li>
                                         </ul>
-                                    </ul>
-                                </Description>
-                                <Description>
-                                    {strings.mealCriteriaComment3}
-                                </Description>
-                                <Description>
-                                    {strings.mealCriteriaComment4}
-                                </Description>
-                                <Description>
-                                    {strings.mealCriteriaComment5}
-                                </Description>
-                            </ListView>
+                                    </li>
+                                </ul>
+                            </Description>
+                            <Description>{strings.mealCriteriaComment3}</Description>
+                            <Description>{strings.mealCriteriaComment4}</Description>
+                            <Description>{strings.mealCriteriaComment5}</Description>
                         </ListView>
                     )}
                 />
             )}
         >
-            <Container
-                variant="form"
+            <FormSection
                 heading={strings.mealHeading}
+                disabled={disabled}
+                readOnly={readOnly}
             >
-                <ListView
-                    layout="block"
-                    spacing="sm"
-                >
-                    <InputSection
-                        title={strings.mealTitle}
-                        headerActions={(
-                            <ExplanatoryNote
-                                heading={strings.mealTitle}
-                                ariaLabel={strings.mealTitle}
-                                title={strings.mealTitle}
-                                content={(
-                                    <ListView layout="block">
-                                        <ListView spacing="xs" layout="block" withSpacingOpticalCorrection>
-                                            <Label strong>
-                                                {strings.mealExplanatoryNoteLabel}
-                                            </Label>
-                                            <Description>
-                                                {strings.mealExplanatoryNote}
-                                            </Description>
-                                        </ListView>
-                                        <ListView spacing="xs" layout="block" withSpacingOpticalCorrection>
-                                            <Label strong>
-                                                {strings.mealRequiredPointsLabel}
-                                            </Label>
-                                            <Description>
-                                                <ul>
-                                                    <li>{strings.mealDescription1}</li>
-                                                    <ul>
-                                                        <li>{strings.mealDescription11}</li>
-                                                        <li>{strings.mealDescription12}</li>
-                                                        <li>{strings.mealDescription13}</li>
-                                                        <li>{strings.mealDescription14}</li>
-                                                    </ul>
-                                                    <li>{strings.mealDescription2}</li>
-                                                    <li>{strings.mealDescription3}</li>
-                                                </ul>
-                                            </Description>
-                                        </ListView>
-                                    </ListView>
-                                )}
-                            />
-                        )}
-                        description={(
-                            <ul>
-                                <li>{strings.mealDescription1}</li>
+                <FieldGroup
+                    heading={strings.mealTitle}
+                    description={(
+                        <ul>
+                            <li>
+                                {strings.mealDescription1}
                                 <ul>
                                     <li>{strings.mealDescription11}</li>
                                     <li>{strings.mealDescription12}</li>
                                     <li>{strings.mealDescription13}</li>
                                 </ul>
-                                <li>{strings.mealDescription2}</li>
-                                <li>{strings.mealDescription3}</li>
-                            </ul>
-                        )}
-                        withAsteriskOnTitle
+                            </li>
+                            <li>{strings.mealDescription2}</li>
+                            <li>{strings.mealDescription3}</li>
+                        </ul>
+                    )}
+                    info={(
+                        <ListView layout="block">
+                            <ListView layout="block" spacing="xs">
+                                <Text variant="strong">{strings.mealExplanatoryNoteLabel}</Text>
+                                <Description>{strings.mealExplanatoryNote}</Description>
+                            </ListView>
+                            <ListView layout="block" spacing="xs">
+                                <Text variant="strong">{strings.mealRequiredPointsLabel}</Text>
+                                <Description>
+                                    <ul>
+                                        <li>
+                                            {strings.mealDescription1}
+                                            <ul>
+                                                <li>{strings.mealDescription11}</li>
+                                                <li>{strings.mealDescription12}</li>
+                                                <li>{strings.mealDescription13}</li>
+                                                <li>{strings.mealDescription14}</li>
+                                            </ul>
+                                        </li>
+                                        <li>{strings.mealDescription2}</li>
+                                        <li>{strings.mealDescription3}</li>
+                                    </ul>
+                                </Description>
+                            </ListView>
+                        </ListView>
+                    )}
+                    required
+                >
+                    <TextArea
+                        name="meal"
+                        label={strings.mealDescriptionLabel}
+                        value={value?.meal}
+                        onChange={setFieldValue}
+                        error={getErrorString(error?.meal)}
+                        maxWords={wordLimits.meal}
+                    />
+                </FieldGroup>
+                <FieldGroup
+                    heading={strings.mealAttachRelevantFilesTitle}
+                    description={strings.mealAttachRelevantFilesDescription}
+                >
+                    <GoMultiFileInput
+                        name="meal_relevant_files"
+                        url="/api/v2/eap-file/multiple/"
+                        accept={EAP_ACCEPTED_FILE_FORMATS}
+                        value={value.meal_relevant_files}
+                        onChange={setFieldValue}
+                        error={getErrorString(error?.meal_relevant_files)}
+                        fileIdToUrlMap={fileIdToUrlMap}
+                        setFileIdToUrlMap={setFileIdToUrlMap}
+                        clearable
+                        useCurrentLanguageForMutation
                     >
-                        <TextArea
-                            label={strings.mealDescriptionLabel}
-                            name="meal"
-                            value={value?.meal}
-                            error={error?.meal}
-                            onChange={setFieldValue}
-                            disabled={disabled}
-                            readOnly={readOnly}
-                            maxWords={wordLimits.meal}
-                        />
-                    </InputSection>
-                    <InputSection
-                        title={strings.mealAttachRelevantFilesTitle}
-                        description={strings.mealAttachRelevantFilesDescription}
+                        {strings.mealAttachRelevantFilesUploadLabel}
+                    </GoMultiFileInput>
+                </FieldGroup>
+                <FieldGroup
+                    heading={strings.mealSourcesInformationTitle}
+                    description={strings.mealSourcesInformationDescription}
+                >
+                    <RepeatableList
+                        addLabel={strings.addNewMealButtonLabel}
+                        onAdd={sourcesOfInformation.add}
+                        error={getErrorString(error?.meal_source_of_information)}
                     >
-                        <GoMultiFileInput
-                            name="meal_relevant_files"
-                            accept={EAP_ACCEPTED_FILE_FORMATS}
-                            fileIdToUrlMap={fileIdToUrlMap}
-                            onChange={setFieldValue}
-                            url="/api/v2/eap-file/multiple/"
-                            value={value.meal_relevant_files}
-                            error={getErrorString(error?.meal_relevant_files)}
-                            setFileIdToUrlMap={setFileIdToUrlMap}
-                            clearable
-                            disabled={disabled}
-                            readOnly={readOnly}
-                            useCurrentLanguageForMutation
-                        >
-                            {strings.mealAttachRelevantFilesUploadLabel}
-                        </GoMultiFileInput>
-                    </InputSection>
-                    <InputSection
-                        title={strings.mealSourcesInformationTitle}
-                        description={strings.mealSourcesInformationDescription}
-                    >
-                        <NonFieldError
-                            error={getErrorObject(
-                                error?.meal_source_of_information,
-                            )}
-                        />
-                        {value?.meal_source_of_information?.map(
-                            (source, index) => (
-                                <EAPSourceInformationInput
-                                    key={source.client_id}
-                                    index={index}
-                                    value={source}
-                                    onChange={onSourceInformationChange}
-                                    onRemove={onSourceInformationRemove}
-                                    error={getErrorObject(
-                                        error?.meal_source_of_information,
-                                    )}
-                                    disabled={disabled}
-                                    readOnly={readOnly}
-                                />
-                            ),
-                        )}
-                        <Button
-                            name={undefined}
-                            onClick={handleSourcesInformationAdd}
-                            disabled={disabled || readOnly}
-                            before={<AddLineIcon />}
-                        >
-                            {strings.addNewMealButtonLabel}
-                        </Button>
-                    </InputSection>
-                </ListView>
-            </Container>
+                        {value.meal_source_of_information?.map((source) => (
+                            <EAPSourceInformationInput
+                                key={source.client_id}
+                                value={source}
+                                onChange={sourcesOfInformation.update}
+                                onRemove={sourcesOfInformation.remove}
+                                error={getErrorObject(
+                                    sourcesOfInformationError?.[source.client_id],
+                                )}
+                            />
+                        ))}
+                    </RepeatableList>
+                </FieldGroup>
+            </FormSection>
         </TabPage>
     );
 }

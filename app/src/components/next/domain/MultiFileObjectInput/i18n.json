@@ -1,0 +1,11 @@
+{
+    "namespace": "common",
+    "strings": {
+        "multiFileObjectInputRemoveLabel": "Remove File",
+        "multiFileObjectInputPreviewAlt": "Image preview",
+        "multiFileObjectInputCaptionLabel": "Caption",
+        "multiFileObjectInputCaptionPlaceholder": "Enter caption",
+        "multiFileObjectInputAcceptedFormatsDescription": "Accepted file formats: {fileFormats}",
+        "multiFileObjectInputImagesLabel": "Images"
+    }
+}

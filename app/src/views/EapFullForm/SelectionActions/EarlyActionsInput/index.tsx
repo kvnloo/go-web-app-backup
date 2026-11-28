@@ -1,20 +1,17 @@
-import { DeleteBinTwoLineIcon } from '@ifrc-go/icons';
+import { useTranslation } from '@ifrc-go/ui/hooks';
 import {
-    Container,
-    IconButton,
-    InlineLayout,
+    RemovableItem,
     TextInput,
-} from '@ifrc-go/ui';
-import { randomString } from '@togglecorp/fujs';
+} from '@ifrc-go/ui/next';
 import {
-    type ArrayError,
+    type Error,
     getErrorObject,
-    type SetValueArg,
-    useFormObject,
+    getErrorString,
 } from '@togglecorp/toggle-form';
 
-import NonFieldError from '#components/NonFieldError';
 import { type PartialEapFullFormType } from '#views/EapFullForm/schema';
+
+import i18n from './i18n.json';
 
 type EarlyActionsFormFields = NonNullable<
     PartialEapFullFormType['early_actions']
@@ -22,65 +19,42 @@ type EarlyActionsFormFields = NonNullable<
 
 interface Props {
     value: EarlyActionsFormFields;
-    error: ArrayError<EarlyActionsFormFields> | undefined;
-    onChange: (value: SetValueArg<EarlyActionsFormFields>, index: number) => void;
-    onRemove: (index: number) => void;
-    index: number;
-    disabled?: boolean;
-    readOnly?: boolean;
+    error: Error<EarlyActionsFormFields> | undefined;
+    onChange: (clientId: string, value: EarlyActionsFormFields) => void;
+    onRemove: (clientId: string) => void;
 }
 
 function EarlyActionsInput(props: Props) {
     const {
+        value,
         error: errorFromProps,
         onChange,
-        value,
-        index,
         onRemove,
-        disabled,
-        readOnly,
     } = props;
 
-    const onFieldChange = useFormObject(index, onChange, () => ({
-        client_id: randomString(),
-    }));
+    const strings = useTranslation(i18n);
+    const error = getErrorObject(errorFromProps);
 
-    const error = value && value.client_id && errorFromProps
-        ? getErrorObject(errorFromProps?.[value.client_id])
-        : undefined;
+    const handleActionChange = (action: string | undefined) => {
+        onChange(value.client_id, { ...value, action });
+    };
 
     return (
-        <Container
-            spacing="sm"
-            footer={error && (
-                <NonFieldError error={error} />
-            )}
+        <RemovableItem
+            name={value.client_id}
+            onRemove={onRemove}
+            removeLabel={strings.selectionActionsEarlyActionRemoveLabel}
+            error={getErrorString(errorFromProps)}
         >
-            <InlineLayout
-                after={(
-                    <IconButton
-                        name={index}
-                        onClick={onRemove}
-                        disabled={disabled || readOnly}
-                        // FIXME use translation strings
-                        title="Remove early action"
-                        // FIXME use translation strings
-                        ariaLabel="Remove early action"
-                    >
-                        <DeleteBinTwoLineIcon />
-                    </IconButton>
-                )}
-            >
-                <TextInput
-                    name="action"
-                    value={value.action}
-                    onChange={onFieldChange}
-                    readOnly={readOnly}
-                    disabled={disabled}
-                    error={error?.action}
-                />
-            </InlineLayout>
-        </Container>
+            <TextInput
+                name="action"
+                label={strings.selectionActionsEarlyActionLabel}
+                value={value.action}
+                onChange={handleActionChange}
+                error={getErrorString(error?.action)}
+                required
+            />
+        </RemovableItem>
     );
 }
 

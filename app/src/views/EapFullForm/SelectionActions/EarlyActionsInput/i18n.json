@@ -1,0 +1,7 @@
+{
+    "namespace": "eapFullForm",
+    "strings": {
+        "selectionActionsEarlyActionLabel": "Early Action",
+        "selectionActionsEarlyActionRemoveLabel": "Remove Early Action"
+    }
+}

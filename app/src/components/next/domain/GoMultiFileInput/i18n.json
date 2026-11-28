@@ -1,0 +1,11 @@
+{
+    "namespace": "common",
+    "strings": {
+        "goMultiFileInputUploadFailedMessage": "Failed to upload the file!",
+        "goMultiFileInputNoFileMessage": "No file selected",
+        "goMultiFileInputRemoveLabel": "Remove File",
+        "goMultiFileInputClearLabel": "Remove All Files",
+        "goMultiFileInputUnsupportedFormatMessage": "Unsupported file format!",
+        "goMultiFileInputUnsupportedFormatDescription": "{fileNames} could not be added. Only the following file formats are accepted: {fileFormats}."
+    }
+}
