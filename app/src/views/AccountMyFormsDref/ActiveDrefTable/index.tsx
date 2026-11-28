@@ -6,12 +6,11 @@ import {
 import { type Language } from '@ifrc-go/ui/contexts';
 import { useTranslation } from '@ifrc-go/ui/hooks';
 import {
+    createActionColumn,
     createDateColumn,
-    createElementColumn,
     createStringColumn,
     DataDisplay,
     DataDisplayList,
-    Pagination,
     Section,
     Table,
 } from '@ifrc-go/ui/next';
@@ -57,20 +56,17 @@ function ActiveDrefTable(props: Props) {
     const { actions } = props;
 
     const strings = useTranslation(i18n);
-    const {
-        page,
-        setPage,
-        rawFilter,
-        filter,
-        rawFiltered,
-        setFilterField,
-        resetFilter,
-        limit,
-        offset,
-    } = useFilterState<FilterValue>({
+    const filterState = useFilterState<FilterValue>({
         filter: {},
         pageSize: NUM_ITEMS_PER_PAGE,
     });
+    const {
+        rawFilter,
+        filter,
+        setFilterField,
+        limit,
+        offset,
+    } = filterState;
 
     const { dref_dref_status: drefStatus } = useGlobalEnums();
 
@@ -285,11 +281,9 @@ function ActiveDrefTable(props: Props) {
                     ),
                 },
             ),
-            createElementColumn<LatestDref, Key, DrefTableActionsProps>(
-                'actions',
-                '',
-                DrefTableActions,
-                (key, item) => {
+            createActionColumn<LatestDref, Key, DrefTableActionsProps>('actions', {
+                renderer: DrefTableActions,
+                rendererParams: (key, item) => {
                     const { id } = item;
                     const originalDref = latestDrefToOriginalMap[key];
                     // FIXME: fix typing in server (medium priority)
@@ -362,8 +356,7 @@ function ActiveDrefTable(props: Props) {
                         event,
                     };
                 },
-                { width: 'sm' },
-            ),
+            }),
         ]),
         [
             strings.activeDrefTableCreatedHeading,
@@ -407,18 +400,11 @@ function ActiveDrefTable(props: Props) {
                     onChange={setFilterField}
                 />
             )}
-            onFiltersClear={resetFilter}
-            filtered={rawFiltered}
-            pending={activeDrefResponsePending}
-            empty={(latestDrefs?.length ?? 0) === 0}
-            footerActions={(
-                <Pagination
-                    activePage={page}
-                    numItems={activeDrefResponse?.count ?? 0}
-                    numItemsPerPage={limit}
-                    onActivePageChange={setPage}
-                />
-            )}
+            list={{
+                state: filterState,
+                response: activeDrefResponse,
+                pending: activeDrefResponsePending,
+            }}
         >
             <Table
                 caption={strings.activeDrefTitle}

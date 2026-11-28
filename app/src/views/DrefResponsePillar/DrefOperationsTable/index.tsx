@@ -3,7 +3,6 @@ import { SearchLineIcon } from '@ifrc-go/icons';
 import { useTranslation } from '@ifrc-go/ui/hooks';
 import {
     createDateColumn,
-    Pagination,
     Section,
     SelectInput,
     Table,
@@ -54,23 +53,20 @@ const appealKeySelector = (item: AppealListItem) => item.id;
 function DrefOperationsTable() {
     const strings = useTranslation(i18n);
 
-    const {
-        page,
-        setPage,
-        limit,
-        offset,
-        rawFilter,
-        filter,
-        setFilterField,
-        resetFilter,
-        rawFiltered,
-    } = useFilterState<{
+    const filterState = useFilterState<{
         search?: string,
         year?: number,
     }>({
         filter: {},
         pageSize: PAGE_SIZE,
     });
+    const {
+        limit,
+        offset,
+        rawFilter,
+        filter,
+        setFilterField,
+    } = filterState;
 
     const query = useMemo<AppealQueryParams>(
         () => ({
@@ -174,18 +170,11 @@ function DrefOperationsTable() {
                     />
                 </>
             )}
-            onFiltersClear={resetFilter}
-            filtered={rawFiltered}
-            pending={pending}
-            empty={(response?.results?.length ?? 0) === 0}
-            footerActions={(
-                <Pagination
-                    activePage={page}
-                    numItems={response?.count ?? 0}
-                    numItemsPerPage={limit}
-                    onActivePageChange={setPage}
-                />
-            )}
+            list={{
+                state: filterState,
+                response,
+                pending,
+            }}
         >
             <Table
                 caption={strings.drefOpsHeading}

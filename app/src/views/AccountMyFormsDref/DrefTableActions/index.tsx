@@ -9,7 +9,6 @@ import {
     CheckLineIcon,
     DocumentPdfLineIcon,
     DownloadLineIcon,
-    MoreFillIcon,
     PencilLineIcon,
     ShareLineIcon,
 } from '@ifrc-go/icons';
@@ -19,10 +18,9 @@ import {
     Button,
     Description,
     Dialog,
-    ListView,
-    Menu,
     Message,
     RadioInput,
+    TableActions,
     Text,
     useDialogState,
 } from '@ifrc-go/ui/next';
@@ -656,11 +654,8 @@ function DrefTableActions(props: Props) {
 
     return (
         <>
-            <ListView
-                spacing="sm"
-                layoutOptions={{ align: 'end' }}
-            >
-                {canEdit && (
+            <TableActions
+                actions={canEdit && (
                     <Link
                         to={editLink.to}
                         urlParams={editLink.urlParams}
@@ -670,99 +665,95 @@ function DrefTableActions(props: Props) {
                         {strings.dropdownActionEditLabel}
                     </Link>
                 )}
-                <Menu
-                    icon={<MoreFillIcon />}
-                    ariaLabel={strings.drefTableMoreActionsLabel}
-                >
-                    {canFinalize && (
-                        <MenuItem
-                            name={undefined}
-                            before={<CheckLineIcon />}
-                            confirmMessage={resolveToString(
-                                strings.drefAccountFinalizeConfirmMessage,
-                                {
-                                    selectedLanguage: startingLanguage
-                                        ? languageNameMap[startingLanguage]
-                                        : '--',
-                                },
-                            )}
-                            onConfirm={handleFinalizeClick}
-                            disabled={disabled}
-                        >
-                            {strings.dropdownActionFinalizeLabel}
-                        </MenuItem>
-                    )}
-                    {canApprove && applicationType !== 'DREF' && (
-                        <MenuItem
-                            name={undefined}
-                            before={<CheckLineIcon />}
-                            confirmMessage={strings.drefAccountConfirmMessage}
-                            onConfirm={handlePublishClick}
-                            disabled={disabled}
-                        >
-                            {strings.dropdownActionApproveLabel}
-                        </MenuItem>
-                    )}
-                    {canApprove && applicationType === 'DREF' && (
-                        <MenuItem
-                            name={undefined}
-                            before={<CheckLineIcon />}
-                            onClick={approvalDialog.open}
-                            disabled={disabled}
-                        >
-                            {strings.dropdownActionApproveLabel}
-                        </MenuItem>
-                    )}
-                    {canDownloadAllocation && (
-                        <MenuItem
-                            name={undefined}
-                            before={<DownloadLineIcon />}
-                            onClick={handleDrefAllocationExport}
-                            disabled={disabled}
-                        >
-                            {strings.dropdownActionAllocationFormLabel}
-                        </MenuItem>
-                    )}
-                    {canAddOpsUpdate && (
-                        <MenuItem
-                            name={undefined}
-                            before={<AddLineIcon />}
-                            onClick={opsUpdateDialog.open}
-                            disabled={disabled}
-                        >
-                            {strings.dropdownActionAddOpsUpdateLabel}
-                        </MenuItem>
-                    )}
-                    {canCreateFinalReport && (
-                        <MenuItem
-                            name={undefined}
-                            before={<CaseManagementIcon />}
-                            onClick={finalReportDialog.open}
-                            disabled={disabled}
-                        >
-                            {strings.dropdownActionCreateFinalReportLabel}
-                        </MenuItem>
-                    )}
+            >
+                {canFinalize && (
                     <MenuItem
                         name={undefined}
-                        before={<ShareLineIcon />}
-                        onClick={shareDialog.open}
+                        before={<CheckLineIcon />}
+                        confirmMessage={resolveToString(
+                            strings.drefAccountFinalizeConfirmMessage,
+                            {
+                                selectedLanguage: startingLanguage
+                                    ? languageNameMap[startingLanguage]
+                                    : '--',
+                            },
+                        )}
+                        onConfirm={handleFinalizeClick}
                         disabled={disabled}
                     >
-                        {strings.dropdownActionShareLabel}
+                        {strings.dropdownActionFinalizeLabel}
                     </MenuItem>
-                    {drefType !== DREF_TYPE_LOAN && (
-                        <MenuItem
-                            name={undefined}
-                            before={<DocumentPdfLineIcon />}
-                            onClick={exportDialog.open}
-                            disabled={disabled}
-                        >
-                            {strings.dropdownActionExportLabel}
-                        </MenuItem>
-                    )}
-                </Menu>
-            </ListView>
+                )}
+                {canApprove && applicationType !== 'DREF' && (
+                    <MenuItem
+                        name={undefined}
+                        before={<CheckLineIcon />}
+                        confirmMessage={strings.drefAccountConfirmMessage}
+                        onConfirm={handlePublishClick}
+                        disabled={disabled}
+                    >
+                        {strings.dropdownActionApproveLabel}
+                    </MenuItem>
+                )}
+                {canApprove && applicationType === 'DREF' && (
+                    <MenuItem
+                        name={undefined}
+                        before={<CheckLineIcon />}
+                        onClick={approvalDialog.open}
+                        disabled={disabled}
+                    >
+                        {strings.dropdownActionApproveLabel}
+                    </MenuItem>
+                )}
+                {canDownloadAllocation && (
+                    <MenuItem
+                        name={undefined}
+                        before={<DownloadLineIcon />}
+                        onClick={handleDrefAllocationExport}
+                        disabled={disabled}
+                    >
+                        {strings.dropdownActionAllocationFormLabel}
+                    </MenuItem>
+                )}
+                {canAddOpsUpdate && (
+                    <MenuItem
+                        name={undefined}
+                        before={<AddLineIcon />}
+                        onClick={opsUpdateDialog.open}
+                        disabled={disabled}
+                    >
+                        {strings.dropdownActionAddOpsUpdateLabel}
+                    </MenuItem>
+                )}
+                {canCreateFinalReport && (
+                    <MenuItem
+                        name={undefined}
+                        before={<CaseManagementIcon />}
+                        onClick={finalReportDialog.open}
+                        disabled={disabled}
+                    >
+                        {strings.dropdownActionCreateFinalReportLabel}
+                    </MenuItem>
+                )}
+                <MenuItem
+                    name={undefined}
+                    before={<ShareLineIcon />}
+                    onClick={shareDialog.open}
+                    disabled={disabled}
+                >
+                    {strings.dropdownActionShareLabel}
+                </MenuItem>
+                {drefType !== DREF_TYPE_LOAN && (
+                    <MenuItem
+                        name={undefined}
+                        before={<DocumentPdfLineIcon />}
+                        onClick={exportDialog.open}
+                        disabled={disabled}
+                    >
+                        {strings.dropdownActionExportLabel}
+                    </MenuItem>
+                )}
+            </TableActions>
             {exportDialog.isOpen && (
                 <DrefExportModal
                     onCancel={exportDialog.close}

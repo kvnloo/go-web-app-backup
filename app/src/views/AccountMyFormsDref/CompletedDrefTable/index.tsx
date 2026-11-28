@@ -4,10 +4,9 @@ import {
 } from 'react';
 import { useTranslation } from '@ifrc-go/ui/hooks';
 import {
+    createActionColumn,
     createDateColumn,
-    createElementColumn,
     createStringColumn,
-    Pagination,
     Section,
     Table,
 } from '@ifrc-go/ui/next';
@@ -39,20 +38,17 @@ function CompletedDrefTable(props: Props) {
     const { actions } = props;
 
     const strings = useTranslation(i18n);
-    const {
-        page,
-        setPage,
-        rawFilter,
-        filter,
-        rawFiltered,
-        setFilterField,
-        resetFilter,
-        limit,
-        offset,
-    } = useFilterState<FilterValue>({
+    const filterState = useFilterState<FilterValue>({
         filter: {},
         pageSize: NUM_ITEMS_PER_PAGE,
     });
+    const {
+        rawFilter,
+        filter,
+        setFilterField,
+        limit,
+        offset,
+    } = filterState;
 
     const {
         response: completedDrefResponse,
@@ -115,11 +111,9 @@ function CompletedDrefTable(props: Props) {
                 (item) => item.status_display,
                 { width: 'xs' },
             ),
-            createElementColumn<DrefResultItem, Key, DrefTableActionsProps>(
-                'actions',
-                '',
-                DrefTableActions,
-                (_, item) => ({
+            createActionColumn<DrefResultItem, Key, DrefTableActionsProps>('actions', {
+                renderer: DrefTableActions,
+                rendererParams: (_, item) => ({
                     id: item.id,
                     drefId: item.dref.id,
                     status: item.status,
@@ -132,8 +126,7 @@ function CompletedDrefTable(props: Props) {
                     canAddOpsUpdate: false,
                     canCreateFinalReport: false,
                 }),
-                { width: 'sm' },
-            ),
+            }),
         ]),
         [
             getRouteHref,
@@ -177,18 +170,11 @@ function CompletedDrefTable(props: Props) {
                     onChange={setFilterField}
                 />
             )}
-            onFiltersClear={resetFilter}
-            filtered={rawFiltered}
-            pending={completedDrefResponsePending}
-            empty={(completedDrefResponse?.results?.length ?? 0) === 0}
-            footerActions={(
-                <Pagination
-                    activePage={page}
-                    numItems={completedDrefResponse?.count ?? 0}
-                    numItemsPerPage={limit}
-                    onActivePageChange={setPage}
-                />
-            )}
+            list={{
+                state: filterState,
+                response: completedDrefResponse,
+                pending: completedDrefResponsePending,
+            }}
         >
             <Table
                 caption={strings.completedDrefTitle}
