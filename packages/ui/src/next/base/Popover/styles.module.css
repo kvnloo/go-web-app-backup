@@ -10,6 +10,8 @@
     justify-self: anchor-center;
     margin: 0;
     margin-block-start: var(--go-ui-spacing-2xs);
+    /* NOTE: keeps a gap to the viewport edge when the popup is shifted to fit */
+    margin-inline: var(--go-ui-spacing-md);
     border: 0;
     border-radius: var(--go-ui-border-radius-xl);
     box-shadow: var(--go-ui-box-shadow-2xl);

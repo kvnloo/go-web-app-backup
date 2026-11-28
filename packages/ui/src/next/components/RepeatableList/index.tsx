@@ -2,12 +2,15 @@ import { Children } from 'react';
 import { AddLineIcon } from '@ifrc-go/icons';
 import { isDefined } from '@togglecorp/fujs';
 
+import useTranslation from '#hooks/useTranslation';
 import InputError from '#next/base/InputError';
 import ListLayout from '#next/base/ListLayout';
 import StateMessage from '#next/base/StateMessage';
 import { useInputState } from '#next/utils/input';
 
 import Button from '../Button';
+
+import i18n from './i18n.json';
 
 export interface Props {
     className?: string;
@@ -20,8 +23,7 @@ export interface Props {
     error?: React.ReactNode;
     /**
      * Shown when there are no rows. An editable list shows only its add
-     * button unless this is given; a read-only one falls back to the
-     * library's empty message.
+     * button unless this is given; a read-only one says "None added".
      */
     messages?: { empty?: React.ReactNode };
     /** Defaults to the surrounding form section or page */
@@ -52,13 +54,20 @@ function RepeatableList(props: Props) {
         readOnly: readOnlyFromProps,
     });
 
+    const strings = useTranslation(i18n);
     const empty = Children.toArray(children).length === 0;
     const showEmptyMessage = empty && (readOnly || isDefined(messages?.empty));
 
     return (
         <ListLayout className={className} layout="block" data-repeatable-list>
             {error && <InputError>{error}</InputError>}
-            {showEmptyMessage && <StateMessage empty compact messages={messages} />}
+            {showEmptyMessage && (
+                <StateMessage
+                    empty
+                    compact
+                    messages={{ empty: messages?.empty ?? strings.repeatableListEmptyLabel }}
+                />
+            )}
             {children}
             {!readOnly && (
                 <div data-repeatable-list-add>

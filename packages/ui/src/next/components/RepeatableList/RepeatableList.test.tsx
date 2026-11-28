@@ -59,7 +59,7 @@ test('an empty editable list shows only its add button; a read-only one says it 
         <RepeatableList addLabel="Add source" onAdd={noop} readOnly />,
     );
     expect(readOnly).not.toContain('Add source');
-    expect(readOnly).toContain('role="status"');
+    expect(readOnly).toContain('None added');
 });
 
 test('a read-only form hides the add and remove buttons', () => {

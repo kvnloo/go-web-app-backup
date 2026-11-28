@@ -27,7 +27,12 @@ function FlavourHeading(props: Props) {
     } = props;
 
     const heading = (
-        <Heading id={id} level={level} variant={variant}>
+        <Heading
+            className={info ? styles.inlineHeading : undefined}
+            id={id}
+            level={level}
+            variant={variant}
+        >
             {children}
             {required && <span className={styles.asterisk} aria-hidden>*</span>}
         </Heading>
@@ -37,10 +42,15 @@ function FlavourHeading(props: Props) {
         return heading;
     }
 
+    // NOTE: the heading and the icon flow inline, so the icon follows the
+    // last word of a wrapped heading; it stays outside the heading element so
+    // its name is not read as part of the heading
     return (
-        <div className={styles.headingWithInfo}>
+        <div>
             {heading}
-            <MoreInfo heading={children}>{info}</MoreInfo>
+            <span className={styles.info}>
+                <MoreInfo heading={children}>{info}</MoreInfo>
+            </span>
         </div>
     );
 }
