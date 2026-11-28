@@ -2,6 +2,7 @@ import {
     useContext,
     useMemo,
 } from 'react';
+import { ArrowLeftLineIcon } from '@ifrc-go/icons';
 import { _cs } from '@togglecorp/fujs';
 
 import FormStateContext, { type FormStateContextProps } from '#contexts/form-state';
@@ -14,13 +15,15 @@ import {
     getAsyncStateLayoutProps,
 } from '#next/utils/container';
 
+import Link from '../Link';
+
 import styles from './styles.module.css';
 
 export interface Props extends AsyncStateProps {
     className?: string;
     breadcrumbs?: React.ReactNode;
-    /** A link back to the parent page, in place of breadcrumbs */
-    backLink?: React.ReactNode;
+    /** A link back to the parent page, in place of breadcrumbs; it always has the back look */
+    backLink?: { href: string | null | undefined; label: React.ReactNode };
     /** Short category above the title */
     overline?: React.ReactNode;
     /** The page title (h1) */
@@ -87,7 +90,11 @@ function Page(props: Props) {
             <PageHeader
                 className={styles.header}
                 breadcrumbs={breadcrumbs}
-                backLink={backLink}
+                backLink={backLink && (
+                    <Link href={backLink.href} before={<ArrowLeftLineIcon />}>
+                        {backLink.label}
+                    </Link>
+                )}
                 overline={overline}
                 heading={heading}
                 description={description}

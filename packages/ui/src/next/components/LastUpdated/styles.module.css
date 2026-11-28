@@ -1,0 +1,10 @@
+.last-updated {
+    display: inline-flex;
+    gap: var(--go-ui-spacing-2xs);
+    color: var(--go-ui-color-text-light);
+    font-size: var(--go-ui-font-size-sm);
+
+    .label::after {
+        content: ':';
+    }
+}
