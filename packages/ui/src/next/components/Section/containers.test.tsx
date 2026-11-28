@@ -21,9 +21,22 @@ function FormStateProbe() {
     return <i data-state={`${disabled}-${readOnly}-${inputVariant}`} />;
 }
 
+const listState = {
+    page: 1,
+    setPage: noop,
+    limit: 10,
+    filtered: true,
+    resetFilter: noop,
+};
+
 function forbiddenCombinations() {
     return (
         <>
+            <Section heading="Reports" list={{ state: listState, response: undefined, pending: false }} />
+            {/* @ts-expect-error a paged list sets the section's states itself */}
+            <Section heading="Reports" list={{ state: listState, response: undefined, pending: false }} pending />
+            {/* @ts-expect-error a paged list shows its own pagination */}
+            <Section heading="Reports" list={{ state: listState, response: undefined, pending: false }} footerActions="x" />
             <Section heading="Operations" layout="grid" layoutOptions={{ numPreferredColumns: 3 }} />
             {/* @ts-expect-error column options only apply to the grid layout */}
             <Section heading="Operations" layoutOptions={{ numPreferredColumns: 3 }} />
@@ -83,6 +96,25 @@ test('filters sit in a search landmark with the general input look', () => {
             c
         </Section>,
     )).toContain('Clear Filters');
+});
+
+test('a paged list section shows its pagination, empty message and Clear Filters', () => {
+    const html = renderToStaticMarkup(
+        <Section
+            heading="Reports"
+            filters={<FormStateProbe />}
+            list={{
+                state: listState,
+                response: { count: 35, results: [] },
+                pending: false,
+            }}
+        >
+            c
+        </Section>,
+    );
+    expect(html).toContain('Clear Filters');
+    expect(html).toContain('aria-current="page"');
+    expect(html).toMatch(/>4<\/button>/);
 });
 
 test('a disabled form section disables its fields natively and through context', () => {

@@ -10,6 +10,8 @@ import {
     Section,
     type Sorting,
     Table,
+    TextInput,
+    useListState,
 } from '@ifrc-go/ui/next';
 import type {
     Meta,
@@ -104,6 +106,50 @@ export const Default: Story = {
         columns,
     },
     render: () => <TableExample />,
+};
+
+function PagedExample() {
+    const listState = useListState<{ title?: string }>({ filter: {}, pageSize: 2 });
+    const search = listState.filter.title?.toLowerCase();
+    const matches = operations.filter(
+        (operation) => !search || operation.title.toLowerCase().includes(search),
+    );
+    const response = {
+        count: matches.length,
+        results: matches.slice(listState.offset, listState.offset + listState.limit),
+    };
+
+    return (
+        <Section
+            heading="Operations"
+            filters={(
+                <TextInput
+                    name="title"
+                    ariaLabel="Title"
+                    placeholder="Search titles"
+                    value={listState.rawFilter.title}
+                    onChange={listState.setFilterField}
+                />
+            )}
+            list={{ state: listState, response, pending: false }}
+        >
+            <Table
+                caption="Operations"
+                data={response.results}
+                keySelector={keySelector}
+                columns={columns}
+            />
+        </Section>
+    );
+}
+
+export const PagedList: Story = {
+    args: {
+        data: operations,
+        keySelector,
+        columns,
+    },
+    render: () => <PagedExample />,
 };
 
 export const FilteredEmpty: Story = {
