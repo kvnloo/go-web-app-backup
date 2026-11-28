@@ -43,7 +43,9 @@ import styles from './styles.module.css';
 
 type WrapBreakpoint = InlineLayoutProps['wrapBreakpoint'];
 
-export interface Props extends Omit<React.HTMLProps<HTMLDivElement>, 'ref' | 'wrap' | 'title'> {
+export interface Props extends Omit<React.HTMLProps<HTMLDivElement>, 'ref' | 'wrap' | 'title' | 'as'> {
+    /** Element to render as the root: section for sections, article for one record */
+    as?: 'div' | 'section' | 'article';
     className?: string;
     elementRef?: RefObject<HTMLDivElement | null>;
 
@@ -232,6 +234,7 @@ function ContainerLayout(props: Props) {
     ) : arrangedChildren;
 
     const showChildren = !empty && !errored && (!pending || overlayPending);
+    const childrenUnderOverlay = pending && overlayPending;
     const mainContent = (isDefined(children) || empty || pending || errored || filtered) && (
         <ContainerStateContext.Provider value={containerState}>
             <StateMessage
@@ -244,7 +247,13 @@ function ContainerLayout(props: Props) {
                 compact={withCompactMessage}
                 withoutIcon={withoutMessageIcon}
             />
-            {showChildren && overflowChildren}
+            {showChildren && childrenUnderOverlay && (
+                // NOTE: content under the spinner cannot be reached while it reloads
+                <div className={styles.inertContent} inert>
+                    {overflowChildren}
+                </div>
+            )}
+            {showChildren && !childrenUnderOverlay && overflowChildren}
         </ContainerStateContext.Provider>
     );
 
@@ -324,6 +333,7 @@ function ContainerLayout(props: Props) {
                 )}
                 withBeforeSeparator={withHeaderBorder}
                 withAfterSeparator={withFooterBorder}
+                aria-busy={childrenUnderOverlay || undefined}
                 childrenContainerClassName={_cs(
                     styles.content,
                     pending && overlayPending && styles.pendingOverlaid,

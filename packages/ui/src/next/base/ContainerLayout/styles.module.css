@@ -32,6 +32,10 @@
             display: none;
         }
 
+        .inert-content {
+            display: contents;
+        }
+
         &.pending-overlaid {
             isolation: isolate;
             position: relative;

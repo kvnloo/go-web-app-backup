@@ -20,7 +20,9 @@ import {
 
 import styles from './styles.module.css';
 
-export interface Props extends Omit<HTMLProps<HTMLDivElement>, 'ref' | 'before' | 'after'> {
+export interface Props extends Omit<HTMLProps<HTMLDivElement>, 'ref' | 'before' | 'after' | 'as'> {
+    /** Element to render as the root; pick the one that matches the meaning of the block */
+    as?: 'div' | 'section' | 'article';
     /** Ref to the root DOM node */
     elementRef?: RefObject<HTMLDivElement | null>;
     className?: string;
@@ -48,6 +50,7 @@ export interface Props extends Omit<HTMLProps<HTMLDivElement>, 'ref' | 'before' 
  */
 function BlockLayout(props: Props) {
     const {
+        as: Element = 'div',
         className,
         elementRef,
         before,
@@ -94,7 +97,7 @@ function BlockLayout(props: Props) {
     });
 
     return (
-        <div
+        <Element
             // eslint-disable-next-line react/jsx-props-no-spreading
             {...divProps}
             className={_cs(
@@ -140,7 +143,7 @@ function BlockLayout(props: Props) {
                     {after}
                 </div>
             )}
-        </div>
+        </Element>
     );
 }
 

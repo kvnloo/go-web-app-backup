@@ -1,0 +1,72 @@
+.dialog {
+    --spacing: calc(var(--go-ui-spacing-md) * 2);
+    --max-width: min(calc(100% - var(--spacing)), calc(var(--go-ui-page-width-max) - var(--spacing)));
+    --max-height: calc(100% - var(--spacing));
+
+    /* NOTE: centred in the top layer; the UA border, padding and background are reset */
+    display: flex;
+    position: fixed;
+    flex-direction: column;
+    margin: auto;
+    border: 0;
+    background-color: transparent;
+    padding: 0;
+    width: 100%;
+    max-width: var(--max-width);
+    height: fit-content;
+    max-height: var(--max-height);
+    overflow: hidden;
+    inset: 0;
+    animation: slide-down var(--go-ui-duration-transition-medium) ease-in;
+
+    &:focus {
+        outline: none;
+    }
+
+    &::backdrop {
+        background-color: var(--go-ui-color-background-overlay-dark);
+        animation: fade-in var(--go-ui-duration-transition-medium) ease-in;
+    }
+
+    &.size-sm {
+        max-width: min(var(--max-width), var(--go-ui-width-modal-sm));
+    }
+
+    &.size-md {
+        max-width: min(var(--max-width), var(--go-ui-width-modal-md));
+    }
+
+    &.size-lg {
+        max-width: min(var(--max-width), var(--go-ui-width-modal-lg));
+    }
+
+    &.size-xl {
+        max-width: min(var(--max-width), var(--go-ui-width-modal-xl));
+    }
+
+    &.size-full {
+        height: 100%;
+    }
+
+    .content {
+        flex: 1 1 auto;
+        border: var(--go-ui-width-separator-thin) solid var(--go-ui-color-separator);
+        border-radius: var(--go-ui-border-radius-lg);
+        box-shadow: var(--go-ui-box-shadow-2xl);
+        min-height: 0;
+        max-height: 100%;
+        overflow: auto;
+    }
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+}
+
+@keyframes slide-down {
+    from {
+        transform: translateY(-5pt);
+    }
+}

@@ -3,12 +3,18 @@
 // meant for views; building blocks are exported from `@ifrc-go/ui/next/base`.
 export type { Props as BooleanDisplayProps } from './components/BooleanDisplay';
 export { default as BooleanDisplay } from './components/BooleanDisplay';
+export type { Props as ButtonProps } from './components/Button';
+export { default as Button } from './components/Button';
+export type { Props as ConfirmDialogProps } from './components/ConfirmDialog';
+export { default as ConfirmDialog } from './components/ConfirmDialog';
 export type { Props as DateDisplayProps } from './components/DateDisplay';
 export { default as DateDisplay } from './components/DateDisplay';
 export type { Props as DateRangeDisplayProps } from './components/DateRangeDisplay';
 export { default as DateRangeDisplay } from './components/DateRangeDisplay';
 export type { Props as DescriptionProps } from './components/Description';
 export { default as Description } from './components/Description';
+export type { Props as DialogProps, DialogSize } from './components/Dialog';
+export { default as Dialog } from './components/Dialog';
 export type { Props as HeadingProps, HeadingVariant } from './components/Heading';
 export { default as Heading } from './components/Heading';
 export type { Props as HtmlDisplayProps } from './components/HtmlDisplay';
