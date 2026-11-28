@@ -10,6 +10,6 @@
         "drefOpsCountry": "Country",
         "drefOpsFilterSearchPlaceholder": "Search",
         "drefOpsFilterAllYears": "All Years",
-        "drefOpsClearFilters": "Clear Filters"
+        "drefOpsFilterYearLabel": "Year"
     }
 }

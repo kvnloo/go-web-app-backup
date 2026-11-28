@@ -2,12 +2,13 @@ import {
     useCallback,
     useMemo,
 } from 'react';
-import {
-    Container,
-    ListView,
-    TextOutput,
-} from '@ifrc-go/ui';
 import { useTranslation } from '@ifrc-go/ui/hooks';
+import {
+    DataDisplay,
+    ListView,
+    Section,
+    Text,
+} from '@ifrc-go/ui/next';
 import { listToGroupList } from '@togglecorp/fujs';
 
 import { APPEAL_TYPE_DREF } from '#components/domain/ActiveOperationMap/utils';
@@ -73,21 +74,18 @@ function DrefOperationsMap() {
         (iso3: string) => {
             const appeals = appealsByIso3[iso3] ?? [];
             return (
-                <ListView layout="block" spacing="sm" withSpacingOpticalCorrection>
+                <ListView layout="block" spacing="sm">
                     {appeals.map((appeal) => (
-                        <Container
-                            key={appeal.id}
-                            heading={appeal.name}
-                            headingLevel={6}
-                            spacing="xs"
-                        >
-                            <TextOutput
+                        <ListView key={appeal.id} layout="block" spacing="2xs">
+                            <Text variant="strong">{appeal.name}</Text>
+                            <DataDisplay
                                 label={strings.drefMapFunding}
-                                value={appeal.amount_requested}
                                 valueType="number"
+                                value={appeal.amount_requested}
+                                variant="plain"
                                 textSize="sm"
                             />
-                        </Container>
+                        </ListView>
                     ))}
                 </ListView>
             );
@@ -96,11 +94,13 @@ function DrefOperationsMap() {
     );
 
     return (
-        <Container
+        <Section
             heading={strings.drefMapTitle}
-            withHeaderBorder
             filters={(
+                // FIXME: the v2 domain input ignores the filters look of next
+                // Sections; drop the variant once it moves to next
                 <DisasterTypeSelectInput
+                    variant="general"
                     placeholder={strings.drefMapDisasterTypePlaceholder}
                     name="disasterType"
                     value={rawFilter.disasterType}
@@ -114,7 +114,7 @@ function DrefOperationsMap() {
                 legendOptions={legendOptions}
                 renderPopup={renderPopup}
             />
-        </Container>
+        </Section>
     );
 }
 

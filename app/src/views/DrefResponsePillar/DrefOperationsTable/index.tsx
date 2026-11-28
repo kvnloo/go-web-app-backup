@@ -1,30 +1,26 @@
 import { useMemo } from 'react';
 import { SearchLineIcon } from '@ifrc-go/icons';
-import {
-    Button,
-    Container,
-    Pager,
-    SelectInput,
-    Table,
-    TextInput,
-} from '@ifrc-go/ui';
 import { useTranslation } from '@ifrc-go/ui/hooks';
 import {
     createDateColumn,
+    createLinkColumn,
+    createNumberColumn,
+    createStringColumn,
+    Pagination,
+    Section,
+    SelectInput,
+    Table,
+    TextInput,
+} from '@ifrc-go/ui/next';
+import {
     numericKeySelector,
     stringValueSelector,
 } from '@ifrc-go/ui/utils';
 import { isDefined } from '@togglecorp/fujs';
 
 import { APPEAL_TYPE_DREF } from '#components/domain/ActiveOperationMap/utils';
+import useRouteHref from '#hooks/domain/useRouteHref';
 import useFilterState from '#hooks/useFilterState';
-import {
-    createAppealCodeColumn,
-    createBudgetColumn,
-    createCountryColumn,
-    createDisasterTypeColumn,
-    createLinkColumn,
-} from '#utils/domain/tableHelpers';
 import {
     type GoApiResponse,
     type GoApiUrlQuery,
@@ -51,12 +47,7 @@ const yearOptions = Array.from(
 );
 const appealKeySelector = (item: AppealListItem) => item.id;
 
-interface Props {
-    className?: string;
-}
-
-function DrefOperationsTable(props: Props) {
-    const { className } = props;
+function DrefOperationsTable() {
     const strings = useTranslation(i18n);
 
     const {
@@ -69,7 +60,6 @@ function DrefOperationsTable(props: Props) {
         setFilterField,
         resetFilter,
         rawFiltered,
-        filtered,
     } = useFilterState<{
         search?: string,
         year?: number,
@@ -103,6 +93,8 @@ function DrefOperationsTable(props: Props) {
         query,
     });
 
+    const getRouteHref = useRouteHref();
+
     const columns = useMemo(
         () => ([
             createDateColumn<AppealListItem, Key>(
@@ -110,48 +102,51 @@ function DrefOperationsTable(props: Props) {
                 strings.drefOpsStartDate,
                 (item) => item.start_date,
             ),
-            createAppealCodeColumn<AppealListItem, Key>(
+            createStringColumn<AppealListItem, Key>(
                 'code',
                 strings.drefOpsCode,
                 (item) => item.code,
+                { width: 'sm' },
             ),
             createLinkColumn<AppealListItem, Key>(
                 'operation',
                 strings.drefOpsOperation,
                 (item) => item.name,
                 // NOTE: about half of DREF appeals have no linked emergency;
-                // without the guard the cell renders as a link that cannot resolve.
+                // those show the name without a link
                 (item) => (isDefined(item.event)
-                    ? {
+                    ? getRouteHref({
                         to: 'emergenciesLayout',
                         urlParams: { emergencyId: item.event },
-                    }
-                    : {
-                        to: undefined,
-                        withUnderline: false,
-                    }),
+                    })
+                    : undefined),
+                { stretch: true },
             ),
-            createDisasterTypeColumn<AppealListItem, Key>(
+            createStringColumn<AppealListItem, Key>(
                 'dtype',
                 strings.drefOpsDisasterType,
                 (item) => item.dtype?.name,
+                { width: 'sm' },
             ),
-            createBudgetColumn<AppealListItem, Key>(
+            createNumberColumn<AppealListItem, Key>(
                 'amount_requested',
                 strings.drefOpsFunding,
                 (item) => item.amount_requested,
+                { width: 'sm', formatOptions: { suffix: ' CHF' } },
             ),
-            createCountryColumn<AppealListItem, Key>(
+            createLinkColumn<AppealListItem, Key>(
                 'country',
                 strings.drefOpsCountry,
                 (item) => item.country?.name,
-                (item) => ({
+                (item) => getRouteHref({
                     to: 'countriesLayout',
                     urlParams: { countryId: item.country.id },
                 }),
+                { width: 'sm' },
             ),
         ]),
         [
+            getRouteHref,
             strings.drefOpsStartDate,
             strings.drefOpsCode,
             strings.drefOpsOperation,
@@ -162,55 +157,51 @@ function DrefOperationsTable(props: Props) {
     );
 
     return (
-        <Container
-            className={className}
+        <Section
             heading={strings.drefOpsHeading}
-            withHeaderBorder
             filters={(
                 <>
                     <TextInput
                         name="search"
+                        ariaLabel={strings.drefOpsFilterSearchPlaceholder}
                         placeholder={strings.drefOpsFilterSearchPlaceholder}
+                        type="search"
                         value={rawFilter.search}
                         onChange={setFilterField}
-                        icons={<SearchLineIcon />}
+                        before={<SearchLineIcon />}
                     />
                     <SelectInput
-                        placeholder={strings.drefOpsFilterAllYears}
                         name="year"
+                        ariaLabel={strings.drefOpsFilterYearLabel}
+                        placeholder={strings.drefOpsFilterAllYears}
                         value={rawFilter.year}
                         onChange={setFilterField}
                         keySelector={numericKeySelector}
                         labelSelector={stringValueSelector}
                         options={yearOptions}
                     />
-                    {rawFiltered && (
-                        <Button
-                            name={undefined}
-                            onClick={resetFilter}
-                        >
-                            {strings.drefOpsClearFilters}
-                        </Button>
-                    )}
                 </>
             )}
+            onFiltersClear={resetFilter}
+            filtered={rawFiltered}
+            pending={pending}
+            empty={(response?.results?.length ?? 0) === 0}
             footerActions={(
-                <Pager
+                <Pagination
                     activePage={page}
-                    itemsCount={response?.count ?? 0}
-                    maxItemsPerPage={limit}
+                    numItems={response?.count ?? 0}
+                    numItemsPerPage={limit}
                     onActivePageChange={setPage}
                 />
             )}
         >
             <Table
+                caption={strings.drefOpsHeading}
                 columns={columns}
                 keySelector={appealKeySelector}
                 data={response?.results}
-                pending={pending}
-                filtered={filtered}
             />
-        </Container>
+        </Section>
     );
 }
 

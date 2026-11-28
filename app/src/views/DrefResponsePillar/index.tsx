@@ -1,9 +1,11 @@
+import { useTranslation } from '@ifrc-go/ui/hooks';
 import {
-    Chip,
+    Card,
+    DataDisplay,
     Description,
     ListView,
-} from '@ifrc-go/ui';
-import { useTranslation } from '@ifrc-go/ui/hooks';
+    Tag,
+} from '@ifrc-go/ui/next';
 import { isDefined } from '@togglecorp/fujs';
 
 import DrefDecisionTreeCallout from '#components/domain/DrefDecisionTreeCallout';
@@ -13,7 +15,7 @@ import Faq from '#components/domain/Faq';
 import FaqHeading from '#components/domain/Faq/FaqHeading';
 import TermText from '#components/domain/Faq/TermText';
 import FaqList from '#components/domain/FaqList';
-import Link from '#components/Link';
+import Link from '#components/next/Link';
 import TabPage from '#components/TabPage';
 import { DREF_TYPE_RESPONSE } from '#utils/constants';
 import {
@@ -29,7 +31,6 @@ import DrefOperationsMap from './DrefOperationsMap';
 import DrefOperationsTable from './DrefOperationsTable';
 
 import i18n from './i18n.json';
-import styles from './styles.module.css';
 
 const responseDrefRouteState = getNewDrefRouteState(DREF_TYPE_RESPONSE);
 
@@ -43,15 +44,11 @@ export function Component() {
                 <Description>
                     {strings.responseIntro}
                 </Description>
-                <ListView
-                    withStartAlignment
-                    withWrap
-                >
+                <ListView layoutOptions={{ wrap: true, alignItems: 'start' }}>
                     <Link
                         to="newDrefApplicationForm"
                         state={responseDrefRouteState}
-                        styleVariant="filled"
-                        colorVariant="primary"
+                        variant="primary"
                     >
                         {strings.drefApplicationFormLink}
                     </Link>
@@ -138,10 +135,8 @@ export function Component() {
                             <ul>
                                 <li>
                                     <Link
-                                        external
                                         href={DREF_GUIDELINES_DROUGHT_URL}
-                                        withUnderline
-                                        withLinkIcon
+                                        variant="underline"
                                     >
                                         {strings.faqCharConsiderationDroughtLink}
                                     </Link>
@@ -158,10 +153,8 @@ export function Component() {
                                 </li>
                                 <li>
                                     <Link
-                                        external
                                         href={DREF_GUIDELINES_READINESS_URL}
-                                        withUnderline
-                                        withLinkIcon
+                                        variant="underline"
                                     >
                                         {strings.faqCharConsiderationReadinessLink}
                                     </Link>
@@ -170,10 +163,8 @@ export function Component() {
                                 </li>
                                 <li>
                                     <Link
-                                        external
                                         href={DREF_GUIDELINES_LOAN_URL}
-                                        withUnderline
-                                        withLinkIcon
+                                        variant="underline"
                                     >
                                         {strings.faqCharConsiderationLoanLink}
                                     </Link>
@@ -188,11 +179,7 @@ export function Component() {
                     name="responseProcess"
                     question={strings.faqResponseProcessQuestion}
                 >
-                    <ListView
-                        layout="block"
-                        withSpacingOpticalCorrection
-                        spacing="sm"
-                    >
+                    <ListView layout="block" spacing="sm">
                         <FaqHeading variant="section">
                             {strings.faqProcessPlanningHeading}
                         </FaqHeading>
@@ -217,24 +204,13 @@ export function Component() {
                         <p>{strings.faqProcessPlanningTiming}</p>
                         <p>{strings.faqProcessPlanningAdvance}</p>
                     </ListView>
-                    <ListView
-                        layout="block"
-                        withSpacingOpticalCorrection
-                        spacing="sm"
-                    >
+                    <ListView layout="block" spacing="sm">
                         <FaqHeading variant="section">
                             {strings.faqProcessReviewHeading}
                         </FaqHeading>
                         <p>{strings.faqProcessReviewIntro}</p>
-                        <ListView
-                            layout="block"
-                            withSpacingOpticalCorrection
-                        >
-                            <ListView
-                                layout="block"
-                                withSpacingOpticalCorrection
-                                spacing="2xs"
-                            >
+                        <ListView layout="block">
+                            <ListView layout="block" spacing="2xs">
                                 <FaqHeading variant="subsection">
                                     {strings.faqProcessReviewEligibilityHeading}
                                 </FaqHeading>
@@ -247,11 +223,7 @@ export function Component() {
                                 </ul>
                                 <p>{strings.faqProcessReviewEligibilityTiming}</p>
                             </ListView>
-                            <ListView
-                                layout="block"
-                                withSpacingOpticalCorrection
-                                spacing="2xs"
-                            >
+                            <ListView layout="block" spacing="2xs">
                                 <FaqHeading variant="subsection">
                                     {strings.faqProcessReviewQualityHeading}
                                 </FaqHeading>
@@ -278,11 +250,7 @@ export function Component() {
                             <li>{strings.faqProcessReviewAgreement}</li>
                         </ul>
                     </ListView>
-                    <ListView
-                        layout="block"
-                        withSpacingOpticalCorrection
-                        spacing="sm"
-                    >
+                    <ListView layout="block" spacing="sm">
                         <FaqHeading variant="section">
                             {strings.faqProcessImplementationHeading}
                         </FaqHeading>
@@ -304,51 +272,39 @@ export function Component() {
                     question={strings.faqAdvancePaymentQuestion}
                 >
                     <p>{strings.faqAdvancePaymentIntro}</p>
-                    <div className={styles.advancePaymentDetails}>
-                        <div className={styles.block}>
-                            <div className={styles.blockHeader}>
-                                <div className={styles.blockTitle}>
-                                    {strings.faqAdvancePaymentWhenToUseTitle}
-                                </div>
-                                <Chip
-                                    className={styles.chip}
-                                    name="suddenOnsetOnly"
-                                    label={strings.faqAdvancePaymentSuddenOnsetChip}
-                                    variant="tertiary"
-                                />
-                            </div>
+                    <ListView layout="grid" layoutOptions={{ numPreferredColumns: 2 }}>
+                        <Card
+                            heading={strings.faqAdvancePaymentWhenToUseTitle}
+                            actions={(
+                                <Tag label={strings.faqAdvancePaymentSuddenOnsetChip} />
+                            )}
+                        >
                             <ul>
                                 <li>{strings.faqAdvancePaymentBulletSuddenOnset}</li>
                                 <li>{strings.faqAdvancePaymentBulletGoodStanding}</li>
                                 <li>{strings.faqAdvancePaymentBulletCriteria}</li>
                                 <li>{strings.faqAdvancePaymentBulletPlanning}</li>
                             </ul>
-                        </div>
-                        <div className={styles.block}>
-                            <div className={styles.blockTitle}>
-                                {strings.faqAdvancePaymentFunding}
-                            </div>
-                            <div className={styles.fundingRow}>
-                                <div>{strings.faqAdvancePaymentYellowLabel}</div>
-                                <div className={styles.fundingAmount}>
-                                    {strings.faqAdvancePaymentYellowAmount}
-                                </div>
-                            </div>
-                            <div className={styles.fundingRow}>
-                                <div>{strings.faqAdvancePaymentOrangeRedLabel}</div>
-                                <div className={styles.fundingAmount}>
-                                    {strings.faqAdvancePaymentOrangeRedAmount}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                        </Card>
+                        <Card heading={strings.faqAdvancePaymentFunding}>
+                            <DataDisplay
+                                label={strings.faqAdvancePaymentYellowLabel}
+                                value={strings.faqAdvancePaymentYellowAmount}
+                                variant="strong-value"
+                                surface="contrast"
+                            />
+                            <DataDisplay
+                                label={strings.faqAdvancePaymentOrangeRedLabel}
+                                value={strings.faqAdvancePaymentOrangeRedAmount}
+                                variant="strong-value"
+                                surface="contrast"
+                            />
+                        </Card>
+                    </ListView>
                     {/* Hidden until the form is published (LPC25): an advance payment
                         cannot be requested through the platform yet. */}
                     {isDefined(DREF_ADVANCE_PAYMENT_FORM_URL) && (
-                        <ListView
-                            withStartAlignment
-                            withWrap
-                        >
+                        <ListView layoutOptions={{ wrap: true, alignItems: 'start' }}>
                             <DrefDocumentLink
                                 name="advancePaymentForm"
                                 url={DREF_ADVANCE_PAYMENT_FORM_URL}
