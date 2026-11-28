@@ -114,6 +114,17 @@ test('columns render their kinds; numbers align right and dates get a width', ()
     expect(html).toContain('--');
 });
 
+test('stretch columns keep a minimum width', () => {
+    const html = renderToStaticMarkup(
+        <Table
+            data={reports}
+            keySelector={keySelector}
+            columns={[createStringColumn<Report, number>('title', 'Title', (report) => report.title, { stretch: true })]}
+        />,
+    );
+    expect(html).toContain(styles.stretchCell);
+});
+
 test('a sorted column says so', () => {
     const html = renderToStaticMarkup(
         <Table

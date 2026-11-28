@@ -61,6 +61,11 @@ export interface Props extends Omit<React.HTMLProps<HTMLDivElement>, 'ref' | 'wr
     withHeaderBorder?: boolean;
     /** Puts the header on a white well with a separator below (form sections) */
     withHeaderWell?: boolean;
+    /**
+     * Heading-row actions (a tag, a small button) do not make the row taller,
+     * so the separators of cards side by side line up
+     */
+    withCompactActions?: boolean;
 
     filters?: React.ReactNode;
 
@@ -123,6 +128,7 @@ function ContainerLayout(props: Props) {
         headerWrapBreakpoint = 'md',
         withHeaderBorder,
         withHeaderWell,
+        withCompactActions,
 
         filters,
 
@@ -259,6 +265,7 @@ function ContainerLayout(props: Props) {
     );
 
     const showHeadingRow = isDefined(heading) || isDefined(icon) || isDefined(actions);
+    const actionsClassName = withCompactActions ? styles.compactActions : undefined;
     const showHeader = showHeadingRow || isDefined(description);
     const showFooter = isDefined(footer) || isDefined(footerActions);
 
@@ -303,7 +310,11 @@ function ContainerLayout(props: Props) {
                                 wrapBreakpoint={headerWrapBreakpoint}
                                 before={icon}
                                 after={actions && (
-                                    <ListLayout spacing={spacing} spacingOffset={spacingOffset - 1}>
+                                    <ListLayout
+                                        className={actionsClassName}
+                                        spacing={spacing}
+                                        spacingOffset={spacingOffset - 1}
+                                    >
                                         {actions}
                                     </ListLayout>
                                 )}

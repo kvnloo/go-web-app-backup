@@ -14,6 +14,11 @@
     min-width: 3rem;
 }
 
+/* NOTE: a cell's minimum width is the column's; a col element cannot set one */
+.stretch-cell {
+    min-width: var(--go-ui-width-column-md);
+}
+
 .indicator-cell {
     position: relative;
 }

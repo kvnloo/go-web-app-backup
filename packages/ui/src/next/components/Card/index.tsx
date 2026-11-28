@@ -65,6 +65,7 @@ function Card(props: Props) {
             description={description}
             icon={icon}
             actions={actions}
+            withCompactActions
             withHeaderBorder={!!heading}
             footer={footer}
             footerActions={footerActions}

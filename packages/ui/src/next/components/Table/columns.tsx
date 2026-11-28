@@ -1,4 +1,5 @@
 import {
+    _cs,
     compareBoolean,
     compareDate,
     compareNumber,
@@ -45,7 +46,7 @@ export interface ColumnOptions {
     defaultSortDirection?: SortDirection;
     /** A width from the column scale */
     width?: ColumnSizeType;
-    /** Takes up the free width */
+    /** Takes up the free width, and keeps at least the md width */
     stretch?: boolean;
     /** An explanation, behind an info icon in the header */
     info?: React.ReactNode;
@@ -88,7 +89,7 @@ function createColumn<DATUM, KEY, PROPS>(parts: ColumnParts<DATUM, KEY, PROPS>) 
         },
         cellRenderer,
         cellRendererParams,
-        cellContainerClassName: cellClassName,
+        cellContainerClassName: _cs(cellClassName, options?.stretch && styles.stretchCell),
         columnClassName,
         columnStyle: options?.width
             ? { width: `var(--go-ui-width-column-${options.width})` }

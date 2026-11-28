@@ -24,6 +24,12 @@
         }
     }
 
+    /* NOTE: lets controls up to about two spacings taller than the heading
+    overlap the padding instead of growing the heading row */
+    .compact-actions {
+        margin-block: calc(-1 * var(--go-ui-spacing-2xs));
+    }
+
     .content {
         display: flex;
         flex-direction: column;
