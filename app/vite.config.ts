@@ -5,21 +5,49 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 import webfontDownload from 'vite-plugin-webfont-dl';
 import reactSwc from '@vitejs/plugin-react-swc';
 import { execSync } from 'child_process';
+import { existsSync } from 'node:fs';
+import { extname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { visualizer } from 'rollup-plugin-visualizer';
 import checker from 'vite-plugin-checker';
 import { compression } from 'vite-plugin-compression2';
 import { VitePluginRadar } from 'vite-plugin-radar';
 import svgr from 'vite-plugin-svgr';
 import pkg from './package.json';
+import uiPkg from '../packages/ui/package.json';
 
 import envConfig from './env';
 
 /* Get commit hash */
 const commitHash = execSync('git rev-parse --short HEAD').toString();
 
-export default defineConfig(({ mode }) => {
+/*
+ * NOTE: the dev server compiles @ifrc-go/ui from its source, so a library edit
+ * hot-reloads like an app edit without rebuilding the library. Each entry in
+ * the library's `exports` maps to the source file its dist file is built
+ * from; the library's own `#components/*`-style aliases resolve through its
+ * tsconfig, which vite-tsconfig-paths picks up for files under packages/ui.
+ * Builds, tests and typecheck keep using dist; set GO_UI_FROM_DIST=true to
+ * serve dist instead.
+ */
+const uiRoot = fileURLToPath(new URL('../packages/ui', import.meta.url));
+function getUiSourceAliases() {
+    return Object.entries(uiPkg.exports).map(([subpath, target]) => {
+        const sourceBase = join(uiRoot, target.import.replace(/^\.\/dist\//, 'src/').replace(/\.js$/, ''));
+        const sourcePath = ['', '.tsx', '.ts']
+            .map((extension) => `${sourceBase}${extension}`)
+            .find((candidate) => extname(candidate) !== '' && existsSync(candidate));
+        const specifier = `@ifrc-go/ui${subpath.slice(1)}`.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
+        return { find: new RegExp(`^${specifier}$`), replacement: sourcePath ?? sourceBase };
+    });
+}
+
+export default defineConfig(({ command, mode }) => {
     const isProd = mode === 'production';
     const env = loadEnv(mode, process.cwd(), '')
+    const serveUiSource = command === 'serve'
+        && mode !== 'test'
+        && process.env.GO_UI_FROM_DIST !== 'true';
 
     return {
         define: {
@@ -64,6 +92,9 @@ export default defineConfig(({ mode }) => {
                 scopeBehaviour: 'local',
                 localsConvention: 'camelCaseOnly',
             },
+        },
+        resolve: {
+            alias: serveUiSource ? getUiSourceAliases() : [],
         },
         envPrefix: 'APP_',
         server: {
