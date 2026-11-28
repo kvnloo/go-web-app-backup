@@ -1,6 +1,7 @@
 // NOTE: @ifrc-go/ui/next is the redesigned library, built in parallel with v2
 // (decisions in GO_UI_V3_ROLLOUT.md). This entry exports only the components
 // meant for views; building blocks are exported from `@ifrc-go/ui/next/base`.
+export type { Sorting } from './base/TableLayout/sorting';
 export type { Props as BooleanDisplayProps } from './components/BooleanDisplay';
 export { default as BooleanDisplay } from './components/BooleanDisplay';
 export type { Props as BooleanInputProps } from './components/BooleanInput';
@@ -85,6 +86,19 @@ export type { Props as SelectInputProps } from './components/SelectInput';
 export { default as SelectInput } from './components/SelectInput';
 export type { Props as SwitchProps } from './components/Switch';
 export { default as Switch } from './components/Switch';
+export type { Props as TableProps } from './components/Table';
+export { default as Table } from './components/Table';
+export type { ColumnOptions, TableColumn } from './components/Table/columns';
+export {
+    createActionColumn,
+    createBooleanColumn,
+    createDateColumn,
+    createElementColumn,
+    createLinkColumn,
+    createNumberColumn,
+    createStringColumn,
+    createTagColumn,
+} from './components/Table/columns';
 export type { Props as TagProps, TagVariant } from './components/Tag';
 export { default as Tag } from './components/Tag';
 export type { Props as TextProps, TextVariant } from './components/Text';

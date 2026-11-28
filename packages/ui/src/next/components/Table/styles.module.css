@@ -1,0 +1,60 @@
+/* NOTE: numbers right-align with even digit widths, header included */
+.number-header {
+    justify-content: flex-end;
+    text-align: end;
+}
+
+.number-cell {
+    text-align: end;
+    font-variant-numeric: tabular-nums;
+}
+
+.narrow-column {
+    width: 0%;
+    min-width: 3rem;
+}
+
+.indicator-cell {
+    position: relative;
+}
+
+.expand-button {
+    display: inline-flex;
+    position: static;
+    font-size: var(--go-ui-height-icon-multiplier);
+}
+
+.indicator {
+    display: flex;
+    position: absolute;
+    inset: 0;
+    align-items: center;
+    flex-direction: column;
+
+    .start-border,
+    .end-border {
+        flex-grow: 1;
+        background-color: var(--go-ui-color-separator);
+        width: var(--go-ui-width-separator-thin);
+    }
+
+    .dot {
+        flex-shrink: 0;
+        border-radius: var(--go-ui-border-radius-full);
+        background-color: var(--go-ui-color-primary-red);
+        /* FIXME: not on a token scale (the v2 size) */
+        width: 0.8125rem;
+        height: 0.8125rem;
+    }
+
+    &.start .start-border,
+    &.end .end-border,
+    &.single .start-border,
+    &.single .end-border {
+        background-color: transparent;
+    }
+}
+
+.sub-row-cell {
+    background-color: var(--go-ui-color-background);
+}

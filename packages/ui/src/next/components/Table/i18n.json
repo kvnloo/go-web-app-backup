@@ -1,0 +1,8 @@
+{
+    "namespace": "common",
+    "strings": {
+        "tableExpandRowLabel": "Show details",
+        "tableCollapseRowLabel": "Hide details",
+        "tableMoreActionsLabel": "More actions"
+    }
+}
