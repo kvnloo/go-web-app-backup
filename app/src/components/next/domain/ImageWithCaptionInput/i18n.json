@@ -1,0 +1,9 @@
+{
+    "namespace": "common",
+    "strings": {
+        "imageWithCaptionInputSelectLabel": "Select an Image",
+        "imageWithCaptionInputCaptionLabel": "Caption",
+        "imageWithCaptionInputCaptionPlaceholder": "Enter caption",
+        "imageWithCaptionInputPreviewAlt": "Image preview"
+    }
+}

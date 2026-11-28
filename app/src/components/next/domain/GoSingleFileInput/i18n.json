@@ -1,0 +1,8 @@
+{
+    "namespace": "common",
+    "strings": {
+        "goSingleFileInputUploadFailedMessage": "Failed to upload the file!",
+        "goSingleFileInputRemoveLabel": "Remove File",
+        "goSingleFileInputNoFileMessage": "No file selected"
+    }
+}
