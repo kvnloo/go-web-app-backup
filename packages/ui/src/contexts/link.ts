@@ -1,6 +1,7 @@
 import { createContext } from 'react';
 
-export interface InternalLinkRendererProps {
+/** Anchor props a router link must forward (menu items pass role, tabIndex and onClick) */
+export interface InternalLinkRendererProps extends Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> {
     href: string;
     className?: string;
     children?: React.ReactNode;

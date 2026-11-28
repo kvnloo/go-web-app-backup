@@ -1,0 +1,13 @@
+.menu-list {
+    display: flex;
+    flex-direction: column;
+    padding: var(--go-ui-spacing-xs) 0;
+
+    &:focus {
+        outline: none;
+    }
+}
+
+.icon-trigger {
+    font-size: var(--go-ui-height-icon-multiplier);
+}

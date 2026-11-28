@@ -19,6 +19,8 @@ export type { Props as ChipLayoutProps } from './base/ChipLayout';
 export { default as ChipLayout } from './base/ChipLayout';
 export type { Props as ContainerLayoutProps } from './base/ContainerLayout';
 export { default as ContainerLayout } from './base/ContainerLayout';
+export type { Props as DropdownLayoutProps } from './base/DropdownLayout';
+export { default as DropdownLayout } from './base/DropdownLayout';
 export type { Props as InlineLayoutProps } from './base/InlineLayout';
 export { default as InlineLayout } from './base/InlineLayout';
 export type { Props as InputContainerProps } from './base/InputContainer';

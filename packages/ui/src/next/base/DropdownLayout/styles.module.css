@@ -1,0 +1,16 @@
+.trigger {
+    display: inline-flex;
+    position: static;
+}
+
+.dropdown-icon {
+    margin-inline-start: -0.3em;
+}
+
+.popup {
+    padding: 0;
+}
+
+.popup-content {
+    display: contents;
+}
