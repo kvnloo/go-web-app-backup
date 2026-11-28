@@ -9,24 +9,23 @@ import {
     CheckLineIcon,
     DocumentPdfLineIcon,
     DownloadLineIcon,
+    MoreFillIcon,
     PencilLineIcon,
     ShareLineIcon,
 } from '@ifrc-go/icons';
-import type { ButtonProps } from '@ifrc-go/ui';
+import { type Language } from '@ifrc-go/ui/contexts';
+import { useTranslation } from '@ifrc-go/ui/hooks';
 import {
     Button,
     Description,
+    Dialog,
     ListView,
+    Menu,
     Message,
-    Modal,
     RadioInput,
-    TableActions,
-} from '@ifrc-go/ui';
-import { type Language } from '@ifrc-go/ui/contexts';
-import {
-    useBooleanState,
-    useTranslation,
-} from '@ifrc-go/ui/hooks';
+    Text,
+    useDialogState,
+} from '@ifrc-go/ui/next';
 import {
     resolveToComponent,
     resolveToString,
@@ -43,9 +42,8 @@ import {
 import DrefExportModal from '#components/domain/DrefExportModal';
 import DrefShareModal from '#components/domain/DrefShareModal';
 import EventSearchSelectInput, { type EventItem as EventSearchItem } from '#components/domain/EventSearchSelectInput';
-import DropdownMenuItem from '#components/DropdownMenuItem';
-import Link from '#components/Link';
-import SelectOutput from '#components/SelectOutput';
+import Link from '#components/next/Link';
+import MenuItem from '#components/next/MenuItem';
 import useAlert from '#hooks/useAlert';
 import useInputState from '#hooks/useInputState';
 import useRouting from '#hooks/useRouting';
@@ -68,10 +66,6 @@ import {
 import { exportDrefAllocation } from './drefAllocationExport';
 
 import i18n from './i18n.json';
-import styles from './styles.module.css';
-
-const keySelector = (d: EventSearchItem) => d.id;
-const labelSelector = (d: EventSearchItem) => d.name ?? '???';
 
 const LINK_EMERGENCY_CREATE_NEW = 'create-new';
 const LINK_EMERGENCY_SELECT_EXISTING = 'select-existing';
@@ -174,18 +168,14 @@ function DrefTableActions(props: Props) {
         }
     }, [setEventValue]);
 
-    const [showExportModal, {
-        setTrue: setShowExportModalTrue,
-        setFalse: setShowExportModalFalse,
-    }] = useBooleanState(false);
-
-    const [showDrefApprovalModal, {
-        setTrue: setShowDrefApprovalModalTrue,
-        setFalse: setShowDrefApprovalModalFalse,
-    }] = useBooleanState(false);
+    const exportDialog = useDialogState();
+    const shareDialog = useDialogState();
+    const approvalDialog = useDialogState();
+    const opsUpdateDialog = useDialogState();
+    const finalReportDialog = useDialogState();
 
     useRequest({
-        skip: !showDrefApprovalModal || isNotDefined(eventValue),
+        skip: !approvalDialog.isOpen || isNotDefined(eventValue),
         url: '/api/v2/event/mini/',
         query: {
             id: isDefined(eventValue) ? eventValue : undefined,
@@ -304,7 +294,7 @@ function DrefTableActions(props: Props) {
                 strings.drefApprovalSuccessTitle,
                 { variant: 'success' },
             );
-            setShowDrefApprovalModalFalse();
+            approvalDialog.close();
             if (onPublishSuccess) {
                 onPublishSuccess();
             }
@@ -571,28 +561,6 @@ function DrefTableActions(props: Props) {
         [drefIdFromProps, createFinalReport],
     );
 
-    const [showShareModal, {
-        setTrue: setShowShareModalTrue,
-        setFalse: setShowShareModalFalse,
-    }] = useBooleanState(false);
-
-    const [showOperationConfirmModal, {
-        setTrue: setShowOperationConfirmModalTrue,
-        setFalse: setShowOperationConfirmModalFalse,
-    }] = useBooleanState(false);
-
-    const [showFinalReportConfirmModal, {
-        setTrue: setShowFinalReportConfirmModalTrue,
-        setFalse: setShowFinalReportConfirmModalFalse,
-    }] = useBooleanState(false);
-
-    const handleShareClick: NonNullable<ButtonProps<undefined>['onClick']> = useCallback(
-        () => {
-            setShowShareModalTrue();
-        },
-        [setShowShareModalTrue],
-    );
-
     const handlePublishClick = useCallback(
         () => {
             if (applicationType === 'OPS_UPDATE') {
@@ -666,156 +634,138 @@ function DrefTableActions(props: Props) {
         || createOpsUpdatePending
         || createFinalReportPending;
 
+    const canEdit = status === DREF_STATUS_DRAFT || status === DREF_STATUS_FINALIZED;
+
+    const editLinks = {
+        DREF: { to: 'drefApplicationForm', urlParams: { drefId: id } },
+        OPS_UPDATE: { to: 'drefOperationalUpdateForm', urlParams: { opsUpdateId: id } },
+        FINAL_REPORT: {
+            to: isDrefImminentV2 ? 'drefFinalReportForm' : 'oldDrefFinalReportForm',
+            urlParams: { finalReportId: id },
+        },
+    } as const;
+    const editLink = editLinks[applicationType];
+
+    const linkedEventName = eventOptions?.find((option) => option.id === event)?.name;
+
+    const approveDisabled = disabled
+        || (isNotDefined(event)
+            && (isNotDefined(linkEmergencyValue)
+                || (linkEmergencyValue === LINK_EMERGENCY_SELECT_EXISTING
+                    && isNotDefined(eventValue))));
+
     return (
-        <TableActions
-            persistent
-            extraActions={(
-                <>
+        <>
+            <ListView
+                spacing="sm"
+                layoutOptions={{ align: 'end' }}
+            >
+                {canEdit && (
+                    <Link
+                        to={editLink.to}
+                        urlParams={editLink.urlParams}
+                        variant="secondary"
+                        before={<PencilLineIcon />}
+                    >
+                        {strings.dropdownActionEditLabel}
+                    </Link>
+                )}
+                <Menu
+                    icon={<MoreFillIcon />}
+                    ariaLabel={strings.drefTableMoreActionsLabel}
+                >
                     {canFinalize && (
-                        <DropdownMenuItem
+                        <MenuItem
                             name={undefined}
-                            type="confirm-button"
-                            before={<CheckLineIcon className={styles.icon} />}
-                            confirmMessage={
-                                resolveToString(
-                                    strings.drefAccountFinalizeConfirmMessage,
-                                    {
-                                        selectedLanguage: startingLanguage ? languageNameMap[startingLanguage] : '--',
-                                    },
-                                )
-                            }
+                            before={<CheckLineIcon />}
+                            confirmMessage={resolveToString(
+                                strings.drefAccountFinalizeConfirmMessage,
+                                {
+                                    selectedLanguage: startingLanguage
+                                        ? languageNameMap[startingLanguage]
+                                        : '--',
+                                },
+                            )}
                             onConfirm={handleFinalizeClick}
                             disabled={disabled}
-                            persist
                         >
                             {strings.dropdownActionFinalizeLabel}
-                        </DropdownMenuItem>
+                        </MenuItem>
                     )}
                     {canApprove && applicationType !== 'DREF' && (
-                        <DropdownMenuItem
+                        <MenuItem
                             name={undefined}
-                            type="confirm-button"
-                            before={<CheckLineIcon className={styles.icon} />}
+                            before={<CheckLineIcon />}
                             confirmMessage={strings.drefAccountConfirmMessage}
                             onConfirm={handlePublishClick}
                             disabled={disabled}
-                            persist
                         >
                             {strings.dropdownActionApproveLabel}
-                        </DropdownMenuItem>
+                        </MenuItem>
                     )}
                     {canApprove && applicationType === 'DREF' && (
-                        <DropdownMenuItem
+                        <MenuItem
                             name={undefined}
-                            type="button"
-                            before={<CheckLineIcon className={styles.icon} />}
-                            onClick={setShowDrefApprovalModalTrue}
+                            before={<CheckLineIcon />}
+                            onClick={approvalDialog.open}
                             disabled={disabled}
-                            persist
                         >
                             {strings.dropdownActionApproveLabel}
-                        </DropdownMenuItem>
+                        </MenuItem>
                     )}
                     {canDownloadAllocation && (
-                        <DropdownMenuItem
+                        <MenuItem
                             name={undefined}
-                            type="button"
+                            before={<DownloadLineIcon />}
                             onClick={handleDrefAllocationExport}
-                            before={<DownloadLineIcon className={styles.icon} />}
                             disabled={disabled}
-                            persist
                         >
                             {strings.dropdownActionAllocationFormLabel}
-                        </DropdownMenuItem>
+                        </MenuItem>
                     )}
                     {canAddOpsUpdate && (
-                        <DropdownMenuItem
+                        <MenuItem
                             name={undefined}
-                            type="button"
-                            before={<AddLineIcon className={styles.icon} />}
-                            onClick={setShowOperationConfirmModalTrue}
+                            before={<AddLineIcon />}
+                            onClick={opsUpdateDialog.open}
                             disabled={disabled}
-                            persist
                         >
                             {strings.dropdownActionAddOpsUpdateLabel}
-                        </DropdownMenuItem>
+                        </MenuItem>
                     )}
                     {canCreateFinalReport && (
-                        <DropdownMenuItem
+                        <MenuItem
                             name={undefined}
-                            type="button"
-                            onClick={setShowFinalReportConfirmModalTrue}
-                            before={<CaseManagementIcon className={styles.icon} />}
+                            before={<CaseManagementIcon />}
+                            onClick={finalReportDialog.open}
                             disabled={disabled}
-                            persist
                         >
                             {strings.dropdownActionCreateFinalReportLabel}
-                        </DropdownMenuItem>
+                        </MenuItem>
                     )}
-                    <DropdownMenuItem
+                    <MenuItem
                         name={undefined}
-                        type="button"
-                        before={<ShareLineIcon className={styles.icon} />}
-                        onClick={handleShareClick}
+                        before={<ShareLineIcon />}
+                        onClick={shareDialog.open}
                         disabled={disabled}
-                        persist
                     >
                         {strings.dropdownActionShareLabel}
-                    </DropdownMenuItem>
+                    </MenuItem>
                     {drefType !== DREF_TYPE_LOAN && (
-                        <DropdownMenuItem
+                        <MenuItem
                             name={undefined}
-                            type="button"
-                            before={<DocumentPdfLineIcon className={styles.icon} />}
-                            onClick={setShowExportModalTrue}
+                            before={<DocumentPdfLineIcon />}
+                            onClick={exportDialog.open}
                             disabled={disabled}
-                            persist
                         >
                             {strings.dropdownActionExportLabel}
-                        </DropdownMenuItem>
+                        </MenuItem>
                     )}
-                </>
-            )}
-        >
-            {(status === DREF_STATUS_DRAFT || status === DREF_STATUS_FINALIZED) && applicationType === 'DREF' && (
-                <Link
-                    to="drefApplicationForm"
-                    urlParams={{ drefId: id }}
-                    colorVariant="primary"
-                    styleVariant="outline"
-                    before={<PencilLineIcon />}
-                    spacing="sm"
-                >
-                    {strings.dropdownActionEditLabel}
-                </Link>
-            )}
-            {(status === DREF_STATUS_DRAFT || status === DREF_STATUS_FINALIZED) && applicationType === 'OPS_UPDATE' && (
-                <Link
-                    to="drefOperationalUpdateForm"
-                    urlParams={{ opsUpdateId: id }}
-                    colorVariant="primary"
-                    styleVariant="outline"
-                    before={<PencilLineIcon />}
-                    spacing="sm"
-                >
-                    {strings.dropdownActionEditLabel}
-                </Link>
-            )}
-            {(status === DREF_STATUS_DRAFT || status === DREF_STATUS_FINALIZED) && applicationType === 'FINAL_REPORT' && (
-                <Link
-                    to={isDrefImminentV2 ? 'drefFinalReportForm' : 'oldDrefFinalReportForm'}
-                    urlParams={{ finalReportId: id }}
-                    colorVariant="primary"
-                    styleVariant="outline"
-                    before={<PencilLineIcon />}
-                    spacing="sm"
-                >
-                    {strings.dropdownActionEditLabel}
-                </Link>
-            )}
-            {showExportModal && (
+                </Menu>
+            </ListView>
+            {exportDialog.isOpen && (
                 <DrefExportModal
-                    onCancel={setShowExportModalFalse}
+                    onCancel={exportDialog.close}
                     id={id}
                     drefType={drefType}
                     // eslint-disable-next-line react/jsx-props-no-spreading
@@ -824,20 +774,21 @@ function DrefTableActions(props: Props) {
                         : { applicationType })}
                 />
             )}
-            {showShareModal && (
+            {shareDialog.isOpen && (
                 <DrefShareModal
-                    onCancel={setShowShareModalFalse}
-                    onSuccess={setShowShareModalFalse}
+                    onCancel={shareDialog.close}
+                    onSuccess={shareDialog.close}
                     drefId={drefIdFromProps}
                 />
             )}
-            {showOperationConfirmModal && (
-                <Modal
+            {opsUpdateDialog.isOpen && (
+                <Dialog
                     heading={strings.dropdownActionImminentNewOpsUpdateConfirmationHeading}
-                    onClose={setShowOperationConfirmModalFalse}
+                    onClose={opsUpdateDialog.close}
                     footerActions={(
                         <Button
                             name={undefined}
+                            variant="primary"
                             onClick={handleAddOpsUpdate}
                             disabled={(startingLanguage !== 'en' && !selectOpsLanguage) || disabled}
                         >
@@ -845,36 +796,35 @@ function DrefTableActions(props: Props) {
                         </Button>
                     )}
                 >
-                    <ListView layout="block">
-                        <div>{strings.dropdownActionNewOpsUpdateConfirmationMessage}</div>
-                        {shouldConfirmImminentAddOpsUpdate
-                            && strings.dropdownActionImminentNewOpsUpdateConfirmationMessage}
-                        {startingLanguage !== 'en' && (
-                            <>
-                                <div>
-                                    {strings
-                                        .dropdownActionNewOpsUpdateLanguageSelectLanguageMessage}
-                                </div>
-                                <RadioInput
-                                    name={undefined}
-                                    value={selectOpsLanguage}
-                                    options={selectLanguageOptions}
-                                    onChange={setSelectOpsLanguage}
-                                    keySelector={selectLanguageKeySelector}
-                                    labelSelector={stringLabelSelector}
-                                />
-                            </>
-                        )}
-                    </ListView>
-                </Modal>
+                    <Description>
+                        {strings.dropdownActionNewOpsUpdateConfirmationMessage}
+                    </Description>
+                    {shouldConfirmImminentAddOpsUpdate && (
+                        <Description>
+                            {strings.dropdownActionImminentNewOpsUpdateConfirmationMessage}
+                        </Description>
+                    )}
+                    {startingLanguage !== 'en' && (
+                        <RadioInput
+                            name={undefined}
+                            label={strings.dropdownActionNewOpsUpdateLanguageSelectLanguageMessage}
+                            value={selectOpsLanguage}
+                            options={selectLanguageOptions}
+                            onChange={setSelectOpsLanguage}
+                            keySelector={selectLanguageKeySelector}
+                            labelSelector={stringLabelSelector}
+                        />
+                    )}
+                </Dialog>
             )}
-            {showFinalReportConfirmModal && (
-                <Modal
+            {finalReportDialog.isOpen && (
+                <Dialog
                     heading={strings.dropdownActionNewFinalReportConfirmationHeading}
-                    onClose={setShowFinalReportConfirmModalFalse}
+                    onClose={finalReportDialog.close}
                     footerActions={(
                         <Button
                             name={undefined}
+                            variant="primary"
                             onClick={handleAddFinalReport}
                             disabled={(startingLanguage !== 'en' && !selectFinalLanguage) || disabled}
                         >
@@ -882,71 +832,61 @@ function DrefTableActions(props: Props) {
                         </Button>
                     )}
                 >
-                    <ListView layout="block">
-                        <div>
-                            {strings.dropdownActionNewFinalReportConfirmationMessage}
-                        </div>
-                        {startingLanguage !== 'en' && (
-                            <>
-                                <div>
-                                    {strings
-                                        .dropdownActionNewFinalReportLanguageSelectLanguageMessage}
-                                </div>
-                                <RadioInput
-                                    name={undefined}
-                                    value={selectFinalLanguage}
-                                    options={selectLanguageOptions}
-                                    onChange={setSelectFinalLanguage}
-                                    keySelector={selectLanguageKeySelector}
-                                    labelSelector={stringLabelSelector}
-                                />
-                            </>
-                        )}
-                    </ListView>
-                </Modal>
+                    <Description>
+                        {strings.dropdownActionNewFinalReportConfirmationMessage}
+                    </Description>
+                    {startingLanguage !== 'en' && (
+                        <RadioInput
+                            name={undefined}
+                            label={strings
+                                .dropdownActionNewFinalReportLanguageSelectLanguageMessage}
+                            value={selectFinalLanguage}
+                            options={selectLanguageOptions}
+                            onChange={setSelectFinalLanguage}
+                            keySelector={selectLanguageKeySelector}
+                            labelSelector={stringLabelSelector}
+                        />
+                    )}
+                </Dialog>
             )}
             {drefApprovalPending && (
-                <Modal>
+                <Dialog
+                    ariaLabel={strings.drefApprovalInProgressTitle}
+                    size="sm"
+                >
                     <Message
                         pending
-                        title={strings.drefApprovalInProgressTitle}
+                        heading={strings.drefApprovalInProgressTitle}
                     />
-                </Modal>
+                </Dialog>
             )}
-            {showDrefApprovalModal && (
-                <Modal
+            {approvalDialog.isOpen && (
+                <Dialog
                     heading={strings.drefApprovalConfirmHeading}
-                    onClose={setShowDrefApprovalModalFalse}
+                    onClose={approvalDialog.close}
                     footerActions={(
                         <Button
-                            name={null}
+                            name={undefined}
+                            variant="primary"
                             onClick={handlePublishDref}
-                            disabled={disabled
-                                || (isNotDefined(event)
-                                    && (isNotDefined(linkEmergencyValue)
-                                        || (linkEmergencyValue === LINK_EMERGENCY_SELECT_EXISTING
-                                            && isNotDefined(eventValue)))
-                                )}
+                            disabled={approveDisabled}
                         >
                             {strings.dropdownActionApproveLabel}
                         </Button>
                     )}
                 >
                     {isNotDefined(event) && (
-                        <ListView layout="block">
-                            <Description>
-                                {strings.drefApplicationNoEventApprovalWarningMessage}
-                            </Description>
+                        <>
                             <RadioInput
                                 name={undefined}
+                                label={strings.drefApplicationNoEventApprovalWarningMessage}
                                 options={linkEmergencyOptions}
                                 keySelector={stringKeySelector}
                                 labelSelector={stringLabelSelector}
-                                value={linkEmergencyValue}
-                                spacing="lg"
-                                onChange={handleLinkEmergencyChange}
-                                radioListLayout="block"
                                 descriptionSelector={stringDescriptionSelector}
+                                value={linkEmergencyValue}
+                                onChange={handleLinkEmergencyChange}
+                                layout="block"
                             />
                             <EventSearchSelectInput
                                 name={undefined}
@@ -960,38 +900,30 @@ function DrefTableActions(props: Props) {
                                 disabled={disabled
                                     || linkEmergencyValue !== LINK_EMERGENCY_SELECT_EXISTING}
                             />
-                            <div />
-                        </ListView>
+                        </>
                     )}
-                    {(isDefined(event)) && (
-                        <ListView
-                            layout="block"
-                            spacing="xs"
-                        >
+                    {isDefined(event) && (
+                        <>
                             <Description>
                                 {resolveToComponent(
                                     strings.drefApplicationHasEventMessage,
                                     {
-                                        emergency: isDefined(eventOptions) ? (
-                                            <SelectOutput
-                                                value={event}
-                                                options={eventOptions}
-                                                keySelector={keySelector}
-                                                strongValue
-                                                labelSelector={labelSelector}
-                                            />
-                                        ) : '??',
+                                        emergency: (
+                                            <Text variant="strong">
+                                                {linkedEventName ?? '--'}
+                                            </Text>
+                                        ),
                                     },
                                 )}
                             </Description>
                             <Description>
                                 {strings.drefApprovalSureMessage}
                             </Description>
-                        </ListView>
+                        </>
                     )}
-                </Modal>
+                </Dialog>
             )}
-        </TableActions>
+        </>
     );
 }
 

@@ -3,34 +3,26 @@ import {
     useMemo,
     useState,
 } from 'react';
-import {
-    Container,
-    ListView,
-    Pager,
-    Table,
-    TableBodyContent,
-    TextOutput,
-} from '@ifrc-go/ui';
-import { type RowOptions } from '@ifrc-go/ui';
 import { type Language } from '@ifrc-go/ui/contexts';
 import { useTranslation } from '@ifrc-go/ui/hooks';
 import {
     createDateColumn,
     createElementColumn,
-    createEmptyColumn,
-    createExpandColumn,
-    createExpansionIndicatorColumn,
     createStringColumn,
-    numericIdSelector,
-} from '@ifrc-go/ui/utils';
+    DataDisplay,
+    DataDisplayList,
+    Pagination,
+    Section,
+    Table,
+} from '@ifrc-go/ui/next';
 import {
-    _cs,
     isDefined,
     isNotDefined,
     listToMap,
 } from '@togglecorp/fujs';
 
 import useGlobalEnums from '#hooks/domain/useGlobalEnums';
+import useRouteHref from '#hooks/domain/useRouteHref';
 import useUserMe from '#hooks/domain/useUserMe';
 import useFilterState from '#hooks/useFilterState';
 import {
@@ -43,30 +35,26 @@ import {
     type TypeOfDrefEnum,
 } from '#utils/constants';
 import {
+    createAppealCodeColumn,
     createCountryColumn,
-    createLinkColumn,
     createTitleColumn,
-} from '#utils/domain/tableHelpers';
+} from '#utils/domain/tableColumns';
 import { useRequest } from '#utils/restRequest';
 
 import DrefTableActions, { type Props as DrefTableActionsProps } from '../DrefTableActions';
 import Filters, { type FilterValue } from '../Filters';
+import { getStageKey } from '../utils';
 
 import i18n from './i18n.json';
-import styles from './styles.module.css';
 
 const NUM_ITEMS_PER_PAGE = 10;
 
 interface Props {
-    className?: string;
     actions?: React.ReactNode;
 }
 
 function ActiveDrefTable(props: Props) {
-    const {
-        className,
-        actions,
-    } = props;
+    const { actions } = props;
 
     const strings = useTranslation(i18n);
     const {
@@ -74,8 +62,9 @@ function ActiveDrefTable(props: Props) {
         setPage,
         rawFilter,
         filter,
-        filtered,
+        rawFiltered,
         setFilterField,
+        resetFilter,
         limit,
         offset,
     } = useFilterState<FilterValue>({
@@ -139,7 +128,7 @@ function ActiveDrefTable(props: Props) {
     );
 
     type DrefItem = NonNullable<NonNullable<typeof activeDrefResponse>['results']>[number];
-    type Key = DrefItem['id'];
+    type Key = string;
 
     const getLatestStageOfDref = useCallback(
         (dref: DrefItem) => {
@@ -176,23 +165,12 @@ function ActiveDrefTable(props: Props) {
     const latestDrefToOriginalMap = useMemo(
         () => listToMap(
             activeDrefResponse?.results ?? [],
-            (dref) => {
-                const val = getLatestStageOfDref(dref);
-                return val.id;
-            },
+            (dref) => getStageKey(getLatestStageOfDref(dref)),
         ),
         [activeDrefResponse, getLatestStageOfDref],
     );
 
-    const [expandedRow, setExpandedRow] = useState<LatestDref | undefined>();
-    const handleExpandClick = useCallback(
-        (row: LatestDref) => {
-            setExpandedRow(
-                (prevValue) => (prevValue?.id === row.id ? undefined : row),
-            );
-        },
-        [],
-    );
+    const [expandedKeys, setExpandedKeys] = useState<Key[]>([]);
 
     const statusDescription = useMemo(() => {
         if (isNotDefined(drefStatus)) {
@@ -241,30 +219,27 @@ function ActiveDrefTable(props: Props) {
         strings.activeDrefTableStatusFailedDescription,
     ]);
 
-    const baseColumns = useMemo(
+    const getRouteHref = useRouteHref();
+
+    const columns = useMemo(
         () => ([
             createDateColumn<LatestDref, Key>(
                 'created_at',
                 strings.activeDrefTableCreatedHeading,
                 (item) => item.created_at,
             ),
-            // event lives on the original dref (not the stage objects), so
-            // resolve it via latestDrefToOriginalMap; drafts have none
-            createLinkColumn<LatestDref, Key>(
+            // NOTE: the event lives on the original DREF, not on its stages;
+            // drafts have none
+            createAppealCodeColumn<LatestDref, Key>(
                 'appeal_code',
                 strings.activeDrefTableAppealCodeHeading,
                 (item) => item.appeal_code,
-                (item) => {
-                    const eventId = latestDrefToOriginalMap[item.id]?.event;
-                    return {
-                        to: isDefined(eventId) ? 'emergenciesLayout' : undefined,
-                        urlParams: isDefined(eventId)
-                            ? { emergencyId: eventId }
-                            : undefined,
-                        withEllipsizedContent: true,
-                    };
+                {
+                    eventIdSelector: (item) => (
+                        latestDrefToOriginalMap[getStageKey(item)]?.event
+                    ),
+                    getRouteHref,
                 },
-                { columnClassName: styles.appealCode },
             ),
             createTitleColumn<LatestDref, Key>(
                 'title',
@@ -275,46 +250,38 @@ function ActiveDrefTable(props: Props) {
                 'type',
                 strings.activeDrefTableStageHeading,
                 (item) => item.application_type_display,
-                { columnClassName: styles.stage },
+                { width: 'xs' },
             ),
             createCountryColumn<LatestDref, Key>(
                 'country',
                 strings.activeDrefTableCountryHeading,
-                (item) => item.country_details?.name,
-                (item) => ({
-                    to: 'countriesLayout',
-                    urlParams: { countryId: item.country },
-                }),
+                (item) => item.country_details,
+                getRouteHref,
             ),
             createStringColumn<LatestDref, Key>(
                 'type_of_dref',
                 strings.activeDrefTableTypeOfDrefHeading,
                 (item) => item.type_of_dref_display,
-                { columnClassName: styles.type },
+                { width: 'xs' },
             ),
             createStringColumn<LatestDref, Key>(
                 'status',
                 strings.activeDrefTableStatusHeading,
                 (item) => item.status_display,
                 {
-                    columnClassName: styles.status,
-                    headerInfoTitle: strings.activeDrefTableStatusHeading,
-                    headerInfoDescription: (
-                        <ListView
-                            layout="block"
-                            withSpacingOpticalCorrection
-                        >
+                    width: 'xs',
+                    info: (
+                        <DataDisplayList>
                             {statusDescription?.map((status) => (
-                                <TextOutput
+                                <DataDisplay
                                     key={status.key}
-                                    strongLabel
-                                    withoutLabelColon
                                     label={status.status}
                                     value={status.description}
-                                    withBlockLayout
+                                    layout="block"
+                                    withoutLabelColon
                                 />
                             ))}
-                        </ListView>
+                        </DataDisplayList>
                     ),
                 },
             ),
@@ -322,8 +289,9 @@ function ActiveDrefTable(props: Props) {
                 'actions',
                 '',
                 DrefTableActions,
-                (id, item) => {
-                    const originalDref = latestDrefToOriginalMap[id];
+                (key, item) => {
+                    const { id } = item;
+                    const originalDref = latestDrefToOriginalMap[key];
                     // FIXME: fix typing in server (medium priority)
                     // the application_type should be an enum
                     const applicationType = item.application_type as 'DREF' | 'OPS_UPDATE' | 'FINAL_REPORT';
@@ -394,6 +362,7 @@ function ActiveDrefTable(props: Props) {
                         event,
                     };
                 },
+                { width: 'sm' },
             ),
         ]),
         [
@@ -404,6 +373,7 @@ function ActiveDrefTable(props: Props) {
             strings.activeDrefTableCountryHeading,
             strings.activeDrefTableTypeOfDrefHeading,
             strings.activeDrefTableStatusHeading,
+            getRouteHref,
             latestDrefToOriginalMap,
             userMe,
             userRegionCoordinatorMap,
@@ -412,105 +382,54 @@ function ActiveDrefTable(props: Props) {
         ],
     );
 
-    const columns = useMemo(
-        () => ([
-            createExpansionIndicatorColumn<LatestDref, Key>(false),
-            ...baseColumns,
-            createExpandColumn<LatestDref, Key>(
-                'expandRow',
-                '',
-                (row) => ({
-                    onClick: handleExpandClick,
-                    expanded: row.id === expandedRow?.id,
-                    disabled: row.application_type === 'DREF',
-                }),
-            ),
-        ]),
-        [baseColumns, handleExpandClick, expandedRow],
-    );
+    // NOTE: the latest stage is the row itself; final_report_details is null
+    // until a final report exists
+    const getSubRows = (row: LatestDref): LatestDref[] | undefined => {
+        const originalDref = latestDrefToOriginalMap[getStageKey(row)];
+        if (isNotDefined(originalDref)) {
+            return undefined;
+        }
 
-    const detailColumns = useMemo(
-        () => ([
-            createExpansionIndicatorColumn<LatestDref, Key>(true),
-            ...baseColumns,
-            createEmptyColumn(),
-        ]),
-        [baseColumns],
-    );
-
-    const rowModifier = useCallback(
-        ({ row, datum }: RowOptions<LatestDref, Key>) => {
-            if (expandedRow?.id !== datum.id) {
-                return row;
-            }
-
-            const originalDref = latestDrefToOriginalMap[datum.id];
-
-            if (!originalDref || (!originalDref.has_final_report && !originalDref.has_ops_update)) {
-                return row;
-            }
-
-            const {
-                final_report_details,
-                operational_update_details,
-            } = originalDref;
-
-            const opsUpdateList = operational_update_details ?? [];
-
-            const subRows: LatestDref[] = [
-                final_report_details,
-                ...opsUpdateList,
-                originalDref,
-            ].slice(1);
-            // We don't need first element since, it will be
-            // rendered by row
-
-            return (
-                <>
-                    {row}
-                    <TableBodyContent
-                        keySelector={numericIdSelector}
-                        data={subRows}
-                        columns={detailColumns}
-                        cellClassName={styles.subCell}
-                    />
-                </>
-            );
-        },
-        [expandedRow, detailColumns, latestDrefToOriginalMap],
-    );
+        return [
+            originalDref.final_report_details,
+            ...(originalDref.operational_update_details ?? []),
+            originalDref,
+        ].filter(isDefined).slice(1);
+    };
 
     return (
-        <Container
-            className={_cs(styles.activeDrefTable, className)}
+        <Section
             heading={strings.activeDrefTitle}
-            headerActions={actions}
-            footerActions={(
-                <Pager
-                    activePage={page}
-                    itemsCount={activeDrefResponse?.count ?? 0}
-                    maxItemsPerPage={limit}
-                    onActivePageChange={setPage}
-                />
-            )}
-            withHeaderBorder
+            actions={actions}
             filters={(
                 <Filters
                     value={rawFilter}
                     onChange={setFilterField}
                 />
             )}
+            onFiltersClear={resetFilter}
+            filtered={rawFiltered}
+            pending={activeDrefResponsePending}
+            empty={(latestDrefs?.length ?? 0) === 0}
+            footerActions={(
+                <Pagination
+                    activePage={page}
+                    numItems={activeDrefResponse?.count ?? 0}
+                    numItemsPerPage={limit}
+                    onActivePageChange={setPage}
+                />
+            )}
         >
             <Table
-                className={styles.table}
+                caption={strings.activeDrefTitle}
                 data={latestDrefs}
                 columns={columns}
-                keySelector={numericIdSelector}
-                pending={activeDrefResponsePending}
-                rowModifier={rowModifier}
-                filtered={filtered}
+                keySelector={getStageKey}
+                getSubRows={getSubRows}
+                expandedKeys={expandedKeys}
+                onExpandedKeysChange={setExpandedKeys}
             />
-        </Container>
+        </Section>
     );
 }
 

@@ -3,20 +3,19 @@ import {
     ChevronLeftLineIcon,
     ChevronRightLineIcon,
 } from '@ifrc-go/icons';
+import { useTranslation } from '@ifrc-go/ui/hooks';
 import {
     Button,
     ListView,
-} from '@ifrc-go/ui';
-import { useTranslation } from '@ifrc-go/ui/hooks';
+} from '@ifrc-go/ui/next';
 
-import Link from '#components/Link';
+import Link from '#components/next/Link';
 
 import ActiveDrefTable from './ActiveDrefTable';
 import CompletedDrefTable from './CompletedDrefTable';
 import DownloadImportTemplateButton from './DownloadImportTemplateButton';
 
 import i18n from './i18n.json';
-import styles from './styles.module.css';
 
 // eslint-disable-next-line import/prefer-default-export
 export function Component() {
@@ -24,21 +23,15 @@ export function Component() {
     const strings = useTranslation(i18n);
 
     return (
-        <ListView
-            layout="block"
-            className={styles.accountDrefApplications}
-        >
+        <ListView layout="block">
             <ListView
                 layout="block"
-                withCenteredContents
+                layoutOptions={{ align: 'center' }}
             >
                 <DownloadImportTemplateButton />
                 <Link
                     href="https://forms.office.com/e/wFQsu0V7Zb"
-                    styleVariant="action"
-                    external
-                    withLinkIcon
-                    withUnderline
+                    variant="underline"
                 >
                     {strings.drefFeedbackForm}
                 </Link>
@@ -49,8 +42,8 @@ export function Component() {
                         <Button
                             name="completed"
                             onClick={setCurrentView}
-                            styleVariant="action"
-                            after={<ChevronRightLineIcon className={styles.icon} />}
+                            variant="tertiary"
+                            after={<ChevronRightLineIcon />}
                         >
                             {strings.showCompletedButtonLabel}
                         </Button>
@@ -63,8 +56,8 @@ export function Component() {
                         <Button
                             name="active"
                             onClick={setCurrentView}
-                            styleVariant="action"
-                            before={<ChevronLeftLineIcon className={styles.icon} />}
+                            variant="tertiary"
+                            before={<ChevronLeftLineIcon />}
                         >
                             {strings.backToActiveButtonLabel}
                         </Button>

@@ -4,6 +4,8 @@
         "filterCountryPlaceholder": "All countries",
         "filterTypeOfDrefPlaceholder": "All type of DREFs",
         "filterDisasterTypePlaceholder": "All disaster types",
-        "filterAppealCodePlaceholder": "Search appeal code"
+        "filterAppealCodePlaceholder": "Search appeal code",
+        "filterTypeOfDrefLabel": "Type of DREF",
+        "filterAppealCodeLabel": "Appeal code"
     }
 }

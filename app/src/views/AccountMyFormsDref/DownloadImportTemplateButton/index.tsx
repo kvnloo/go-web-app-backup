@@ -1,35 +1,28 @@
-import { Button } from '@ifrc-go/ui';
+import { useTranslation } from '@ifrc-go/ui/hooks';
 import {
-    useBooleanState,
-    useTranslation,
-} from '@ifrc-go/ui/hooks';
+    Button,
+    useDialogState,
+} from '@ifrc-go/ui/next';
 
 import DownloadImportTemplateModal from './DownloadImportTemplateModal';
 
 import i18n from './i18n.json';
 
 function DownloadImportTemplateButton() {
-    const [
-        showDownloadImportTemplateModal,
-        {
-            setTrue: setShowDownloadImportTemplateTrue,
-            setFalse: setShowDownloadImportTemplateFalse,
-        },
-    ] = useBooleanState(false);
+    const templateDialog = useDialogState();
     const strings = useTranslation(i18n);
 
     return (
         <>
             <Button
-                onClick={setShowDownloadImportTemplateTrue}
                 name={undefined}
-                disabled={showDownloadImportTemplateModal}
+                onClick={templateDialog.open}
             >
                 {strings.downloadImportTemplateButtonLabel}
             </Button>
-            {showDownloadImportTemplateModal && (
+            {templateDialog.isOpen && (
                 <DownloadImportTemplateModal
-                    onComplete={setShowDownloadImportTemplateFalse}
+                    onComplete={templateDialog.close}
                 />
             )}
         </>

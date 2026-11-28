@@ -1,53 +1,42 @@
 import {
-    useCallback,
     useMemo,
     useState,
 } from 'react';
-import {
-    Container,
-    Pager,
-    Table,
-    TableBodyContent,
-} from '@ifrc-go/ui';
-import { type RowOptions } from '@ifrc-go/ui';
 import { useTranslation } from '@ifrc-go/ui/hooks';
 import {
     createDateColumn,
     createElementColumn,
-    createEmptyColumn,
-    createExpandColumn,
-    createExpansionIndicatorColumn,
     createStringColumn,
-    numericIdSelector,
-} from '@ifrc-go/ui/utils';
-import {
-    _cs,
-    isDefined,
-} from '@togglecorp/fujs';
+    Pagination,
+    Section,
+    Table,
+} from '@ifrc-go/ui/next';
+import { isDefined } from '@togglecorp/fujs';
 
+import useRouteHref from '#hooks/domain/useRouteHref';
 import useFilterState from '#hooks/useFilterState';
 import { type TypeOfDrefEnum } from '#utils/constants';
-import { createLinkColumn } from '#utils/domain/tableHelpers';
+import {
+    createAppealCodeColumn,
+    createCountryColumn,
+    createTitleColumn,
+} from '#utils/domain/tableColumns';
 import { useRequest } from '#utils/restRequest';
 
 import DrefTableActions, { type Props as DrefTableActionsProps } from '../DrefTableActions';
 import Filters, { type FilterValue } from '../Filters';
+import { getStageKey } from '../utils';
 
 import i18n from './i18n.json';
-import styles from './styles.module.css';
 
 const NUM_ITEMS_PER_PAGE = 10;
 
 interface Props {
-    className?: string;
     actions?: React.ReactNode;
 }
 
 function CompletedDrefTable(props: Props) {
-    const {
-        className,
-        actions,
-    } = props;
+    const { actions } = props;
 
     const strings = useTranslation(i18n);
     const {
@@ -55,8 +44,9 @@ function CompletedDrefTable(props: Props) {
         setPage,
         rawFilter,
         filter,
-        filtered,
+        rawFiltered,
         setFilterField,
+        resetFilter,
         limit,
         offset,
     } = useFilterState<FilterValue>({
@@ -81,73 +71,56 @@ function CompletedDrefTable(props: Props) {
     });
 
     type DrefResultItem = NonNullable<NonNullable<typeof completedDrefResponse>['results']>[number] & { drefType?: TypeOfDrefEnum | null | undefined };
-    type Key = DrefResultItem['id'];
+    type Key = string;
 
-    const [expandedRow, setExpandedRow] = useState<DrefResultItem | undefined>();
-    const handleExpandClick = useCallback(
-        (row: DrefResultItem) => {
-            setExpandedRow(
-                (prevValue) => (prevValue?.id === row.id ? undefined : row),
-            );
-        },
-        [],
-    );
+    const [expandedKeys, setExpandedKeys] = useState<Key[]>([]);
+    const getRouteHref = useRouteHref();
 
-    const baseColumns = useMemo(
+    const columns = useMemo(
         () => ([
             createDateColumn<DrefResultItem, Key>(
                 'created_at',
                 strings.completedDrefTableCreatedHeading,
                 (item) => item.created_at,
-                { columnClassName: styles.date },
             ),
-            // completed DREFs are always approved, so the event exists
-            createLinkColumn<DrefResultItem, Key>(
+            createAppealCodeColumn<DrefResultItem, Key>(
                 'appeal_code',
                 strings.completedDrefTableAppealCodeHeading,
                 (item) => item.appeal_code,
-                (item) => {
-                    const eventId = item.dref.event;
-                    return {
-                        to: isDefined(eventId) ? 'emergenciesLayout' : undefined,
-                        urlParams: isDefined(eventId)
-                            ? { emergencyId: eventId }
-                            : undefined,
-                        withEllipsizedContent: true,
-                    };
+                {
+                    eventIdSelector: (item) => item.dref.event,
+                    getRouteHref,
                 },
-                { columnClassName: styles.appealCode },
             ),
-            createStringColumn<DrefResultItem, Key>(
+            createTitleColumn<DrefResultItem, Key>(
                 'title',
                 strings.completedDrefTableTitleHeading,
                 (item) => item.title,
-                { columnClassName: styles.title },
             ),
             createStringColumn<DrefResultItem, Key>(
                 'type',
                 strings.completedDrefTableStageHeading,
                 (item) => item.application_type_display,
-                { columnClassName: styles.stage },
+                { width: 'xs' },
             ),
-            createStringColumn<DrefResultItem, Key>(
+            createCountryColumn<DrefResultItem, Key>(
                 'country',
                 strings.completedDrefTableCountryHeading,
-                (item) => item.country_details?.name,
-                { columnClassName: styles.country },
+                (item) => item.country_details,
+                getRouteHref,
             ),
             createStringColumn<DrefResultItem, Key>(
                 'status',
                 strings.completedDrefTableStatusHeading,
                 (item) => item.status_display,
-                { columnClassName: styles.status },
+                { width: 'xs' },
             ),
             createElementColumn<DrefResultItem, Key, DrefTableActionsProps>(
                 'actions',
                 '',
                 DrefTableActions,
-                (id, item) => ({
-                    id,
+                (_, item) => ({
+                    id: item.id,
                     drefId: item.dref.id,
                     status: item.status,
                     // NOTE: drefType is only set on the expanded sub-rows
@@ -159,10 +132,11 @@ function CompletedDrefTable(props: Props) {
                     canAddOpsUpdate: false,
                     canCreateFinalReport: false,
                 }),
-                { columnClassName: styles.actions },
+                { width: 'sm' },
             ),
         ]),
         [
+            getRouteHref,
             strings.completedDrefTableCreatedHeading,
             strings.completedDrefTableAppealCodeHeading,
             strings.completedDrefTableTitleHeading,
@@ -172,109 +146,60 @@ function CompletedDrefTable(props: Props) {
         ],
     );
 
-    const columns = useMemo(
-        () => ([
-            createExpansionIndicatorColumn<DrefResultItem, Key>(false),
-            ...baseColumns,
-            createExpandColumn<DrefResultItem, Key>(
-                'expandRow',
-                '',
-                (row) => ({
-                    onClick: handleExpandClick,
-                    expanded: row.id === expandedRow?.id,
-                    disabled: row.application_type === 'DREF',
-                }),
-            ),
-        ]),
-        [baseColumns, handleExpandClick, expandedRow],
-    );
+    const getSubRows = (row: DrefResultItem): DrefResultItem[] => {
+        const opsUpdateList = row.dref.operational_update_details ?? [];
 
-    const detailColumns = useMemo(
-        () => ([
-            createExpansionIndicatorColumn<DrefResultItem, Key>(true),
-            ...baseColumns,
-            createEmptyColumn(),
-        ]),
-        [baseColumns],
-    );
-
-    const rowModifier = useCallback(
-        ({ row, datum }: RowOptions<DrefResultItem, Key>) => {
-            if (expandedRow?.id !== datum.id) {
-                return row;
-            }
-
-            const {
-                operational_update_details,
-            } = datum.dref;
-
-            const opsUpdateList = operational_update_details ?? [];
-
-            const subRows: DrefResultItem[] = [
-                ...opsUpdateList.map(
-                    (opsUpdate) => ({
-                        ...opsUpdate,
-                        dref: datum.dref,
-                        glide_codes: datum.glide_codes,
-                        date_of_publication: datum.date_of_publication,
-                        starting_language: datum.starting_language,
-                    }),
-                ),
-                {
-                    ...datum.dref,
-                    dref: datum.dref,
-                    drefType: datum.dref.type_of_dref,
-                    glide_codes: datum.glide_codes,
-                    date_of_publication: datum.date_of_publication,
-                },
-            ];
-
-            return (
-                <>
-                    {row}
-                    <TableBodyContent
-                        keySelector={numericIdSelector}
-                        data={subRows}
-                        columns={detailColumns}
-                        cellClassName={styles.subCell}
-                    />
-                </>
-            );
-        },
-        [expandedRow, detailColumns],
-    );
+        return [
+            ...opsUpdateList.map((opsUpdate) => ({
+                ...opsUpdate,
+                dref: row.dref,
+                glide_codes: row.glide_codes,
+                date_of_publication: row.date_of_publication,
+                starting_language: row.starting_language,
+            })),
+            {
+                ...row.dref,
+                dref: row.dref,
+                drefType: row.dref.type_of_dref,
+                glide_codes: row.glide_codes,
+                date_of_publication: row.date_of_publication,
+            },
+        ];
+    };
 
     return (
-        <Container
-            className={_cs(styles.completedDrefTable, className)}
+        <Section
             heading={strings.completedDrefTitle}
-            headerActions={actions}
-            footerActions={(
-                <Pager
-                    activePage={page}
-                    itemsCount={completedDrefResponse?.count ?? 0}
-                    maxItemsPerPage={limit}
-                    onActivePageChange={setPage}
-                />
-            )}
-            withHeaderBorder
+            actions={actions}
             filters={(
                 <Filters
                     value={rawFilter}
                     onChange={setFilterField}
                 />
             )}
+            onFiltersClear={resetFilter}
+            filtered={rawFiltered}
+            pending={completedDrefResponsePending}
+            empty={(completedDrefResponse?.results?.length ?? 0) === 0}
+            footerActions={(
+                <Pagination
+                    activePage={page}
+                    numItems={completedDrefResponse?.count ?? 0}
+                    numItemsPerPage={limit}
+                    onActivePageChange={setPage}
+                />
+            )}
         >
             <Table
-                className={styles.table}
+                caption={strings.completedDrefTitle}
                 data={completedDrefResponse?.results}
                 columns={columns}
-                keySelector={numericIdSelector}
-                pending={completedDrefResponsePending}
-                rowModifier={rowModifier}
-                filtered={filtered}
+                keySelector={getStageKey}
+                getSubRows={getSubRows}
+                expandedKeys={expandedKeys}
+                onExpandedKeysChange={setExpandedKeys}
             />
-        </Container>
+        </Section>
     );
 }
 

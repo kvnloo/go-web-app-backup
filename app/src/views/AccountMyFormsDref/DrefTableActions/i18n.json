@@ -41,6 +41,7 @@
         "drefAllocatedFromAnticipatoryPillar": "Anticipatory Pillar",
         "drefAllocatedFromResponsePillar": "Response Pillar",
         "drefImplementationPeriodDays": "{count} days",
-        "drefImplementationPeriodMonths": "{count} months"
+        "drefImplementationPeriodMonths": "{count} months",
+        "drefTableMoreActionsLabel": "More actions"
     }
 }

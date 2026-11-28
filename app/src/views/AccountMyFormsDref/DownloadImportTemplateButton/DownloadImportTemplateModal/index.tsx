@@ -4,15 +4,14 @@ import {
     useMemo,
     useState,
 } from 'react';
+import { useTranslation } from '@ifrc-go/ui/hooks';
 import {
     Button,
     Description,
-    ListView,
+    Dialog,
     Message,
-    Modal,
     RadioInput,
-} from '@ifrc-go/ui';
-import { useTranslation } from '@ifrc-go/ui/hooks';
+} from '@ifrc-go/ui/next';
 import { stringValueSelector } from '@ifrc-go/ui/utils';
 import {
     isDefined,
@@ -133,11 +132,12 @@ function DownloadImportTemplateModal(props: Props) {
     ]);
 
     return (
-        <Modal
+        <Dialog
             heading={strings.heading}
             footerActions={(
                 <Button
                     name={undefined}
+                    variant="primary"
                     onClick={handleDownloadClick}
                     disabled={generationPending || !canDownload}
                 >
@@ -146,38 +146,36 @@ function DownloadImportTemplateModal(props: Props) {
             )}
             onClose={onComplete}
         >
-            <ListView layout="block">
-                <RadioInput
-                    name={undefined}
-                    label={strings.selectDrefTypeLabel}
-                    options={supportedTypeOptions}
-                    keySelector={typeOfDrefKeySelector}
-                    labelSelector={stringValueSelector}
-                    value={typeOfDref}
-                    onChange={setTypeOfDref}
+            <RadioInput
+                name={undefined}
+                label={strings.selectDrefTypeLabel}
+                options={supportedTypeOptions}
+                keySelector={typeOfDrefKeySelector}
+                labelSelector={stringValueSelector}
+                value={typeOfDref}
+                onChange={setTypeOfDref}
+            />
+            {requiredDataPending && (
+                <Message
+                    compact
+                    pending
+                    heading={strings.dataPendingMessage}
                 />
-                {requiredDataPending && (
-                    <Message
-                        compact
-                        pending
-                        title={strings.dataPendingMessage}
-                    />
-                )}
-                {isRequiredDataMissing && (
-                    <Message
-                        compact
-                        variant="error"
-                        title={strings.dataMissingTitle}
-                        description={strings.dataMissingDescription}
-                    />
-                )}
-                {!requiredDataPending && !isRequiredDataMissing && (
-                    <Description>
-                        {strings.description}
-                    </Description>
-                )}
-            </ListView>
-        </Modal>
+            )}
+            {isRequiredDataMissing && (
+                <Message
+                    compact
+                    status="negative"
+                    heading={strings.dataMissingTitle}
+                    description={strings.dataMissingDescription}
+                />
+            )}
+            {!requiredDataPending && !isRequiredDataMissing && (
+                <Description>
+                    {strings.description}
+                </Description>
+            )}
+        </Dialog>
     );
 }
 
