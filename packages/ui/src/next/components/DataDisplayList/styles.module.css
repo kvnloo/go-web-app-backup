@@ -1,0 +1,29 @@
+.data-display-list {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+
+    &.inline-layout {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    /* NOTE: up to --num-columns columns, fewer when a column would get narrower than the minimum */
+    &.grid-layout {
+        /* NOTE: defaults for the values the component sets inline */
+        --num-columns: 2;
+        --min-column-size: var(--go-ui-width-column-sm);
+
+        display: grid;
+        grid-template-columns: repeat(
+            auto-fill,
+            minmax(
+                max(
+                    var(--min-column-size),
+                    calc((100% - (var(--num-columns) - 1) * var(--spec-spacing, 0px)) / var(--num-columns))
+                ),
+                1fr
+            )
+        );
+    }
+}

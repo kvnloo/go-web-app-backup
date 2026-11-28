@@ -1,0 +1,26 @@
+.key-figure {
+    display: flex;
+    flex-direction: column;
+    gap: var(--go-ui-spacing-4xs);
+
+    .value-row {
+        display: flex;
+        align-items: baseline;
+        flex-wrap: wrap;
+        gap: var(--go-ui-spacing-4xs);
+    }
+
+    .value {
+        line-height: var(--go-ui-line-height-xs);
+        font-weight: var(--go-ui-font-weight-bold);
+    }
+
+    .supplement {
+        color: var(--go-ui-color-text-light);
+        font-size: var(--go-ui-font-size-xl);
+    }
+
+    .label {
+        font-size: var(--go-ui-font-size-sm);
+    }
+}
