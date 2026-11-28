@@ -3,6 +3,7 @@
     "strings": {
         "overviewKeyActorsPartnerPlaceholder": "Enter partner",
         "overviewKeyActorsDescriptionLabel": "Description",
-        "overviewKeyActorsDeleteButton": "Delete Actor"
+        "overviewKeyActorsDeleteButton": "Delete Actor",
+        "overviewKeyActorsPartnerLabel": "Partner"
     }
 }

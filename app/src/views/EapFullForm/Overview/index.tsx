@@ -1,33 +1,29 @@
 import { useCallback } from 'react';
-import { AddLineIcon } from '@ifrc-go/icons';
+import { useTranslation } from '@ifrc-go/ui/hooks';
 import {
     BooleanInput,
-    Button,
     Checkbox,
-    Container,
     Description,
-    InputSection,
-    Label,
+    FieldGroup,
+    FormSection,
     ListView,
-    Radio,
+    RadioInput,
+    RepeatableList,
+    Text,
     TextArea,
     TextInput,
-} from '@ifrc-go/ui';
-import { useTranslation } from '@ifrc-go/ui/hooks';
+    useRepeatableList,
+} from '@ifrc-go/ui/next';
 import {
     resolveToComponent,
     resolveToString,
 } from '@ifrc-go/ui/utils';
-import {
-    isNotDefined,
-    randomString,
-} from '@togglecorp/fujs';
+import { isNotDefined } from '@togglecorp/fujs';
 import {
     type EntriesAsList,
     type Error,
     getErrorObject,
     getErrorString,
-    useFormArray,
 } from '@togglecorp/toggle-form';
 
 import ContactInputsSection from '#components/domain/ContactInputsSection';
@@ -37,8 +33,6 @@ import EapMonthYearInput from '#components/domain/EapMonthYearInput';
 import ImageWithCaptionInput from '#components/domain/ImageWithCaptionInput';
 import NationalSocietyMultiSelectInput from '#components/domain/NationalSocietyMultiSelectInput';
 import NationalSocietySelectInput from '#components/domain/NationalSocietySelectInput';
-import ExplanatoryNote from '#components/ExplanatoryNote';
-import NonFieldError from '#components/NonFieldError';
 import TabPage from '#components/TabPage';
 import {
     DISASTER_TYPE_EPIDEMIC,
@@ -54,9 +48,14 @@ import KeyActorsInput from './KeyActorsInput';
 import i18n from './i18n.json';
 
 type EapRegisterRequestDetails = GoApiResponse<'/api/v2/eap-registration/{id}/'>;
-type KeyActorsFormFields = NonNullable<
-    PartialEapFullFormType['key_actors']
->[number];
+
+const NOT_SURE = 'not-sure';
+interface NotSureOption {
+    key: typeof NOT_SURE;
+    label: string;
+}
+const notSureKeySelector = (option: NotSureOption) => option.key;
+const notSureLabelSelector = (option: NotSureOption) => option.label;
 
 interface Props {
     value: PartialEapFullFormType;
@@ -86,13 +85,9 @@ function Overview(props: Props) {
     const strings = useTranslation(i18n);
     const error = getErrorObject(formError);
 
-    const objectiveDescription = (
-        <span>
-            {resolveToComponent(
-                strings.objectiveDescription,
-                { exampleObjective: <i>{strings.objectiveDescriptionExample}</i> },
-            )}
-        </span>
+    const objectiveDescription = resolveToComponent(
+        strings.objectiveDescription,
+        { exampleObjective: <i>{strings.objectiveDescriptionExample}</i> },
     );
 
     // NOTE: We dont want some fields to have onChange functionality
@@ -102,24 +97,10 @@ function Overview(props: Props) {
         ?.disaster_type === DISASTER_TYPE_EPIDEMIC;
     const isOtherDisasterType = eapRegistrationDetail?.disaster_type === DISASTER_TYPE_OTHER;
 
-    const { setValue: onKeyActorsChange, removeValue: onKeyActorsRemove } = useFormArray<'key_actors', KeyActorsFormFields>(
-        'key_actors',
-        setFieldValue,
-    );
+    const keyActors = useRepeatableList('key_actors', value.key_actors, setFieldValue);
+    const keyActorsError = getErrorObject(error?.key_actors);
 
-    const handleKeyActorsAdd = useCallback(() => {
-        const newKeyActorsItem: KeyActorsFormFields = {
-            client_id: randomString(),
-        };
-
-        setFieldValue(
-            (oldValue: KeyActorsFormFields[] | undefined) => [
-                ...(oldValue ?? []),
-                newKeyActorsItem,
-            ],
-            'key_actors' as const,
-        );
-    }, [setFieldValue]);
+    const notSureOptions: NotSureOption[] = [{ key: NOT_SURE, label: strings.notSure }];
 
     const handleSubmissionTimeNotSureClick = useCallback(() => {
         setFieldValue(undefined, 'expected_submission_time');
@@ -132,420 +113,325 @@ function Overview(props: Props) {
                 <SectionQualityCriteria
                     heading={strings.overviewSectionHeading}
                     content={(
-                        <ListView withSpacingOpticalCorrection layout="block">
-                            <Description>
-                                {strings.sectionCriteriaIntroduction1}
-                            </Description>
-                            <Description>
-                                {strings.sectionCriteriaIntroduction2}
-                            </Description>
-                            <Description>
-                                {strings.sectionCriteriaComment2}
-                            </Description>
-                            <Description>
-                                {strings.sectionCriteriaComment3}
-                            </Description>
-                            <Description>
-                                {strings.sectionCriteriaComment4}
-                            </Description>
+                        <ListView layout="block">
+                            <Description>{strings.sectionCriteriaIntroduction1}</Description>
+                            <Description>{strings.sectionCriteriaIntroduction2}</Description>
+                            <Description>{strings.sectionCriteriaComment2}</Description>
+                            <Description>{strings.sectionCriteriaComment3}</Description>
+                            <Description>{strings.sectionCriteriaComment4}</Description>
                         </ListView>
                     )}
                 />
             )}
         >
-            <Container
+            {/* FIXME: the v2 domain inputs ignore the form state of next form
+            sections; drop their disabled and readOnly once they move to next */}
+            <FormSection
                 heading={strings.overviewHeading}
-                variant="form"
+                disabled={disabled}
+                readOnly={readOnly}
             >
-                <ListView
-                    layout="block"
-                    spacing="sm"
+                <FieldGroup
+                    heading={strings.nationalSociety}
+                    description={strings.nationalSocietyDescription}
+                    required
                 >
-                    <InputSection
-                        title={strings.nationalSociety}
-                        description={strings.nationalSocietyDescription}
-                        withAsteriskOnTitle
-                    >
-                        <NationalSocietySelectInput
-                            name="national_society"
+                    <NationalSocietySelectInput
+                        name="national_society"
+                        onChange={noop}
+                        value={eapRegistrationDetail?.national_society}
+                        disabled={disabled}
+                        readOnly
+                    />
+                </FieldGroup>
+                <FieldGroup
+                    heading={strings.formCountry}
+                    description={strings.formCountryDescription}
+                    required
+                >
+                    <CountrySelectInput
+                        name="country"
+                        value={eapRegistrationDetail?.country}
+                        onChange={noop}
+                        disabled={disabled}
+                        readOnly
+                    />
+                </FieldGroup>
+                <FieldGroup
+                    heading={strings.disasterType}
+                    description={strings.disasterTypeDescription}
+                    required
+                >
+                    <DisasterTypeSelectInput
+                        name="disaster_type"
+                        value={eapRegistrationDetail?.disaster_type}
+                        onChange={noop}
+                        disabled={disabled}
+                        readOnly
+                    />
+                    {(isEpidemicDisasterType || isOtherDisasterType) && (
+                        <TextInput
+                            name="disaster_sub_type"
+                            label={isEpidemicDisasterType
+                                ? strings.epidemicType
+                                : strings.otherDisasterType}
+                            value={eapRegistrationDetail?.disaster_sub_type}
                             onChange={noop}
-                            value={eapRegistrationDetail?.national_society}
-                            disabled={disabled}
                             readOnly
                         />
-                    </InputSection>
-                    <InputSection
-                        title={strings.formCountry}
-                        description={strings.formCountryDescription}
-                        withAsteriskOnTitle
-                    >
-                        <CountrySelectInput
-                            name="country"
-                            value={eapRegistrationDetail?.country}
-                            onChange={noop}
-                            disabled={disabled}
-                            readOnly
-                        />
-                    </InputSection>
-                    <InputSection
-                        title={strings.disasterType}
-                        description={strings.disasterTypeDescription}
-                        withAsteriskOnTitle
-                    >
-                        <DisasterTypeSelectInput
-                            name="disaster_type"
-                            value={eapRegistrationDetail?.disaster_type}
-                            onChange={noop}
-                            disabled={disabled}
-                            readOnly
-                        />
-                        {(isEpidemicDisasterType || isOtherDisasterType) && (
-                            <TextInput
-                                name="disaster_sub_type"
-                                value={eapRegistrationDetail?.disaster_sub_type}
-                                onChange={noop}
-                                disabled={disabled}
-                                label={isEpidemicDisasterType
-                                    ? strings.epidemicType
-                                    : strings.otherDisasterType}
-                                readOnly
-                            />
-                        )}
-                    </InputSection>
-                    <InputSection
-                        title={strings.formUploadCoverImage}
-                        description={strings.formUploadCoverImageDescription}
-                        withAsteriskOnTitle
-                        numPreferredColumns={2}
-                    >
-                        <ImageWithCaptionInput
-                            name="cover_image_file"
-                            url="/api/v2/eap-file/"
-                            value={value?.cover_image_file}
-                            onChange={setFieldValue}
-                            error={getErrorObject(error?.cover_image_file)}
-                            fileIdToUrlMap={fileIdToUrlMap}
-                            setFileIdToUrlMap={setFileIdToUrlMap}
-                            label={strings.formUploadAnImageLabel}
-                            readOnly={readOnly}
-                            disabled={disabled}
-                        />
-                    </InputSection>
-                    <InputSection
-                        title={strings.formExpectedSubmissionTimeTitle}
-                        description={strings.formExpectedSubmissionTimeDescription}
-                        withAsteriskOnTitle
-                        numPreferredColumns={2}
-                        error={error?.expected_submission_time}
-                    >
-                        <EapMonthYearInput
-                            name="expected_submission_time"
-                            value={value?.expected_submission_time}
-                            onChange={setFieldValue}
-                            disabled={disabled}
-                            readOnly={readOnly}
-                        />
-                        <Radio
-                            name={undefined}
-                            value={isNotDefined(value?.expected_submission_time)}
-                            onClick={handleSubmissionTimeNotSureClick}
-                            disabled={disabled}
-                            readOnly={readOnly}
-                        >
-                            {strings.notSure}
-                        </Radio>
-                    </InputSection>
-                    <InputSection
-                        title={strings.objectiveTitle}
-                        description={objectiveDescription}
-                        withAsteriskOnTitle
-                    >
-                        <TextArea
-                            label={strings.workWithGovernmentDescriptionLabel}
-                            name="objective"
-                            value={value?.objective}
-                            error={error?.objective}
-                            onChange={setFieldValue}
-                            disabled={disabled}
-                            readOnly={readOnly}
-                        />
-                    </InputSection>
-                    <InputSection
-                        title={strings.partnersInvolved}
-                        description={strings.partnersInvolvedDescription}
-                    >
-                        <ListView layout="block">
-                            <NationalSocietyMultiSelectInput
-                                name="partners"
-                                value={value.partners}
-                                error={getErrorString(error?.partners)}
-                                onChange={setFieldValue}
-                                disabled={disabled}
-                                readOnly={readOnly}
-                            />
-                            <Checkbox
-                                name="include_rcrc_climate_center"
-                                disabled={disabled}
-                                readOnly={readOnly}
-                                value={value?.include_rcrc_climate_center}
-                                onChange={setFieldValue}
-                                error={error?.include_rcrc_climate_center}
-                                label={strings.rcrcClimateCenter}
-                            />
-                        </ListView>
-                    </InputSection>
-                </ListView>
-            </Container>
-            <Container
+                    )}
+                </FieldGroup>
+                <FieldGroup
+                    heading={strings.formUploadCoverImage}
+                    description={strings.formUploadCoverImageDescription}
+                    required
+                    layoutOptions={{ numPreferredColumns: 2 }}
+                >
+                    <ImageWithCaptionInput
+                        name="cover_image_file"
+                        url="/api/v2/eap-file/"
+                        value={value?.cover_image_file}
+                        onChange={setFieldValue}
+                        error={getErrorObject(error?.cover_image_file)}
+                        fileIdToUrlMap={fileIdToUrlMap}
+                        setFileIdToUrlMap={setFileIdToUrlMap}
+                        label={strings.formUploadAnImageLabel}
+                        readOnly={readOnly}
+                        disabled={disabled}
+                    />
+                </FieldGroup>
+                <FieldGroup
+                    heading={strings.formExpectedSubmissionTimeTitle}
+                    description={strings.formExpectedSubmissionTimeDescription}
+                    required
+                    layoutOptions={{ numPreferredColumns: 2 }}
+                    error={getErrorString(error?.expected_submission_time)}
+                >
+                    <EapMonthYearInput
+                        name="expected_submission_time"
+                        value={value?.expected_submission_time}
+                        onChange={setFieldValue}
+                        disabled={disabled}
+                        readOnly={readOnly}
+                    />
+                    <RadioInput
+                        name={undefined}
+                        ariaLabel={strings.formExpectedSubmissionTimeTitle}
+                        options={notSureOptions}
+                        keySelector={notSureKeySelector}
+                        labelSelector={notSureLabelSelector}
+                        value={isNotDefined(value?.expected_submission_time)
+                            ? NOT_SURE
+                            : undefined}
+                        onChange={handleSubmissionTimeNotSureClick}
+                    />
+                </FieldGroup>
+                <FieldGroup
+                    heading={strings.objectiveTitle}
+                    description={objectiveDescription}
+                    required
+                >
+                    <TextArea
+                        name="objective"
+                        label={strings.workWithGovernmentDescriptionLabel}
+                        value={value?.objective}
+                        error={getErrorString(error?.objective)}
+                        onChange={setFieldValue}
+                    />
+                </FieldGroup>
+                <FieldGroup
+                    heading={strings.partnersInvolved}
+                    description={strings.partnersInvolvedDescription}
+                >
+                    <NationalSocietyMultiSelectInput
+                        name="partners"
+                        value={value.partners}
+                        error={getErrorString(error?.partners)}
+                        onChange={setFieldValue}
+                        disabled={disabled}
+                        readOnly={readOnly}
+                    />
+                    <Checkbox
+                        name="include_rcrc_climate_center"
+                        label={strings.rcrcClimateCenter}
+                        value={value?.include_rcrc_climate_center}
+                        onChange={setFieldValue}
+                        error={getErrorString(error?.include_rcrc_climate_center)}
+                    />
+                </FieldGroup>
+            </FormSection>
+            <FormSection
                 heading={strings.formContacts}
-                variant="form"
+                disabled={disabled}
+                readOnly={readOnly}
             >
-                <ListView
-                    layout="block"
-                    spacing="lg"
-                >
-                    <Container
-                        variant="form"
-                    >
-                        <ContactInputsSection
-                            title={strings.nSContact}
-                            description={strings.nSContactDescription}
-                            namePrefix="national_society_contact"
-                            value={value}
-                            setFieldValue={setFieldValue}
-                            error={error}
-                            disabled={disabled}
-                            readOnly={readOnly}
-                            withRequiredNameAndEmail
-                            withRequiredTitle
-                        />
-                        <ContactInputsSection
-                            title={strings.drefFocalPoint}
-                            description={strings.drefFocalPointDescription}
-                            namePrefix="dref_focal_point"
-                            value={value}
-                            setFieldValue={setFieldValue}
-                            error={error}
-                            disabled={disabled}
-                            readOnly={readOnly}
-                        />
-                        <ContactInputsSection
-                            title={strings.regionalFocalPoint}
-                            namePrefix="ifrc_regional_focal_point"
-                            value={value}
-                            setFieldValue={setFieldValue}
-                            error={error}
-                            disabled={disabled}
-                            readOnly={readOnly}
-                        />
-                        <ContactInputsSection
-                            title={strings.regionalManager}
-                            namePrefix="ifrc_regional_ops_manager"
-                            value={value}
-                            setFieldValue={setFieldValue}
-                            error={error}
-                            disabled={disabled}
-                            readOnly={readOnly}
-                        />
-                        <ContactInputsSection
-                            title={strings.regionalHead}
-                            namePrefix="ifrc_regional_head_dcc"
-                            value={value}
-                            setFieldValue={setFieldValue}
-                            error={error}
-                            disabled={disabled}
-                            readOnly={readOnly}
-                        />
-                    </Container>
-                </ListView>
-            </Container>
-            <Container
+                <ContactInputsSection
+                    title={strings.nSContact}
+                    description={strings.nSContactDescription}
+                    namePrefix="national_society_contact"
+                    value={value}
+                    setFieldValue={setFieldValue}
+                    error={error}
+                    disabled={disabled}
+                    readOnly={readOnly}
+                    withRequiredNameAndEmail
+                    withRequiredTitle
+                />
+                <ContactInputsSection
+                    title={strings.drefFocalPoint}
+                    description={strings.drefFocalPointDescription}
+                    namePrefix="dref_focal_point"
+                    value={value}
+                    setFieldValue={setFieldValue}
+                    error={error}
+                    disabled={disabled}
+                    readOnly={readOnly}
+                />
+                <ContactInputsSection
+                    title={strings.regionalFocalPoint}
+                    namePrefix="ifrc_regional_focal_point"
+                    value={value}
+                    setFieldValue={setFieldValue}
+                    error={error}
+                    disabled={disabled}
+                    readOnly={readOnly}
+                />
+                <ContactInputsSection
+                    title={strings.regionalManager}
+                    namePrefix="ifrc_regional_ops_manager"
+                    value={value}
+                    setFieldValue={setFieldValue}
+                    error={error}
+                    disabled={disabled}
+                    readOnly={readOnly}
+                />
+                <ContactInputsSection
+                    title={strings.regionalHead}
+                    namePrefix="ifrc_regional_head_dcc"
+                    value={value}
+                    setFieldValue={setFieldValue}
+                    error={error}
+                    disabled={disabled}
+                    readOnly={readOnly}
+                />
+            </FormSection>
+            <FormSection
                 heading={strings.stakeholderHeader}
-                variant="form"
+                disabled={disabled}
+                readOnly={readOnly}
             >
-                <ListView
-                    layout="block"
-                    spacing="sm"
-                >
-                    <InputSection
-                        title={strings.workWithGovernmentTitle}
-                        headerActions={(
-                            <ExplanatoryNote
-                                heading={strings.workWithGovernmentTitle}
-                                ariaLabel={strings.workWithGovernmentTitle}
-                                title={strings.workWithGovernmentTitle}
-                                content={(
-                                    <ListView spacing="xs" layout="block" withSpacingOpticalCorrection>
-                                        <Label strong>
-                                            {strings.overviewExplanatoryNoteLabel}
-                                        </Label>
-                                        <Description>
-                                            {strings.workExplanatoryNote}
-                                        </Description>
-                                    </ListView>
-                                )}
-                            />
-                        )}
-                        description={strings.workWithGovernmentDescription}
-                        withAsteriskOnTitle
-                    >
-                        <Container
-                            withBorder
-                            withPadding
-                            spacing="sm"
-                        >
-                            <ListView layout="block">
-                                <BooleanInput
-                                    name="is_worked_with_government"
-                                    value={value?.is_worked_with_government}
-                                    onChange={setFieldValue}
-                                    error={error?.is_worked_with_government}
-                                    disabled={disabled}
-                                    readOnly={readOnly}
-                                />
-                                {value.is_worked_with_government && (
-                                    <TextArea
-                                        label={strings.workWithGovernmentDescriptionLabel}
-                                        name="worked_with_government_description"
-                                        value={value?.worked_with_government_description}
-                                        onChange={setFieldValue}
-                                        error={error?.worked_with_government_description}
-                                        disabled={disabled}
-                                        readOnly={readOnly}
-                                    />
-                                )}
-                            </ListView>
-                        </Container>
-                    </InputSection>
-                    <InputSection
-                        title={strings.keyActorsTitle}
-                        headerActions={(
-                            <ExplanatoryNote
-                                heading={strings.keyActorsTitle}
-                                ariaLabel={strings.keyActorsTitle}
-                                title={strings.keyActorsTitle}
-                                content={(
-                                    <ListView layout="block">
-                                        <ListView spacing="xs" layout="block" withSpacingOpticalCorrection>
-                                            <Label strong>
-                                                {strings.overviewExplanatoryNoteLabel}
-                                            </Label>
-                                            <Description>
-                                                {strings.actorsExplanatoryNote}
-                                            </Description>
-                                        </ListView>
-                                        <ListView spacing="xs" layout="block" withSpacingOpticalCorrection>
-                                            <Label strong>
-                                                {strings.overviewRequiredPointsLabel}
-                                            </Label>
-                                            <Description>
-                                                <ul>
-                                                    <li>{strings.overviewRequiredPoint1}</li>
-                                                    <li>{strings.overviewRequiredPoint2}</li>
-                                                    <li>{strings.overviewRequiredPoint3}</li>
-                                                </ul>
-                                            </Description>
-                                        </ListView>
-                                    </ListView>
-                                )}
-                            />
-                        )}
-                        description={(
-                            <>
-                                <div>
-                                    {strings.keyActorsDescription}
-                                </div>
-                                <div>
-                                    {resolveToString(
-                                        strings.keyActorsDescription2,
-                                        { addNewActorButtonLabel: strings.keyActorsAddButton },
-                                    )}
-                                </div>
-                            </>
-                        )}
-                        withAsteriskOnTitle
-                    >
-                        <NonFieldError error={getErrorObject(error?.key_actors)} />
-                        <ListView
-                            layout="block"
-                            spacing="sm"
-                        >
-                            {value.key_actors?.map((actor, index) => (
-                                <KeyActorsInput
-                                    key={actor.client_id}
-                                    index={index}
-                                    value={actor}
-                                    onChange={onKeyActorsChange}
-                                    onRemove={onKeyActorsRemove}
-                                    error={getErrorObject(error?.key_actors)}
-                                    disabled={disabled}
-                                    readOnly={readOnly}
-                                />
-                            ))}
+                <FieldGroup
+                    heading={strings.workWithGovernmentTitle}
+                    description={strings.workWithGovernmentDescription}
+                    info={(
+                        <ListView layout="block" spacing="xs">
+                            <Text variant="strong">{strings.overviewExplanatoryNoteLabel}</Text>
+                            <Description>{strings.workExplanatoryNote}</Description>
                         </ListView>
-                        <Button
-                            name={undefined}
-                            onClick={handleKeyActorsAdd}
-                            disabled={disabled || readOnly}
-                            before={<AddLineIcon />}
-                        >
-                            {strings.keyActorsAddButton}
-                        </Button>
-                    </InputSection>
-                    <InputSection
-                        title={strings.technicalWorkingGroupsTitle}
-                        description={strings.technicalWorkingGroupDescription}
-                        withAsteriskOnTitle
-                    >
-                        <Container
-                            withPadding
-                            withBorder
-                            spacing="sm"
-                        >
-                            <ListView
-                                layout="block"
-                                spacing="sm"
-                            >
-                                <BooleanInput
-                                    name="is_technical_working_groups"
-                                    value={value?.is_technical_working_groups}
-                                    onChange={setFieldValue}
-                                    error={error?.is_technical_working_groups}
-                                    disabled={disabled}
-                                    readOnly={readOnly}
-                                />
-                                {value.is_technical_working_groups && (
-                                    <>
-                                        <TextInput
-                                            label={strings.technicalWorkingGroupsTitleLabel}
-                                            name="technically_working_group_title"
-                                            value={value?.technically_working_group_title}
-                                            onChange={setFieldValue}
-                                            error={error?.technically_working_group_title}
-                                            disabled={!value?.is_technical_working_groups
-                                                || disabled}
-                                            readOnly={readOnly}
-                                        />
-                                        <TextArea
-                                            label={strings.workWithGovernmentDescriptionLabel}
-                                            name="technical_working_groups_in_place_description"
-                                            value={value
-                                                ?.technical_working_groups_in_place_description}
-                                            onChange={setFieldValue}
-                                            error={error
-                                                ?.technical_working_groups_in_place_description}
-                                            disabled={disabled}
-                                            readOnly={readOnly}
-                                            maxWords={wordLimits
-                                                .technical_working_groups_in_place_description}
-                                        />
-                                    </>
+                    )}
+                    required
+                >
+                    <BooleanInput
+                        name="is_worked_with_government"
+                        ariaLabel={strings.workWithGovernmentTitle}
+                        value={value?.is_worked_with_government}
+                        onChange={setFieldValue}
+                        error={getErrorString(error?.is_worked_with_government)}
+                    />
+                    {value.is_worked_with_government && (
+                        <TextArea
+                            name="worked_with_government_description"
+                            label={strings.workWithGovernmentDescriptionLabel}
+                            value={value?.worked_with_government_description}
+                            onChange={setFieldValue}
+                            error={getErrorString(error?.worked_with_government_description)}
+                        />
+                    )}
+                </FieldGroup>
+                <FieldGroup
+                    heading={strings.keyActorsTitle}
+                    description={(
+                        <>
+                            <Description>{strings.keyActorsDescription}</Description>
+                            <Description>
+                                {resolveToString(
+                                    strings.keyActorsDescription2,
+                                    { addNewActorButtonLabel: strings.keyActorsAddButton },
                                 )}
+                            </Description>
+                        </>
+                    )}
+                    info={(
+                        <ListView layout="block">
+                            <ListView layout="block" spacing="xs">
+                                <Text variant="strong">{strings.overviewExplanatoryNoteLabel}</Text>
+                                <Description>{strings.actorsExplanatoryNote}</Description>
                             </ListView>
-                        </Container>
-                    </InputSection>
-                </ListView>
-            </Container>
+                            <ListView layout="block" spacing="xs">
+                                <Text variant="strong">{strings.overviewRequiredPointsLabel}</Text>
+                                <Description>
+                                    <ul>
+                                        <li>{strings.overviewRequiredPoint1}</li>
+                                        <li>{strings.overviewRequiredPoint2}</li>
+                                        <li>{strings.overviewRequiredPoint3}</li>
+                                    </ul>
+                                </Description>
+                            </ListView>
+                        </ListView>
+                    )}
+                    required
+                >
+                    <RepeatableList
+                        addLabel={strings.keyActorsAddButton}
+                        onAdd={keyActors.add}
+                        error={getErrorString(error?.key_actors)}
+                    >
+                        {value.key_actors?.map((actor) => (
+                            <KeyActorsInput
+                                key={actor.client_id}
+                                value={actor}
+                                onChange={keyActors.update}
+                                onRemove={keyActors.remove}
+                                error={getErrorObject(keyActorsError?.[actor.client_id])}
+                            />
+                        ))}
+                    </RepeatableList>
+                </FieldGroup>
+                <FieldGroup
+                    heading={strings.technicalWorkingGroupsTitle}
+                    description={strings.technicalWorkingGroupDescription}
+                    required
+                >
+                    <BooleanInput
+                        name="is_technical_working_groups"
+                        ariaLabel={strings.technicalWorkingGroupsTitle}
+                        value={value?.is_technical_working_groups}
+                        onChange={setFieldValue}
+                        error={getErrorString(error?.is_technical_working_groups)}
+                    />
+                    {value.is_technical_working_groups && (
+                        <>
+                            <TextInput
+                                name="technically_working_group_title"
+                                label={strings.technicalWorkingGroupsTitleLabel}
+                                value={value?.technically_working_group_title}
+                                onChange={setFieldValue}
+                                error={getErrorString(error?.technically_working_group_title)}
+                            />
+                            <TextArea
+                                name="technical_working_groups_in_place_description"
+                                label={strings.workWithGovernmentDescriptionLabel}
+                                value={value?.technical_working_groups_in_place_description}
+                                onChange={setFieldValue}
+                                error={getErrorString(
+                                    error?.technical_working_groups_in_place_description,
+                                )}
+                                maxWords={wordLimits.technical_working_groups_in_place_description}
+                            />
+                        </>
+                    )}
+                </FieldGroup>
+            </FormSection>
         </TabPage>
     );
 }

@@ -1,22 +1,15 @@
-import { DeleteBinTwoLineIcon } from '@ifrc-go/icons';
+import { useTranslation } from '@ifrc-go/ui/hooks';
 import {
-    Container,
-    IconButton,
-    InlineLayout,
-    ListView,
+    RemovableItem,
     TextArea,
     TextInput,
-} from '@ifrc-go/ui';
-import { useTranslation } from '@ifrc-go/ui/hooks';
-import { randomString } from '@togglecorp/fujs';
+} from '@ifrc-go/ui/next';
 import {
-    type ArrayError,
+    type Error,
     getErrorObject,
-    type SetValueArg,
-    useFormObject,
+    getErrorString,
 } from '@togglecorp/toggle-form';
 
-import NonFieldError from '#components/NonFieldError';
 import { wordLimits } from '#views/EapFullForm/common';
 import { type PartialEapFullFormType } from '#views/EapFullForm/schema';
 
@@ -28,12 +21,9 @@ type KeyActorsFormFields = NonNullable<
 
 interface Props {
     value: KeyActorsFormFields;
-    error: ArrayError<KeyActorsFormFields> | undefined;
-    onChange: (value: SetValueArg<KeyActorsFormFields>, index: number) => void;
-    onRemove: (index: number) => void;
-    index: number;
-    disabled?: boolean;
-    readOnly?: boolean;
+    error: Error<KeyActorsFormFields> | undefined;
+    onChange: (clientId: string, value: KeyActorsFormFields) => void;
+    onRemove: (clientId: string) => void;
 }
 
 function KeyActorsInput(props: Props) {
@@ -41,73 +31,45 @@ function KeyActorsInput(props: Props) {
         value,
         onChange,
         onRemove,
-        index,
-        disabled,
-        readOnly,
         error: errorFromProps,
     } = props;
 
     const strings = useTranslation(i18n);
+    const error = getErrorObject(errorFromProps);
 
-    const onFieldChange = useFormObject(index, onChange, () => ({
-        client_id: randomString(),
-    }));
-
-    const error = value && value.client_id && errorFromProps
-        ? getErrorObject(errorFromProps?.[value.client_id])
-        : undefined;
+    const handleFieldChange = (
+        fieldValue: string | undefined,
+        fieldName: 'partner' | 'description',
+    ) => {
+        onChange(value.client_id, { ...value, [fieldName]: fieldValue });
+    };
 
     return (
-        <Container
-            withPadding
-            withBorder
-            spacing="sm"
-            headerDescription={(
-                <NonFieldError error={error} />
-            )}
+        <RemovableItem
+            name={value.client_id}
+            onRemove={onRemove}
+            removeLabel={strings.overviewKeyActorsDeleteButton}
+            error={getErrorString(error)}
         >
-            <InlineLayout
-                after={(
-                    <IconButton
-                        name={index}
-                        onClick={onRemove}
-                        disabled={disabled || readOnly}
-                        title={strings.overviewKeyActorsDeleteButton}
-                        ariaLabel={strings.overviewKeyActorsDeleteButton}
-                    >
-                        <DeleteBinTwoLineIcon />
-                    </IconButton>
-                )}
-                contentAlignment="start"
-                spacing="sm"
-            >
-                <ListView
-                    layout="block"
-                    spacing="sm"
-                >
-                    <TextInput
-                        placeholder={strings.overviewKeyActorsPartnerPlaceholder}
-                        error={error?.partner}
-                        name="partner"
-                        onChange={onFieldChange}
-                        value={value?.partner}
-                        disabled={disabled}
-                        readOnly={readOnly}
-                        required
-                    />
-                    <TextArea
-                        label={strings.overviewKeyActorsDescriptionLabel}
-                        error={error?.description}
-                        name="description"
-                        value={value?.description}
-                        onChange={onFieldChange}
-                        required
-                        maxWords={wordLimits.key_actors}
-                        readOnly={readOnly}
-                    />
-                </ListView>
-            </InlineLayout>
-        </Container>
+            <TextInput
+                name="partner"
+                label={strings.overviewKeyActorsPartnerLabel}
+                placeholder={strings.overviewKeyActorsPartnerPlaceholder}
+                value={value.partner}
+                onChange={handleFieldChange}
+                error={getErrorString(error?.partner)}
+                required
+            />
+            <TextArea
+                name="description"
+                label={strings.overviewKeyActorsDescriptionLabel}
+                value={value.description}
+                onChange={handleFieldChange}
+                error={getErrorString(error?.description)}
+                maxWords={wordLimits.key_actors}
+                required
+            />
+        </RemovableItem>
     );
 }
 
