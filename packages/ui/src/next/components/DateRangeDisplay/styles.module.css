@@ -1,0 +1,5 @@
+.date-range-display {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: var(--go-ui-spacing-4xs);
+}

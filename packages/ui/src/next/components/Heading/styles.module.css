@@ -1,0 +1,28 @@
+.heading {
+    margin: 0;
+    line-height: var(--go-ui-line-height-xs);
+    font-weight: var(--go-ui-font-weight-semibold);
+
+    &.display {
+        font-size: var(--go-ui-font-size-3xl);
+    }
+
+    &.section {
+        /* FIXME: 1.125rem is not on the text size scale (designer-gated heading scale) */
+        text-transform: uppercase;
+        font-size: 1.125rem;
+
+        @media print {
+            color: var(--go-ui-color-primary-red);
+        }
+    }
+
+    &.card {
+        font-size: 1.125rem;
+    }
+
+    &.group {
+        line-height: var(--go-ui-line-height-md);
+        font-size: var(--go-ui-font-size-md);
+    }
+}
