@@ -26,7 +26,7 @@
         "generate:type:translations": "openapi-typescript ../cacheppuccino/openapi.json -o ./generated/translationTypes.ts --alphabetize",
         "generate:type:malawi-graphql": "graphql-codegen --config codegen.ts",
         "prestart": "pnpm initialize:type",
-        "start": "pnpm -F @ifrc-go/ui build && vite",
+        "start": "vite",
         "prebuild": "pnpm initialize:type",
         "build": "pnpm -F @ifrc-go/ui build && vite build",
         "preview": "vite preview",
