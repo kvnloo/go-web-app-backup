@@ -20,6 +20,14 @@
     /* NOTE: was 50vh, which clipped longer content and select lists */
     max-height: min(36rem, 70vh);
     overflow: auto;
+    /* NOTE: the popup sits inside its trigger's parent in the DOM (a table
+    header, for example), so it starts from the base text styles */
+    text-align: start;
+    line-height: var(--go-ui-line-height-md);
+    white-space: normal;
+    color: var(--go-ui-color-text);
+    font-size: var(--go-ui-font-size-md);
+    font-weight: var(--go-ui-font-weight-normal);
     /* flip above the trigger when there is not enough room below */
     position-try-fallbacks: flip-block;
 }

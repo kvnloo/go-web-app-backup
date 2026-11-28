@@ -85,6 +85,7 @@ function Dialog(props: Props) {
 
     useEffect(() => {
         const dialogElement = dialogRef.current;
+        const previouslyFocused = document.activeElement;
         dialogElement?.showModal();
         // NOTE: focus the dialog, not its first control (the close button), so
         // it is announced by name and no focus ring shows on open
@@ -97,6 +98,11 @@ function Dialog(props: Props) {
         return () => {
             document.body.style.overflow = prevOverflow;
             dialogElement?.close();
+            // NOTE: the dialog is already detached when this runs, so the
+            // browser does not restore focus on close
+            if (previouslyFocused instanceof HTMLElement && previouslyFocused.isConnected) {
+                previouslyFocused.focus();
+            }
         };
     }, []);
 

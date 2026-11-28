@@ -51,9 +51,14 @@ function MenuPopup(props: MenuPopupProps) {
 
     const { close, focusTrigger } = useContext(PopupControlsContext);
     const value = useMemo<MenuContextProps>(() => ({
-        close,
+        // NOTE: the chosen item unmounts with the menu, so focus goes back to
+        // the trigger first; a dialog the item opens then restores it there
+        close: () => {
+            focusTrigger();
+            close();
+        },
         requestConfirmation: onConfirmationRequest,
-    }), [close, onConfirmationRequest]);
+    }), [close, focusTrigger, onConfirmationRequest]);
 
     return (
         <MenuContext.Provider value={value}>
