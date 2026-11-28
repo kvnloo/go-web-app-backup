@@ -12,6 +12,8 @@ export type { Props as BooleanDisplayProps } from './components/BooleanDisplay';
 export { default as BooleanDisplay } from './components/BooleanDisplay';
 export type { Props as BooleanInputProps } from './components/BooleanInput';
 export { default as BooleanInput } from './components/BooleanInput';
+export type { Props as BreadcrumbsProps } from './components/Breadcrumbs';
+export { default as Breadcrumbs } from './components/Breadcrumbs';
 export type { Props as ButtonProps } from './components/Button';
 export { default as Button } from './components/Button';
 export type { Props as CardProps } from './components/Card';
@@ -72,6 +74,10 @@ export type { Props as MessageProps } from './components/Message';
 export { default as Message } from './components/Message';
 export type { Props as MoreInfoProps } from './components/MoreInfo';
 export { default as MoreInfo } from './components/MoreInfo';
+export type { Props as NavigationTabProps } from './components/NavigationTab';
+export { default as NavigationTab } from './components/NavigationTab';
+export type { Props as NavigationTabListProps, NavigationTabListVariant } from './components/NavigationTabList';
+export { default as NavigationTabList } from './components/NavigationTabList';
 export type { Props as NumberDisplayProps } from './components/NumberDisplay';
 export { default as NumberDisplay } from './components/NumberDisplay';
 export type { Props as NumberInputProps } from './components/NumberInput';
@@ -104,6 +110,8 @@ export type { Props as StackedProgressBarProps } from './components/StackedProgr
 export { default as StackedProgressBar } from './components/StackedProgressBar';
 export type { Props as SwitchProps } from './components/Switch';
 export { default as Switch } from './components/Switch';
+export type { Props as TabProps } from './components/Tab';
+export { default as Tab } from './components/Tab';
 export type { Props as TableProps } from './components/Table';
 export { default as Table } from './components/Table';
 export type { ColumnOptions, TableColumn } from './components/Table/columns';
@@ -117,6 +125,12 @@ export {
     createStringColumn,
     createTagColumn,
 } from './components/Table/columns';
+export type { Props as TabListProps } from './components/TabList';
+export { default as TabList } from './components/TabList';
+export type { Props as TabPanelProps } from './components/TabPanel';
+export { default as TabPanel } from './components/TabPanel';
+export type { Props as TabsProps, TabsVariant } from './components/Tabs';
+export { default as Tabs } from './components/Tabs';
 export type { Props as TagProps, TagVariant } from './components/Tag';
 export { default as Tag } from './components/Tag';
 export type { Props as TextProps, TextVariant } from './components/Text';

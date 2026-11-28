@@ -1,0 +1,31 @@
+.breadcrumbs {
+    .list {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .item {
+        display: flex;
+        align-items: center;
+        color: var(--go-ui-surface-color-text-light);
+
+        /* NOTE: parent crumbs are muted links (v2 links turned black over the gray) */
+        &:not(:last-child) {
+            --go-ui-surface-color-text-strong: var(--go-ui-surface-color-text-light);
+        }
+
+        &:last-child {
+            color: var(--go-ui-surface-color-text);
+            font-weight: var(--go-ui-font-weight-medium);
+        }
+    }
+
+    .separator {
+        flex-shrink: 0;
+        font-size: var(--go-ui-font-size-xl);
+    }
+}

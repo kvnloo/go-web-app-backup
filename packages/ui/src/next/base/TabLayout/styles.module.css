@@ -145,8 +145,10 @@
         }
     }
 
+    /* NOTE: steps have no plate (v2 showed a gray one on white surfaces) */
     &.variant-step {
         --outline-color: transparent;
+        --background-color: transparent;
         --text-color: var(--go-ui-color-text);
         text-transform: uppercase;
 

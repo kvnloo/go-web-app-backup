@@ -34,8 +34,9 @@
         --tone-color: var(--go-ui-color-primary-blue);
     }
 
+    /* NOTE: follows the surface, so text-like links read as the text around them */
     &.tone-neutral {
-        --tone-color: var(--go-ui-color-text-black);
+        --tone-color: var(--go-ui-surface-color-text-strong);
     }
 
     &.tone-positive {

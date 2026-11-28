@@ -1,0 +1,5 @@
+.navigation-tab {
+    display: flex;
+    text-decoration: none;
+    color: inherit;
+}
