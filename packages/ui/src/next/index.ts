@@ -37,6 +37,8 @@ export type { Props as MoreInfoProps } from './components/MoreInfo';
 export { default as MoreInfo } from './components/MoreInfo';
 export type { Props as NumberDisplayProps } from './components/NumberDisplay';
 export { default as NumberDisplay } from './components/NumberDisplay';
+export type { Props as PaginationProps } from './components/Pagination';
+export { default as Pagination } from './components/Pagination';
 export type { Props as TagProps, TagVariant } from './components/Tag';
 export { default as Tag } from './components/Tag';
 export type { Props as TextProps, TextVariant } from './components/Text';

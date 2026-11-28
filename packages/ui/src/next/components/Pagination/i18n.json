@@ -1,0 +1,9 @@
+{
+    "namespace": "common",
+    "strings": {
+        "paginationLabel": "Pagination",
+        "paginationPreviousPageLabel": "Previous page",
+        "paginationNextPageLabel": "Next page",
+        "paginationGoToPageLabel": "Go to page {page}"
+    }
+}
