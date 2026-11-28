@@ -16,6 +16,8 @@ import {
     LanguageContext,
     type LanguageContextProps,
     type LanguageNamespaceStatus,
+    LinkContext,
+    type LinkContextProps,
 } from '@ifrc-go/ui/contexts';
 import * as Sentry from '@sentry/react';
 import {
@@ -24,6 +26,7 @@ import {
 } from '@togglecorp/fujs';
 import mapboxgl from 'mapbox-gl';
 
+import RouterLink from '#components/next/RouterLink';
 import { mbtoken } from '#config';
 import RouteContext from '#contexts/route';
 import UserContext, {
@@ -58,6 +61,10 @@ const requestContextValue = {
     transformOptions: processGoOptions,
     transformResponse: processGoResponse,
     transformError: processGoError,
+};
+// NOTE: @ifrc-go/ui/next renders internal links through the router
+const linkContextValue: LinkContextProps = {
+    renderInternal: RouterLink,
 };
 const sentryCreateBrowserRouter = Sentry.wrapCreateBrowserRouterV7(createBrowserRouter);
 const router = sentryCreateBrowserRouter(unwrappedRoutes);
@@ -244,17 +251,19 @@ function Application() {
                 <UserContext.Provider value={userContextValue}>
                     <AlertContext.Provider value={alertContextValue}>
                         <RequestContext.Provider value={requestContextValue}>
-                            {isDefined(malawiRiskWatchGraphqlClient) ? (
-                                <GraphqlProvider value={malawiRiskWatchGraphqlClient}>
+                            <LinkContext.Provider value={linkContextValue}>
+                                {isDefined(malawiRiskWatchGraphqlClient) ? (
+                                    <GraphqlProvider value={malawiRiskWatchGraphqlClient}>
+                                        <RouterProvider
+                                            router={router}
+                                        />
+                                    </GraphqlProvider>
+                                ) : (
                                     <RouterProvider
                                         router={router}
                                     />
-                                </GraphqlProvider>
-                            ) : (
-                                <RouterProvider
-                                    router={router}
-                                />
-                            )}
+                                )}
+                            </LinkContext.Provider>
                         </RequestContext.Provider>
                     </AlertContext.Provider>
                 </UserContext.Provider>
