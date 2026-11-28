@@ -1,0 +1,13 @@
+.key-figure-card {
+    .icon {
+        display: inline-flex;
+        line-height: 1;
+        color: var(--go-ui-color-primary-red);
+        font-size: var(--go-ui-height-key-figure-icon);
+    }
+
+    /* NOTE: the progress heading reads smaller than the figure label */
+    .progress {
+        font-size: var(--go-ui-font-size-sm);
+    }
+}

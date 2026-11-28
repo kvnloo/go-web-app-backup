@@ -1,0 +1,57 @@
+.progress-bar {
+    /* NOTE: default for the colour the component may set inline */
+    --bar-color: var(--go-ui-color-primary-blue);
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--go-ui-spacing-2xs);
+
+    .heading-row {
+        display: flex;
+        justify-content: space-between;
+        gap: var(--go-ui-spacing-sm);
+    }
+
+    .meter {
+        position: absolute;
+        clip-path: inset(50%);
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .track {
+        border-radius: var(--go-ui-border-radius-md);
+        background-color: var(--go-ui-color-separator);
+        height: 0.5rem;
+
+        .bar {
+            transition: var(--go-ui-duration-transition-medium) width ease-in-out;
+            border-radius: var(--go-ui-border-radius-md);
+            background-color: var(--bar-color);
+            height: 100%;
+        }
+    }
+
+    .description {
+        color: var(--go-ui-color-text-light);
+        font-size: var(--go-ui-font-size-sm);
+    }
+
+    &.positive {
+        --bar-color: var(--go-ui-color-positive);
+    }
+
+    &.information {
+        --bar-color: var(--go-ui-color-information);
+    }
+
+    &.warning {
+        --bar-color: var(--go-ui-color-warning);
+    }
+
+    &.negative {
+        --bar-color: var(--go-ui-color-negative);
+    }
+}

@@ -1,0 +1,25 @@
+.top-banner {
+    --status-color: var(--go-ui-color-information);
+
+    background-color: color-mix(in srgb, var(--status-color) 16%, var(--go-ui-color-foreground));
+    padding: var(--go-ui-spacing-md);
+    text-align: center;
+    font-weight: var(--go-ui-font-weight-medium);
+
+    &.positive {
+        --status-color: var(--go-ui-color-positive);
+    }
+
+    &.warning {
+        --status-color: var(--go-ui-color-warning);
+    }
+
+    &.negative {
+        --status-color: var(--go-ui-color-negative);
+    }
+
+    &.brand {
+        background-color: var(--go-ui-color-primary-red);
+        color: var(--go-ui-color-text-on-dark);
+    }
+}

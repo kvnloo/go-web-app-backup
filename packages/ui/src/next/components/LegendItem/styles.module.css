@@ -1,0 +1,17 @@
+.legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--go-ui-spacing-2xs);
+    font-size: var(--go-ui-font-size-sm);
+
+    .swatch {
+        /* NOTE: default for the colour the component sets inline */
+        --swatch-color: var(--go-ui-color-gray-40);
+
+        flex-shrink: 0;
+        border-radius: var(--go-ui-border-radius-full);
+        background-color: var(--swatch-color);
+        width: 0.75rem;
+        height: 0.75rem;
+    }
+}

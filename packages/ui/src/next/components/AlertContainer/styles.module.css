@@ -1,0 +1,21 @@
+.alert-container {
+    display: flex;
+    position: fixed;
+    top: var(--go-ui-spacing-2xl);
+    left: 50%;
+    flex-direction: column;
+    transform: translateX(-50%);
+    /* NOTE: above dialogs and popups */
+    z-index: 1;
+    margin: 0;
+    border: 0;
+    background-color: transparent;
+    padding: 0;
+    width: min(26rem, calc(100vw - 2rem));
+    max-height: calc(100vh - 2 * var(--go-ui-spacing-2xl));
+    overflow: auto;
+    inset-block-end: auto;
+    inset-inline-end: auto;
+    gap: var(--go-ui-spacing-xs);
+    isolation: isolate;
+}

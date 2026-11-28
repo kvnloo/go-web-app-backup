@@ -1,0 +1,38 @@
+.alert {
+    --status-color: var(--go-ui-color-information);
+
+    border-radius: var(--go-ui-border-radius-md);
+    background-color: color-mix(in srgb, var(--status-color) 8%, var(--go-ui-color-foreground));
+
+    .icon {
+        display: inline-flex;
+        color: var(--status-color);
+        font-size: var(--go-ui-font-size-2xl);
+    }
+
+    &.positive {
+        --status-color: var(--go-ui-color-positive);
+    }
+
+    &.negative {
+        --status-color: var(--go-ui-color-negative);
+    }
+
+    &.warning {
+        --status-color: var(--go-ui-color-warning);
+    }
+
+    /* NOTE: tripled to win over the dark surface's own background; information
+       toasts stay the v2 dark gray */
+    &.toast.toast.toast {
+        background-color: var(--status-color);
+
+        &.information {
+            --status-color: var(--go-ui-color-gray-80);
+        }
+
+        .icon {
+            color: inherit;
+        }
+    }
+}
