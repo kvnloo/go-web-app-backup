@@ -6,8 +6,8 @@ import {
 import { stringValueSelector } from '@ifrc-go/ui/utils';
 import { type EntriesAsList } from '@togglecorp/toggle-form';
 
-import CountrySelectInput from '#components/domain/CountrySelectInput';
-import DisasterTypeSelectInput from '#components/domain/DisasterTypeSelectInput';
+import CountrySelectInput from '#components/next/domain/CountrySelectInput';
+import DisasterTypeSelectInput from '#components/next/domain/DisasterTypeSelectInput';
 import { type components } from '#generated/types';
 import useGlobalEnums from '#hooks/domain/useGlobalEnums';
 
@@ -39,13 +39,11 @@ function Filters(props: Props) {
     const strings = useTranslation(i18n);
     const { dref_dref_dref_type: drefTypeOptions } = useGlobalEnums();
 
-    // FIXME: the v2 domain inputs ignore the filters look of next Sections;
-    // drop their variant once they move to next
     return (
         <>
             <CountrySelectInput
-                variant="general"
                 name="country"
+                ariaLabel={strings.filterCountryLabel}
                 value={value.country}
                 onChange={onChange}
                 placeholder={strings.filterCountryPlaceholder}
@@ -61,8 +59,8 @@ function Filters(props: Props) {
                 onChange={onChange}
             />
             <DisasterTypeSelectInput
-                variant="general"
                 name="disaster_type"
+                ariaLabel={strings.filterDisasterTypeLabel}
                 placeholder={strings.filterDisasterTypePlaceholder}
                 value={value.disaster_type}
                 onChange={onChange}

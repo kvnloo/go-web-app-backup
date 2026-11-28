@@ -4,6 +4,7 @@
         "drefMapTitle": "Map of DREF operations",
         "drefMapDisasterTypePlaceholder": "All Hazards",
         "drefMapLegendDref": "DREF",
-        "drefMapFunding": "Funding requested"
+        "drefMapFunding": "Funding requested",
+        "drefMapDisasterTypeLabel": "Hazard type"
     }
 }

@@ -16,7 +16,7 @@ import CountryPointsMap, {
     type CountryPoint,
     type MapLegendOption,
 } from '#components/domain/CountryPointsMap';
-import DisasterTypeSelectInput from '#components/domain/DisasterTypeSelectInput';
+import DisasterTypeSelectInput from '#components/next/domain/DisasterTypeSelectInput';
 import useFilterState from '#hooks/useFilterState';
 import { COLOR_BLUE } from '#utils/constants';
 import { useRequest } from '#utils/restRequest';
@@ -97,10 +97,8 @@ function DrefOperationsMap() {
         <Section
             heading={strings.drefMapTitle}
             filters={(
-                // FIXME: the v2 domain input ignores the filters look of next
-                // Sections; drop the variant once it moves to next
                 <DisasterTypeSelectInput
-                    variant="general"
+                    ariaLabel={strings.drefMapDisasterTypeLabel}
                     placeholder={strings.drefMapDisasterTypePlaceholder}
                     name="disasterType"
                     value={rawFilter.disasterType}

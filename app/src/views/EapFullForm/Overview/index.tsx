@@ -27,12 +27,11 @@ import {
 } from '@togglecorp/toggle-form';
 
 import ContactInputsSection from '#components/domain/ContactInputsSection';
-import CountrySelectInput from '#components/domain/CountrySelectInput';
-import DisasterTypeSelectInput from '#components/domain/DisasterTypeSelectInput';
 import EapMonthYearInput from '#components/domain/EapMonthYearInput';
 import ImageWithCaptionInput from '#components/domain/ImageWithCaptionInput';
-import NationalSocietyMultiSelectInput from '#components/domain/NationalSocietyMultiSelectInput';
-import NationalSocietySelectInput from '#components/domain/NationalSocietySelectInput';
+import CountrySelectInput from '#components/next/domain/CountrySelectInput';
+import DisasterTypeSelectInput from '#components/next/domain/DisasterTypeSelectInput';
+import NationalSocietySelectInput from '#components/next/domain/NationalSocietySelectInput';
 import TabPage from '#components/TabPage';
 import {
     DISASTER_TYPE_EPIDEMIC,
@@ -124,8 +123,9 @@ function Overview(props: Props) {
                 />
             )}
         >
-            {/* FIXME: the v2 domain inputs ignore the form state of next form
-            sections; drop their disabled and readOnly once they move to next */}
+            {/* FIXME: ImageWithCaptionInput, EapMonthYearInput and
+            ContactInputsSection are still v2 and ignore the form state of next
+            form sections; drop their disabled and readOnly once they move */}
             <FormSection
                 heading={strings.overviewHeading}
                 disabled={disabled}
@@ -138,9 +138,9 @@ function Overview(props: Props) {
                 >
                     <NationalSocietySelectInput
                         name="national_society"
+                        ariaLabel={strings.nationalSociety}
                         onChange={noop}
                         value={eapRegistrationDetail?.national_society}
-                        disabled={disabled}
                         readOnly
                     />
                 </FieldGroup>
@@ -151,9 +151,9 @@ function Overview(props: Props) {
                 >
                     <CountrySelectInput
                         name="country"
+                        ariaLabel={strings.formCountry}
                         value={eapRegistrationDetail?.country}
                         onChange={noop}
-                        disabled={disabled}
                         readOnly
                     />
                 </FieldGroup>
@@ -164,9 +164,9 @@ function Overview(props: Props) {
                 >
                     <DisasterTypeSelectInput
                         name="disaster_type"
+                        ariaLabel={strings.disasterType}
                         value={eapRegistrationDetail?.disaster_type}
                         onChange={noop}
-                        disabled={disabled}
                         readOnly
                     />
                     {(isEpidemicDisasterType || isOtherDisasterType) && (
@@ -243,13 +243,13 @@ function Overview(props: Props) {
                     heading={strings.partnersInvolved}
                     description={strings.partnersInvolvedDescription}
                 >
-                    <NationalSocietyMultiSelectInput
+                    <NationalSocietySelectInput
                         name="partners"
+                        ariaLabel={strings.partnersInvolved}
+                        multiple
                         value={value.partners}
                         error={getErrorString(error?.partners)}
                         onChange={setFieldValue}
-                        disabled={disabled}
-                        readOnly={readOnly}
                     />
                     <Checkbox
                         name="include_rcrc_climate_center"
