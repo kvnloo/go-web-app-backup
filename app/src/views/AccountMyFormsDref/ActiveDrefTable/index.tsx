@@ -21,7 +21,6 @@ import {
     createExpandColumn,
     createExpansionIndicatorColumn,
     createStringColumn,
-    numericIdSelector,
 } from '@ifrc-go/ui/utils';
 import {
     _cs,
@@ -56,6 +55,12 @@ import i18n from './i18n.json';
 import styles from './styles.module.css';
 
 const NUM_ITEMS_PER_PAGE = 10;
+
+// NOTE: DREFs, operational updates and final reports have their own ids,
+// which can repeat across the three
+function getStageKey(stage: { id: number, application_type: string }) {
+    return `${stage.application_type}-${stage.id}`;
+}
 
 interface Props {
     className?: string;
@@ -139,7 +144,7 @@ function ActiveDrefTable(props: Props) {
     );
 
     type DrefItem = NonNullable<NonNullable<typeof activeDrefResponse>['results']>[number];
-    type Key = DrefItem['id'];
+    type Key = string;
 
     const getLatestStageOfDref = useCallback(
         (dref: DrefItem) => {
@@ -176,10 +181,7 @@ function ActiveDrefTable(props: Props) {
     const latestDrefToOriginalMap = useMemo(
         () => listToMap(
             activeDrefResponse?.results ?? [],
-            (dref) => {
-                const val = getLatestStageOfDref(dref);
-                return val.id;
-            },
+            (dref) => getStageKey(getLatestStageOfDref(dref)),
         ),
         [activeDrefResponse, getLatestStageOfDref],
     );
@@ -188,7 +190,11 @@ function ActiveDrefTable(props: Props) {
     const handleExpandClick = useCallback(
         (row: LatestDref) => {
             setExpandedRow(
-                (prevValue) => (prevValue?.id === row.id ? undefined : row),
+                (prevValue) => (
+                    isDefined(prevValue) && getStageKey(prevValue) === getStageKey(row)
+                        ? undefined
+                        : row
+                ),
             );
         },
         [],
@@ -255,7 +261,7 @@ function ActiveDrefTable(props: Props) {
                 strings.activeDrefTableAppealCodeHeading,
                 (item) => item.appeal_code,
                 (item) => {
-                    const eventId = latestDrefToOriginalMap[item.id]?.event;
+                    const eventId = latestDrefToOriginalMap[getStageKey(item)]?.event;
                     return {
                         to: isDefined(eventId) ? 'emergenciesLayout' : undefined,
                         urlParams: isDefined(eventId)
@@ -322,8 +328,9 @@ function ActiveDrefTable(props: Props) {
                 'actions',
                 '',
                 DrefTableActions,
-                (id, item) => {
-                    const originalDref = latestDrefToOriginalMap[id];
+                (key, item) => {
+                    const { id } = item;
+                    const originalDref = latestDrefToOriginalMap[key];
                     // FIXME: fix typing in server (medium priority)
                     // the application_type should be an enum
                     const applicationType = item.application_type as 'DREF' | 'OPS_UPDATE' | 'FINAL_REPORT';
@@ -421,7 +428,8 @@ function ActiveDrefTable(props: Props) {
                 '',
                 (row) => ({
                     onClick: handleExpandClick,
-                    expanded: row.id === expandedRow?.id,
+                    expanded: isDefined(expandedRow)
+                        && getStageKey(row) === getStageKey(expandedRow),
                     disabled: row.application_type === 'DREF',
                 }),
             ),
@@ -440,11 +448,12 @@ function ActiveDrefTable(props: Props) {
 
     const rowModifier = useCallback(
         ({ row, datum }: RowOptions<LatestDref, Key>) => {
-            if (expandedRow?.id !== datum.id) {
+            const rowKey = getStageKey(datum);
+            if (isNotDefined(expandedRow) || getStageKey(expandedRow) !== rowKey) {
                 return row;
             }
 
-            const originalDref = latestDrefToOriginalMap[datum.id];
+            const originalDref = latestDrefToOriginalMap[rowKey];
 
             if (!originalDref || (!originalDref.has_final_report && !originalDref.has_ops_update)) {
                 return row;
@@ -457,19 +466,19 @@ function ActiveDrefTable(props: Props) {
 
             const opsUpdateList = operational_update_details ?? [];
 
+            // NOTE: the latest stage is the row itself; final_report_details
+            // is null until a final report exists
             const subRows: LatestDref[] = [
                 final_report_details,
                 ...opsUpdateList,
                 originalDref,
-            ].slice(1);
-            // We don't need first element since, it will be
-            // rendered by row
+            ].filter(isDefined).slice(1);
 
             return (
                 <>
                     {row}
                     <TableBodyContent
-                        keySelector={numericIdSelector}
+                        keySelector={getStageKey}
                         data={subRows}
                         columns={detailColumns}
                         cellClassName={styles.subCell}
@@ -505,7 +514,7 @@ function ActiveDrefTable(props: Props) {
                 className={styles.table}
                 data={latestDrefs}
                 columns={columns}
-                keySelector={numericIdSelector}
+                keySelector={getStageKey}
                 pending={activeDrefResponsePending}
                 rowModifier={rowModifier}
                 filtered={filtered}
