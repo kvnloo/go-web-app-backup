@@ -66,6 +66,9 @@ function Card(props: Props) {
             icon={icon}
             actions={actions}
             withCompactActions
+            // NOTE: card heading actions are small (decision 67), so they stay on
+            // the heading row in narrow grid cells instead of wrapping below it
+            headerWrapBreakpoint="none"
             withHeaderBorder={!!heading}
             footer={footer}
             footerActions={footerActions}

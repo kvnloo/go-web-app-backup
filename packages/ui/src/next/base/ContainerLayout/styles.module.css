@@ -47,8 +47,16 @@
             position: relative;
             min-height: var(--go-ui-content-min-height);
 
+            /* NOTE: the message sits over the stale content, which is dimmed
+            (the wrapper is display: contents, so its children take the opacity) */
             .message {
+                position: absolute;
                 z-index: 1;
+                inset: 0;
+            }
+
+            .inert-content > * {
+                opacity: var(--go-ui-opacity-disabled-element);
             }
         }
 
