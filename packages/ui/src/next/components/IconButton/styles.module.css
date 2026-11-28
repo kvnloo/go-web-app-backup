@@ -1,0 +1,8 @@
+.icon-button {
+    display: inline-flex;
+    position: static;
+}
+
+.layout {
+    font-size: var(--go-ui-height-icon-multiplier);
+}

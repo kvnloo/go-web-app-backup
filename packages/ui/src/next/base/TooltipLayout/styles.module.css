@@ -1,0 +1,37 @@
+.anchor {
+    display: none;
+}
+
+.tooltip {
+    display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    flex-direction: column;
+    z-index: 1;
+    border-radius: var(--go-ui-border-radius-md);
+    box-shadow: var(--go-ui-box-shadow-md);
+    background-color: var(--go-ui-color-white);
+    padding: var(--go-ui-spacing-xs) var(--go-ui-spacing-sm);
+    width: max-content;
+    max-width: min(20rem, calc(100vw - 1rem));
+    max-height: min(36rem, 70vh);
+    overflow: auto;
+    animation: fade-in var(--go-ui-duration-transition-fast) ease-in both;
+    animation-delay: var(--go-ui-duration-transition-fast);
+    white-space: pre-wrap;
+    color: var(--go-ui-color-text);
+    font-size: var(--go-ui-font-size-sm);
+    gap: var(--go-ui-spacing-2xs);
+    pointer-events: none;
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}

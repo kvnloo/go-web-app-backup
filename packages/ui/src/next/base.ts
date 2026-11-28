@@ -89,3 +89,5 @@ export type { Props as TabListLayoutProps } from './base/TabListLayout';
 export { default as TabListLayout } from './base/TabListLayout';
 export type { Props as TextLayoutProps } from './base/TextLayout';
 export { default as TextLayout } from './base/TextLayout';
+export type { Props as TooltipLayoutProps } from './base/TooltipLayout';
+export { default as TooltipLayout } from './base/TooltipLayout';

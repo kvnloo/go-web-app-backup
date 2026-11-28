@@ -1,0 +1,6 @@
+.link {
+    display: inline-flex;
+    max-width: 100%;
+    text-decoration: none;
+    color: inherit;
+}
