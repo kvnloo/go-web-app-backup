@@ -3,9 +3,6 @@ import { SearchLineIcon } from '@ifrc-go/icons';
 import { useTranslation } from '@ifrc-go/ui/hooks';
 import {
     createDateColumn,
-    createLinkColumn,
-    createNumberColumn,
-    createStringColumn,
     Pagination,
     Section,
     SelectInput,
@@ -21,6 +18,13 @@ import { isDefined } from '@togglecorp/fujs';
 import { APPEAL_TYPE_DREF } from '#components/domain/ActiveOperationMap/utils';
 import useRouteHref from '#hooks/domain/useRouteHref';
 import useFilterState from '#hooks/useFilterState';
+import {
+    createAppealCodeColumn,
+    createBudgetColumn,
+    createCountryColumn,
+    createDisasterTypeColumn,
+    createEventColumn,
+} from '#utils/domain/tableColumns';
 import {
     type GoApiResponse,
     type GoApiUrlQuery,
@@ -102,47 +106,35 @@ function DrefOperationsTable() {
                 strings.drefOpsStartDate,
                 (item) => item.start_date,
             ),
-            createStringColumn<AppealListItem, Key>(
+            createAppealCodeColumn<AppealListItem, Key>(
                 'code',
                 strings.drefOpsCode,
                 (item) => item.code,
-                { width: 'sm' },
             ),
-            createLinkColumn<AppealListItem, Key>(
+            // NOTE: about half of DREF appeals have no linked emergency;
+            // those show the name without a link
+            createEventColumn<AppealListItem, Key>(
                 'operation',
                 strings.drefOpsOperation,
                 (item) => item.name,
-                // NOTE: about half of DREF appeals have no linked emergency;
-                // those show the name without a link
-                (item) => (isDefined(item.event)
-                    ? getRouteHref({
-                        to: 'emergenciesLayout',
-                        urlParams: { emergencyId: item.event },
-                    })
-                    : undefined),
-                { stretch: true },
+                (item) => item.event,
+                getRouteHref,
             ),
-            createStringColumn<AppealListItem, Key>(
+            createDisasterTypeColumn<AppealListItem, Key>(
                 'dtype',
                 strings.drefOpsDisasterType,
                 (item) => item.dtype?.name,
-                { width: 'sm' },
             ),
-            createNumberColumn<AppealListItem, Key>(
+            createBudgetColumn<AppealListItem, Key>(
                 'amount_requested',
                 strings.drefOpsFunding,
                 (item) => item.amount_requested,
-                { width: 'sm', formatOptions: { suffix: ' CHF' } },
             ),
-            createLinkColumn<AppealListItem, Key>(
+            createCountryColumn<AppealListItem, Key>(
                 'country',
                 strings.drefOpsCountry,
-                (item) => item.country?.name,
-                (item) => getRouteHref({
-                    to: 'countriesLayout',
-                    urlParams: { countryId: item.country.id },
-                }),
-                { width: 'sm' },
+                (item) => item.country,
+                getRouteHref,
             ),
         ]),
         [
