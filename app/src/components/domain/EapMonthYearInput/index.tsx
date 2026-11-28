@@ -21,7 +21,7 @@ import {
     getMonthOptions,
     getYearMonthParts,
     getYearOptions,
-} from './utils';
+} from '#components/next/domain/EapMonthYearInput/utils';
 
 import i18n from './i18n.json';
 

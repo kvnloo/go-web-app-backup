@@ -1,4 +1,7 @@
-import { type SelectInputProps } from '@ifrc-go/ui/next';
+import {
+    type SearchSelectInputProps,
+    type SelectInputProps,
+} from '@ifrc-go/ui/next';
 
 /** Omit that keeps the branches of a union apart (a plain Omit merges them) */
 type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K> : never;
@@ -15,4 +18,25 @@ export type DomainSelectInputProps<
 > = DistributiveOmit<
     SelectInputProps<NAME, OPTION, KEY>,
     'options' | 'keySelector' | 'labelSelector' | 'descriptionSelector'
+>;
+
+/**
+ * The props of a select that searches GO records on the server: the domain
+ * select runs the search and supplies how to read the results
+ */
+export type DomainSearchSelectInputProps<
+    NAME,
+    OPTION extends object,
+    KEY extends string | number,
+> = DistributiveOmit<
+    SearchSelectInputProps<NAME, OPTION, KEY>,
+    | 'searchOptions'
+    | 'onSearchValueChange'
+    | 'optionsPending'
+    | 'optionsErrored'
+    | 'totalOptionsCount'
+    | 'onShowDropdownChange'
+    | 'keySelector'
+    | 'labelSelector'
+    | 'descriptionSelector'
 >;

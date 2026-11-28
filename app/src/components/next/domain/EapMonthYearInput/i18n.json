@@ -1,0 +1,8 @@
+{
+    "namespace": "common",
+    "strings": {
+        "eapMonthYearInputMonthLabel": "Month",
+        "eapMonthYearInputYearLabel": "Year",
+        "eapMonthYearInputNotSureLabel": "Not Sure"
+    }
+}

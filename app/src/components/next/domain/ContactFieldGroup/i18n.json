@@ -1,0 +1,9 @@
+{
+    "namespace": "common",
+    "strings": {
+        "contactFieldGroupNameLabel": "Name",
+        "contactFieldGroupTitleLabel": "Title",
+        "contactFieldGroupEmailLabel": "Email",
+        "contactFieldGroupPhoneLabel": "Phone number"
+    }
+}
