@@ -14,6 +14,7 @@ import {
     getBoxShadowClassName,
     getDarkSurfaceClassName,
     getFontWeightClassName,
+    getLightSurfaceClassName,
     getSpacingClassName,
     getTextColorClassName,
     getTextSizeClassName,
@@ -46,8 +47,9 @@ describe('every token resolves to a utility class', () => {
     test.each(backgroundColors)('background color %s', (token) => {
         expect(getBackgroundColorClassName(token)).toBeTruthy();
     });
-    test('dark surface', () => {
+    test('dark and light surfaces', () => {
         expect(getDarkSurfaceClassName()).toBe(specs.surfaceDark);
+        expect(getLightSurfaceClassName()).toBe(specs.surfaceLight);
     });
 });
 

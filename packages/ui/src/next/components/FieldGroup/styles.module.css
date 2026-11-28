@@ -1,0 +1,19 @@
+.field-group {
+    border-radius: var(--go-ui-border-radius-md);
+    background-color: var(--go-ui-color-foreground);
+    padding: var(--go-ui-spacing-lg);
+
+    .header {
+        display: flex;
+        flex-direction: column;
+        gap: var(--go-ui-spacing-xs);
+    }
+
+    .heading-row {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: var(--go-ui-spacing-xs);
+    }
+}

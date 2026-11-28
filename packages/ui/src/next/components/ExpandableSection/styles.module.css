@@ -1,0 +1,51 @@
+.expandable-section {
+    border: var(--go-ui-width-separator-thin) solid var(--go-ui-color-separator);
+    border-radius: var(--go-ui-border-radius-md);
+    background-color: var(--go-ui-color-foreground);
+
+    .summary {
+        display: flex;
+        align-items: center;
+        gap: var(--go-ui-spacing-sm);
+        border-radius: var(--go-ui-border-radius-md);
+        cursor: pointer;
+        padding: var(--go-ui-spacing-md);
+        list-style: none;
+
+        &::-webkit-details-marker {
+            display: none;
+        }
+
+        &:focus-visible {
+            outline: var(--go-ui-width-separator-md) solid var(--go-ui-color-primary-blue);
+        }
+
+        > :global(h1),
+        > :global(h2),
+        > :global(h3),
+        > :global(h4),
+        > :global(h5),
+        > :global(h6) {
+            flex-grow: 1;
+        }
+
+        .icon {
+            display: inline-flex;
+            font-size: var(--go-ui-height-icon-multiplier);
+        }
+
+        .indicator {
+            flex-shrink: 0;
+            transition: transform var(--go-ui-duration-transition-medium) ease-in-out;
+            font-size: var(--go-ui-height-icon-multiplier);
+        }
+    }
+
+    &[open] .summary .indicator {
+        transform: rotate(180deg);
+    }
+
+    .content {
+        padding: 0 var(--go-ui-spacing-md) var(--go-ui-spacing-md);
+    }
+}

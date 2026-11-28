@@ -24,6 +24,7 @@ import {
     getBorderRadiusClassName,
     getBoxShadowClassName,
     getDarkSurfaceClassName,
+    getLightSurfaceClassName,
     getSpacingClassName,
     getSpacingValue,
     paddingSpacings,
@@ -270,6 +271,7 @@ function ContainerLayout(props: Props) {
                 className={_cs(
                     styles.containerLayout,
                     surface === 'dark' && getDarkSurfaceClassName(),
+                    parentSurface.dark && !surfaceValue.dark && getLightSurfaceClassName(),
                     getBackgroundColorClassName(backgroundColor),
                     getBorderRadiusClassName(borderRadius),
                     getBoxShadowClassName(boxShadow),

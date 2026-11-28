@@ -1,5 +1,8 @@
 import { _cs } from '@togglecorp/fujs';
 
+import SurfaceContext from '#contexts/surface';
+import { getDarkSurfaceClassName } from '#utils/style';
+
 import InlineLayout from '../InlineLayout';
 import ListLayout from '../ListLayout';
 import PageContainer from '../PageContainer';
@@ -19,7 +22,11 @@ export interface Props {
     actions?: React.ReactNode;
     /** A summary row under the description (key facts) */
     info?: React.ReactNode;
+    /** A photo behind the header; the header text switches to its on-dark colours */
+    background?: React.ReactNode;
 }
+
+const darkSurface = { background: 'foreground', dark: true } as const;
 
 /**
  * The page header: breadcrumbs or back link with page actions, then the
@@ -36,16 +43,22 @@ function PageHeader(props: Props) {
         description,
         actions,
         info,
+        background,
     } = props;
 
     if (!(actions || breadcrumbs || backLink || info || description || heading || overline)) {
         return null;
     }
 
-    return (
+    const header = (
         <PageContainer
             containerAs="header"
-            className={_cs(styles.pageHeader, className)}
+            className={_cs(
+                styles.pageHeader,
+                background && getDarkSurfaceClassName(),
+                className,
+            )}
+            background={background}
         >
             <ListLayout layout="block" spacing="xl">
                 {(breadcrumbs || backLink || actions) && (
@@ -101,6 +114,16 @@ function PageHeader(props: Props) {
                 {info}
             </ListLayout>
         </PageContainer>
+    );
+
+    if (!background) {
+        return header;
+    }
+
+    return (
+        <SurfaceContext.Provider value={darkSurface}>
+            {header}
+        </SurfaceContext.Provider>
     );
 }
 

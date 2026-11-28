@@ -1,0 +1,10 @@
+.heading-with-info {
+    display: flex;
+    align-items: center;
+    gap: var(--go-ui-spacing-2xs);
+}
+
+.asterisk {
+    margin-inline-start: var(--go-ui-spacing-4xs);
+    color: var(--go-ui-color-primary-red);
+}

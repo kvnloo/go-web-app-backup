@@ -255,6 +255,11 @@ export function getDarkSurfaceClassName() {
     return specs.surfaceDark;
 }
 
+/** Restores the light text colours inside a dark surface (a white card on navy) */
+export function getLightSurfaceClassName() {
+    return specs.surfaceLight;
+}
+
 export function getOpticallyCorrectedSpacingValue(value: string, mode: SpacingMode) {
     // Horizontal padding seems a bit imbalanced
     // due to the gap from the line height in vertical padding

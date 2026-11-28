@@ -1,0 +1,7 @@
+/* NOTE: a fieldset without a legend, only for the native disabled state */
+.fieldset {
+    margin: 0;
+    border: 0;
+    padding: 0;
+    min-inline-size: 0;
+}

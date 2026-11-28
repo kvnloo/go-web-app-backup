@@ -287,6 +287,14 @@
 }
 
 /* A dark surface: navy background, and on-dark values for the surface text colours */
+.surface-light.surface-light {
+    --go-ui-surface-color-text: var(--go-ui-color-text);
+    --go-ui-surface-color-text-light: var(--go-ui-color-text-light);
+    --go-ui-surface-color-text-strong: var(--go-ui-color-text-black);
+    --go-ui-surface-color-text-brand: var(--go-ui-color-primary-red);
+    color: var(--go-ui-surface-color-text);
+}
+
 .surface-dark.surface-dark {
     --go-ui-surface-color-text: var(--go-ui-color-text-on-dark);
     --go-ui-surface-color-text-light: var(--go-ui-color-text-on-dark-light);
