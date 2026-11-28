@@ -6,3 +6,8 @@
     border-radius: var(--go-ui-border-radius-md);
     padding: var(--go-ui-spacing-md);
 }
+
+/* NOTE: also the hook for finding the next row's remove button */
+.remove-button {
+    flex-shrink: 0;
+}

@@ -1,5 +1,6 @@
 import { Children } from 'react';
 import { AddLineIcon } from '@ifrc-go/icons';
+import { isDefined } from '@togglecorp/fujs';
 
 import InputError from '#next/base/InputError';
 import ListLayout from '#next/base/ListLayout';
@@ -17,7 +18,11 @@ export interface Props {
     onAdd: () => void;
     /** An error for the list as a whole, shown above the rows */
     error?: React.ReactNode;
-    /** Shown when there are no rows; defaults to the library's empty message */
+    /**
+     * Shown when there are no rows. An editable list shows only its add
+     * button unless this is given; a read-only one falls back to the
+     * library's empty message.
+     */
     messages?: { empty?: React.ReactNode };
     /** Defaults to the surrounding form section or page */
     disabled?: boolean;
@@ -48,15 +53,15 @@ function RepeatableList(props: Props) {
     });
 
     const empty = Children.toArray(children).length === 0;
+    const showEmptyMessage = empty && (readOnly || isDefined(messages?.empty));
 
     return (
-        <ListLayout className={className} layout="block">
+        <ListLayout className={className} layout="block" data-repeatable-list>
             {error && <InputError>{error}</InputError>}
-            {empty ? (
-                <StateMessage empty compact messages={messages} />
-            ) : children}
+            {showEmptyMessage && <StateMessage empty compact messages={messages} />}
+            {children}
             {!readOnly && (
-                <div>
+                <div data-repeatable-list-add>
                     <Button
                         name={undefined}
                         onClick={onAdd}

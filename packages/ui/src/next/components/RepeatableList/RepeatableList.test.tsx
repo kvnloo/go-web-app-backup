@@ -50,6 +50,18 @@ test('rows get a specific remove name; an empty list shows its message', () => {
     expect(empty).toContain('No sources yet');
 });
 
+test('an empty editable list shows only its add button; a read-only one says it is empty', () => {
+    const editable = renderToStaticMarkup(<RepeatableList addLabel="Add source" onAdd={noop} />);
+    expect(editable).toContain('Add source');
+    expect(editable).not.toContain('role="status"');
+
+    const readOnly = renderToStaticMarkup(
+        <RepeatableList addLabel="Add source" onAdd={noop} readOnly />,
+    );
+    expect(readOnly).not.toContain('Add source');
+    expect(readOnly).toContain('role="status"');
+});
+
 test('a read-only form hides the add and remove buttons', () => {
     const html = renderToStaticMarkup(
         <FormSection readOnly>
