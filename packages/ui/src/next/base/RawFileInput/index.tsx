@@ -94,8 +94,9 @@ function RawFileInput<NAME>(props: Props<NAME>) {
                 onChange={handleChange}
                 name={typeof name === 'string' ? name : undefined}
                 ref={inputRef}
-                disabled={disabled}
-                readOnly={readOnly}
+                // NOTE: browsers ignore readOnly on file inputs, so a read-only
+                // picker is disabled to keep it from opening
+                disabled={disabled || readOnly}
                 {...inputProps} // eslint-disable-line react/jsx-props-no-spreading
             />
         </label>

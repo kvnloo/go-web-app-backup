@@ -73,3 +73,10 @@ test('a read-only form hides the add and remove buttons', () => {
     expect(html).not.toContain('Add source');
     expect(html).not.toContain('Remove source');
 });
+
+test('a read-only file button cannot open the file picker', () => {
+    const html = renderToStaticMarkup(
+        <FileInputButton name="f" onChange={setFile} readOnly>Upload</FileInputButton>,
+    );
+    expect(html).toMatch(/<input[^>]*type="file"[^>]*disabled/);
+});
