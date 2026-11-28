@@ -1,0 +1,50 @@
+.checkbox-layout {
+    display: inline-flex;
+    align-items: flex-start;
+    cursor: pointer;
+    gap: var(--go-ui-spacing-3xs);
+
+    &.with-label-first {
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+    }
+
+    .indicator {
+        display: inline-flex;
+        position: relative;
+        flex-shrink: 0;
+        line-height: 0;
+        font-size: var(--go-ui-height-icon-multiplier);
+
+        .input {
+            position: absolute;
+            opacity: 0;
+            margin: 0;
+            padding: 0;
+            width: 0;
+            height: 0;
+            pointer-events: none;
+        }
+
+        &:has(.input:focus-visible) {
+            outline: var(--go-ui-width-separator-md) solid var(--go-ui-color-primary-blue);
+            outline-offset: var(--go-ui-width-separator-sm);
+            border-radius: var(--go-ui-border-radius-sm);
+        }
+    }
+
+    .content {
+        display: flex;
+        flex-direction: column;
+        line-height: var(--go-ui-line-height-sm);
+    }
+
+    &.disabled {
+        opacity: var(--go-ui-opacity-disabled-element);
+        cursor: not-allowed;
+    }
+
+    &.read-only {
+        cursor: default;
+    }
+}

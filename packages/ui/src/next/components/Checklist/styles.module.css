@@ -1,0 +1,7 @@
+.checked {
+    color: var(--go-ui-color-primary-red);
+}
+
+.prev-label:not(:last-child)::after {
+    content: ', ';
+}

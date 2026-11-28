@@ -23,6 +23,7 @@ export function extractInputContainerProps<MIXED_PROPS extends Partial<InputCont
         hintId: true,
         errorId: true,
         role: true,
+        ariaLabel: true,
         disabled: true,
         readOnly: true,
         required: true,

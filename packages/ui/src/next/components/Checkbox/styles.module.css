@@ -1,0 +1,9 @@
+.checkbox {
+    display: flex;
+    flex-direction: column;
+    gap: var(--go-ui-spacing-4xs);
+
+    .checked {
+        color: var(--go-ui-color-primary-red);
+    }
+}

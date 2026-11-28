@@ -1,0 +1,26 @@
+.raw-radio {
+    display: inline-flex;
+    position: relative;
+    cursor: pointer;
+
+    .input {
+        position: absolute;
+        opacity: 0;
+        margin: 0;
+        padding: 0;
+        width: 0;
+        height: 0;
+        pointer-events: none;
+    }
+
+    &:has(.input:focus-visible) {
+        outline: var(--go-ui-width-separator-md) solid var(--go-ui-color-primary-blue);
+        outline-offset: var(--go-ui-width-separator-sm);
+        border-radius: var(--go-ui-border-radius-sm);
+    }
+
+    &.disabled {
+        opacity: var(--go-ui-opacity-disabled-element);
+        cursor: not-allowed;
+    }
+}

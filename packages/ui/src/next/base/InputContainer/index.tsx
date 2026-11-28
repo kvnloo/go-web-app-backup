@@ -51,6 +51,8 @@ export interface Props {
      * group-level `aria-describedby` pointing at the hint/error nodes.
      */
     role?: 'radiogroup' | 'group';
+    /** Accessible name for a grouped container without a visible label */
+    ariaLabel?: string;
 
     disabled?: boolean;
     readOnly?: boolean;
@@ -90,6 +92,7 @@ function InputContainer(props: Props) {
         hintId,
         errorId,
         role,
+        ariaLabel,
         label,
         readOnly,
         required,
@@ -129,6 +132,8 @@ function InputContainer(props: Props) {
             role={role}
             aria-describedby={groupDescribedBy}
             aria-labelledby={labelId}
+            aria-label={isGrouped && !labelId ? ariaLabel : undefined}
+            aria-readonly={isGrouped && readOnly ? true : undefined}
             aria-invalid={isGrouped && !!error ? true : undefined}
             aria-required={isGrouped && isRequired ? true : undefined}
             layout="block"

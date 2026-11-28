@@ -1,0 +1,38 @@
+.switch {
+    display: flex;
+    flex-direction: column;
+    gap: var(--go-ui-spacing-4xs);
+
+    .track {
+        --gap: .05em;
+        --border-width: var(--go-ui-width-separator-sm);
+        --knob-diameter: calc(1em - 2 * var(--gap) - 2 * var(--border-width));
+
+        display: flex;
+        align-items: center;
+        transition: var(--go-ui-duration-transition-medium) background-color ease-in-out;
+        border: var(--border-width) solid var(--go-ui-color-gray-30);
+        border-radius: .5em;
+        background-color: var(--go-ui-color-gray-30);
+        padding: var(--gap);
+        width: calc(1em + var(--knob-diameter));
+        height: 1em;
+
+        .knob {
+            transition: var(--go-ui-duration-transition-medium) transform ease-in-out;
+            border-radius: var(--go-ui-border-radius-full);
+            background-color: var(--go-ui-color-white);
+            width: var(--knob-diameter);
+            height: var(--knob-diameter);
+        }
+
+        &.on {
+            border-color: var(--go-ui-color-primary-red);
+            background-color: var(--go-ui-color-primary-red);
+
+            .knob {
+                transform: translateX(100%);
+            }
+        }
+    }
+}

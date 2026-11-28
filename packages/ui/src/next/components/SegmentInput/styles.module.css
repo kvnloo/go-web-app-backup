@@ -1,0 +1,14 @@
+.track {
+    border-radius: var(--go-ui-border-radius-md);
+    background-color: var(--go-ui-color-background);
+    padding: var(--go-ui-spacing-5xs);
+    width: fit-content;
+
+    .segment {
+        border-radius: var(--go-ui-border-radius-md);
+
+        .segment-look {
+            border-radius: var(--go-ui-border-radius-md);
+        }
+    }
+}
