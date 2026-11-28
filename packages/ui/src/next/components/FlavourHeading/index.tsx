@@ -16,6 +16,8 @@ interface Props {
 }
 
 /** The heading of a container flavour, with its info trigger (internal) */
+const WORD_JOINER = '\u2060';
+
 function FlavourHeading(props: Props) {
     const {
         id,
@@ -34,7 +36,12 @@ function FlavourHeading(props: Props) {
             variant={variant}
         >
             {children}
-            {required && <span className={styles.asterisk} aria-hidden>*</span>}
+            {required && (
+                <span className={styles.asterisk} aria-hidden>
+                    {WORD_JOINER}
+                    *
+                </span>
+            )}
         </Heading>
     );
 
@@ -43,13 +50,18 @@ function FlavourHeading(props: Props) {
     }
 
     // NOTE: the heading and the icon flow inline, so the icon follows the
-    // last word of a wrapped heading; it stays outside the heading element so
-    // its name is not read as part of the heading
+    // last word of a wrapped heading. Word joiners keep the asterisk and the
+    // icon with that word; the icon's joiner sits inside a nowrap wrapper as
+    // Chrome breaks before an inline box even after a joiner. The icon stays
+    // outside the heading element so its name is not read as part of it
     return (
         <div>
             {heading}
             <span className={styles.info}>
-                <MoreInfo heading={children}>{info}</MoreInfo>
+                {WORD_JOINER}
+                <span className={styles.icon}>
+                    <MoreInfo heading={children}>{info}</MoreInfo>
+                </span>
             </span>
         </div>
     );

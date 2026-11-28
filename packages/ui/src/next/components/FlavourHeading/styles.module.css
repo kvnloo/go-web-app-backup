@@ -3,9 +3,13 @@
 }
 
 .info {
-    display: inline-flex;
-    margin-inline-start: var(--go-ui-spacing-2xs);
-    vertical-align: middle;
+    white-space: nowrap;
+
+    .icon {
+        display: inline-flex;
+        margin-inline-start: var(--go-ui-spacing-2xs);
+        vertical-align: middle;
+    }
 }
 
 /* NOTE: the asterisk takes the text colour, as on input labels (Figma) */

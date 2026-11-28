@@ -144,7 +144,8 @@ test('a field group is a group named by its heading, with a spaced asterisk', ()
         <FieldGroup heading="Contacts" required error="Add a contact">i</FieldGroup>,
     );
     expect(html).toContain('role="group"');
-    expect(html).toMatch(/aria-hidden="true">\*<\/span>/);
+    // NOTE: a word joiner keeps the asterisk on the line of the last word
+    expect(html).toMatch(/aria-hidden="true">\u2060\*<\/span>/);
     expect(html).toContain('Add a contact');
 });
 
