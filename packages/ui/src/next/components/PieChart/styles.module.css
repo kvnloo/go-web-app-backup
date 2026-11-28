@@ -1,0 +1,18 @@
+.pie-chart {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--go-ui-spacing-md);
+
+    .svg {
+        flex-shrink: 0;
+    }
+
+    .legend {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        justify-content: center;
+        gap: var(--go-ui-spacing-2xs);
+    }
+}

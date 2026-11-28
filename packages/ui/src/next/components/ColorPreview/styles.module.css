@@ -1,0 +1,23 @@
+.color-preview {
+    /* NOTE: defaults for the values the component sets inline or by size */
+    --preview-color: var(--go-ui-color-gray-40);
+    --preview-size: 0.75rem;
+
+    display: inline-block;
+    flex-shrink: 0;
+    background-color: var(--preview-color);
+    width: var(--preview-size);
+    height: var(--preview-size);
+
+    &.round {
+        border-radius: var(--go-ui-border-radius-full);
+    }
+
+    &.small {
+        --preview-size: 0.5rem;
+    }
+
+    &.large {
+        --preview-size: 1rem;
+    }
+}
