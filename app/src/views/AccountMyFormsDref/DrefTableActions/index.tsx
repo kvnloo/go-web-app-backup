@@ -39,7 +39,7 @@ import {
 
 import DrefExportModal from '#components/domain/DrefExportModal';
 import DrefShareModal from '#components/domain/DrefShareModal';
-import EventSearchSelectInput, { type EventItem as EventSearchItem } from '#components/domain/EventSearchSelectInput';
+import EventSearchSelectInput, { type EventItem as EventSearchItem } from '#components/next/domain/EventSearchSelectInput';
 import Link from '#components/next/Link';
 import MenuItem from '#components/next/MenuItem';
 import useAlert from '#hooks/useAlert';
@@ -881,13 +881,14 @@ function DrefTableActions(props: Props) {
                             />
                             <EventSearchSelectInput
                                 name={undefined}
+                                ariaLabel={strings.linkEmergencySelectExistingLabel}
                                 value={eventValue}
                                 onChange={setEventValue}
                                 countryId={countryId}
                                 options={eventOptions}
                                 onOptionsChange={setEventOptions}
                                 placeholder={strings.drefApprovalLinkEmergencyPlaceholder}
-                                nonClearable
+                                withoutClearButton
                                 disabled={disabled
                                     || linkEmergencyValue !== LINK_EMERGENCY_SELECT_EXISTING}
                             />

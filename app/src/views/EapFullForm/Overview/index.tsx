@@ -1,4 +1,3 @@
-import { useCallback } from 'react';
 import { useTranslation } from '@ifrc-go/ui/hooks';
 import {
     BooleanInput,
@@ -7,7 +6,6 @@ import {
     FieldGroup,
     FormSection,
     ListView,
-    RadioInput,
     RepeatableList,
     Text,
     TextArea,
@@ -18,7 +16,6 @@ import {
     resolveToComponent,
     resolveToString,
 } from '@ifrc-go/ui/utils';
-import { isNotDefined } from '@togglecorp/fujs';
 import {
     type EntriesAsList,
     type Error,
@@ -26,11 +23,11 @@ import {
     getErrorString,
 } from '@togglecorp/toggle-form';
 
-import ContactInputsSection from '#components/domain/ContactInputsSection';
-import EapMonthYearInput from '#components/domain/EapMonthYearInput';
 import ImageWithCaptionInput from '#components/domain/ImageWithCaptionInput';
+import ContactFieldGroup from '#components/next/domain/ContactFieldGroup';
 import CountrySelectInput from '#components/next/domain/CountrySelectInput';
 import DisasterTypeSelectInput from '#components/next/domain/DisasterTypeSelectInput';
+import EapMonthYearInput from '#components/next/domain/EapMonthYearInput';
 import NationalSocietySelectInput from '#components/next/domain/NationalSocietySelectInput';
 import TabPage from '#components/TabPage';
 import {
@@ -47,14 +44,6 @@ import KeyActorsInput from './KeyActorsInput';
 import i18n from './i18n.json';
 
 type EapRegisterRequestDetails = GoApiResponse<'/api/v2/eap-registration/{id}/'>;
-
-const NOT_SURE = 'not-sure';
-interface NotSureOption {
-    key: typeof NOT_SURE;
-    label: string;
-}
-const notSureKeySelector = (option: NotSureOption) => option.key;
-const notSureLabelSelector = (option: NotSureOption) => option.label;
 
 interface Props {
     value: PartialEapFullFormType;
@@ -99,12 +88,6 @@ function Overview(props: Props) {
     const keyActors = useRepeatableList('key_actors', value.key_actors, setFieldValue);
     const keyActorsError = getErrorObject(error?.key_actors);
 
-    const notSureOptions: NotSureOption[] = [{ key: NOT_SURE, label: strings.notSure }];
-
-    const handleSubmissionTimeNotSureClick = useCallback(() => {
-        setFieldValue(undefined, 'expected_submission_time');
-    }, [setFieldValue]);
-
     return (
         <TabPage
             spacingOffset={-2}
@@ -123,9 +106,9 @@ function Overview(props: Props) {
                 />
             )}
         >
-            {/* FIXME: ImageWithCaptionInput, EapMonthYearInput and
-            ContactInputsSection are still v2 and ignore the form state of next
-            form sections; drop their disabled and readOnly once they move */}
+            {/* FIXME: ImageWithCaptionInput is still v2 and ignores the form
+            state of next form sections; drop its disabled and readOnly once it
+            moves */}
             <FormSection
                 heading={strings.overviewHeading}
                 disabled={disabled}
@@ -204,26 +187,13 @@ function Overview(props: Props) {
                     heading={strings.formExpectedSubmissionTimeTitle}
                     description={strings.formExpectedSubmissionTimeDescription}
                     required
-                    layoutOptions={{ numPreferredColumns: 2 }}
                     error={getErrorString(error?.expected_submission_time)}
                 >
                     <EapMonthYearInput
                         name="expected_submission_time"
                         value={value?.expected_submission_time}
                         onChange={setFieldValue}
-                        disabled={disabled}
-                        readOnly={readOnly}
-                    />
-                    <RadioInput
-                        name={undefined}
-                        ariaLabel={strings.formExpectedSubmissionTimeTitle}
-                        options={notSureOptions}
-                        keySelector={notSureKeySelector}
-                        labelSelector={notSureLabelSelector}
-                        value={isNotDefined(value?.expected_submission_time)
-                            ? NOT_SURE
-                            : undefined}
-                        onChange={handleSubmissionTimeNotSureClick}
+                        withNotSure
                     />
                 </FieldGroup>
                 <FieldGroup
@@ -265,54 +235,44 @@ function Overview(props: Props) {
                 disabled={disabled}
                 readOnly={readOnly}
             >
-                <ContactInputsSection
-                    title={strings.nSContact}
+                <ContactFieldGroup
+                    heading={strings.nSContact}
                     description={strings.nSContactDescription}
                     namePrefix="national_society_contact"
                     value={value}
                     setFieldValue={setFieldValue}
                     error={error}
-                    disabled={disabled}
-                    readOnly={readOnly}
                     withRequiredNameAndEmail
                     withRequiredTitle
                 />
-                <ContactInputsSection
-                    title={strings.drefFocalPoint}
+                <ContactFieldGroup
+                    heading={strings.drefFocalPoint}
                     description={strings.drefFocalPointDescription}
                     namePrefix="dref_focal_point"
                     value={value}
                     setFieldValue={setFieldValue}
                     error={error}
-                    disabled={disabled}
-                    readOnly={readOnly}
                 />
-                <ContactInputsSection
-                    title={strings.regionalFocalPoint}
+                <ContactFieldGroup
+                    heading={strings.regionalFocalPoint}
                     namePrefix="ifrc_regional_focal_point"
                     value={value}
                     setFieldValue={setFieldValue}
                     error={error}
-                    disabled={disabled}
-                    readOnly={readOnly}
                 />
-                <ContactInputsSection
-                    title={strings.regionalManager}
+                <ContactFieldGroup
+                    heading={strings.regionalManager}
                     namePrefix="ifrc_regional_ops_manager"
                     value={value}
                     setFieldValue={setFieldValue}
                     error={error}
-                    disabled={disabled}
-                    readOnly={readOnly}
                 />
-                <ContactInputsSection
-                    title={strings.regionalHead}
+                <ContactFieldGroup
+                    heading={strings.regionalHead}
                     namePrefix="ifrc_regional_head_dcc"
                     value={value}
                     setFieldValue={setFieldValue}
                     error={error}
-                    disabled={disabled}
-                    readOnly={readOnly}
                 />
             </FormSection>
             <FormSection
