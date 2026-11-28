@@ -109,9 +109,13 @@ function InputContainer(props: Props) {
     const isRequired = required;
     const paddingClassName = getSpacingClassName({
         spacing,
-        offset: variant === 'inline' ? -2 : -3,
+        offset: variant === 'general' ? -3 : -2,
         modes: withoutInputSectionPadding ? [] : ['padding-inline'],
     });
+    // NOTE: the label of a boxed input lines up with the text inside the box (Figma)
+    const labelClassName = (variant === 'form' && !withoutInputSectionPadding)
+        ? paddingClassName
+        : undefined;
 
     // Group-level description for radiogroup/group containers; individual
     // text-style fields wire aria-describedby on the control itself instead.
@@ -159,6 +163,7 @@ function InputContainer(props: Props) {
             withPadding={withPadding}
         >
             <InputLabel
+                className={labelClassName}
                 id={labelId}
                 htmlFor={inputId}
                 disabled={disabled}
